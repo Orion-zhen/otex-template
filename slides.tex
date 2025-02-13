@@ -1,0 +1,44 @@
+\documentclass{beamer}
+\usepackage{otex}
+\usetheme{Singapore}
+% my favor: Berkeley, Berlin, Luebeck, Singapore
+% default, AnnArbor, Antibes, Bergen, Berkeley, Berlin, Boadilla, CambridgeUS, Copenhagen, Darmstadt, Dresden, Frankfurt, Goettingen, Hannover, Ilmenau, JuanLesPins, Luebeck, Madrid, Malmoe, Marburg, Montpellier, PaloAlto, Pittsburgh, Rochester, Singapore, Szeged, Warsaw
+
+\title{Example Slides}
+\author{Orion \inst{1}}
+\institute[*]{\inst{1} My institute}
+\date{\today}
+
+\begin{document}
+\begin{frame}
+    \titlepage
+\end{frame}
+
+\begin{frame}{Contents}
+    \centering
+    \tableofcontents
+\end{frame}
+
+\section{Abstract}
+\begin{frame}{Abstract}
+    Abstract
+\end{frame}
+
+\section{Introduction}
+
+% lstlisting 和 frame 不兼容, 不能在 frame 里用 lstlisting
+\begin{lstlisting}[language=Python, caption={Example Python code}, label={lst:example:Python}]
+    print("Hello, world!")
+\end{lstlisting}
+
+\begin{frame}{Introduction}
+    简介
+
+    \begin{block}{My block}
+        内容
+    \end{block}
+
+    The code \ref{lst:example:Python} is an example Python code.
+\end{frame}
+
+\end{document}

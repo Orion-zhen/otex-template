@@ -1,0 +1,35 @@
+\documentclass{article}
+\usepackage{otex}
+
+\geometry {
+    a4paper, % 纸张大小
+    left=3.18cm, % 左间距
+    right=3.18cm, % 右间距
+    top=2.54cm, % 上间距
+    bottom=2.54cm, % 下间距
+    heightrounded,
+}
+
+\title{Example Article}
+\author{Orion\thanks{org.orion}}
+\date{\today}
+
+\begin{document}
+
+\maketitle % 生成标题页
+\newpage % 换页
+\tableofcontents % 生成目录
+\newpage % 换页
+\section{Abstract}
+
+This is an example article.
+
+\section{Intruduction}
+
+\begin{lstlisting}[language=Python, caption={Example Python code}, label={lst:example:Python}]
+print("Hello, world!")
+\end{lstlisting}
+
+The code \ref{lst:example:Python} is an example Python code.
+
+\end{document}

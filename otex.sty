@@ -1,0 +1,168 @@
+\ProvidesPackage{otex}
+
+\RequirePackage{xcolor} % 颜色配置
+% 代码块颜色配置:
+\definecolor{code_background}{rgb}{0.95, 0.95, 0.95} % 浅灰色背景
+\definecolor{code_keyword}{rgb}{0.16, 0.32, 0.75}    % 蓝色关键字
+\definecolor{code_comment}{rgb}{0.12, 0.38, 0.17}    % 深绿色注释
+\definecolor{code_string}{rgb}{0.63, 0.12, 0.94}     % 紫色字符串
+\definecolor{code_identifier}{rgb}{0.0, 0.0, 0.0}    % 黑色标识符
+\definecolor{code_number}{rgb}{0.0, 0.0, 0.0}        % 黑色数字
+
+\RequirePackage{listings} % 代码高亮
+\lstset {
+    backgroundcolor=\color{code_background},      % 设置背景色
+    basicstyle=\ttfamily\small,                   % 基本样式，小号等宽字体
+    keywordstyle=\color{code_keyword},            % 关键字样式
+    commentstyle=\color{code_comment}\itshape,    % 注释样式，斜体
+    stringstyle=\color{code_string},              % 字符串样式
+    identifierstyle=\color{code_identifier},      % 标识符样式
+    numberstyle=\color{code_number},              % 行号样式
+    numbers=left,                                 % 在左侧显示行号
+    stepnumber=1,                                 % 行号步长
+    frame=single,                                 % 给代码块加框
+    frameround=tttt,                              % 框的四个角都为圆角
+    breaklines=true,                              % 自动换行
+    tabsize=4,                                    % 制表符宽度
+    showspaces=false,                             % 不显示空格
+    showstringspaces=false                        % 不显示字符串中的空格
+}
+% 一般代码块配置:
+% \begin{lstlisting}[language=Python, caption={示例代码}, label={lst:example}]
+% # 代码内容
+% \end{lstlisting}
+% 从文件导入代码块:
+% \lstinputlisting[language=Python, firstline=2, lastline=12]{main.py}
+% 行内代码
+% \lstinline|mycodes|
+
+\RequirePackage{amsmath} % 使用 align(*) 对齐多行公式
+% 一般多行对齐配置:
+% \begin{align}
+%     x + y &= z \\ % 使用 \\ 换行
+%     2x - y &= 10 % 使用 & 来标记对齐点
+% \end{align}
+
+\RequirePackage{siunitx} % SI 单位支持
+% \SI{5}{\meter} % 显示为 5 m
+% \SI{1}{\newton\meter}  % 显示为 1 N·m
+% \SI{1}{\meter\per\second}  % 显示为 1 m/s
+% \SI{5.0 \pm 0.1}{\meter}  % 显示为 5.0 ± 0.1 m
+
+\RequirePackage{caption} % 图片标题
+% \captionsetup{
+%     font=small,            % 设置标题字体大小
+%     labelfont=bf,          % 设置标签字体为粗体
+%     labelsep=colon,        % 设置标签与标题之间的分隔符
+%     justification=centering % 设置标题对齐方式
+% }
+
+\RequirePackage{graphicx} % 图片支持
+% \graphicspath{{images/}} % 配置图片路径
+% \includegraphics{picture} % 插入图片, 建议不要带扩展名
+% 一般图像配置:
+% \begin{figure}[h] % h: here; t: top; b: bottom; p: new page
+%     \centering
+%     \includegraphics[width=0.8\textwidth]{picture}
+%     \caption{图片标题}
+%     \label{fig:picture}
+% \end{figure}
+
+\RequirePackage{subcaption} % 子图支持
+% 一般子图配置:
+% \begin{figure}[htbp] % h: here; t: top; b: bottom; p: new page
+%     \centering
+%     \begin{subfigure}[htbp]{0.45\textwidth}
+%         \includegraphics[width=0.4\textwidth]{picture1}
+%         \caption{子图1标题}
+%         \label{fig:sub1}
+%     \end{subfigure}
+%     \hfill
+%     \begin{subfigure}[htbp]{0.45\textwidth}
+%         \includegraphics[width=0.4\textwidth]{picture2}
+%         \caption{子图2标题}
+%         \label{fig:sub2}
+%     \end{subfigure}
+%     \caption{整体图片标题}
+%     \label{fig:overall}
+% \end{figure}
+
+\RequirePackage{booktabs} % 增强表格
+% 一般表格配置:
+% \begin{table}[htbp]
+%     \centering
+%     \caption{表格标题}
+%     \label{tab:table}
+%     \begin{tabular}{ccc} % {ccc} 是各列的对齐方式, l: left; c: center; r: right
+%         \toprule % 顶部粗线
+%         第一列 & 第二列 & 第三列 \\ % 同样地, \\ 换行, & 标记对齐点
+%         \midrule % 中间粗线
+%         第一行第一列 & 第一行第二列 & 第一行第三列 \\
+%         第二行第一列 & 第二行第二列 & 第二行第三列 \\
+%         \bottomrule % 底部粗线
+%     \end{tabular}
+% \end{table}
+
+\RequirePackage{enumitem} % 增强列表
+% 一般列表配置:
+% \begin{enumerate}[label=\ding{112}, leftmargin=2cm] % 列表项目符号
+%     \item 第一项
+%     \item 第二项
+%     \item 第三项
+% \end{enumerate}
+
+\RequirePackage{tcolorbox} % 彩色盒子, 用于强调或突出显示
+% 一般彩色盒子配置:
+% \begin{tcolorbox}[colback=yellow!10!white, colframe=yellow!50!black, title=注意]
+% colback: 背景颜色
+% colframe: 边框颜色
+% 这是一个提示框。
+% \end{tcolorbox}
+
+\RequirePackage[UTF8]{ctex} % 中文支持
+
+\RequirePackage{xeCJK} % 中文字体设置
+\RequirePackage{fontspec} % 字体设置, 与 pdflatex 不兼容
+\setmainfont{Times New Roman} % 设置默认字体, 需要 ttf-ms-fonts
+% \setCJKmainfont{思源宋体} % 设置中文字体
+
+\RequirePackage{microtype} % 微调排版效果
+
+\makeatletter
+\@ifclassloaded{article}{
+    % 仅在 article 文档中加载以下包
+    \RequirePackage{fancyhdr} % 页眉页脚支持
+    % 一般页眉页脚配置:
+    % \pagestyle{fancy}
+    % \fancyhf{} % 清空页眉页脚
+    % \lhead{左侧页眉内容}
+    % \chead{中央页眉内容}
+    % \rhead{右侧页眉内容}
+    % \lfoot{左侧页脚内容}
+    % \cfoot{中央页脚内容}
+    % \rfoot{右侧页脚内容}
+    
+    \RequirePackage{geometry} % 页面布局
+    % 一般页面配置:
+    % \geometry {
+    %     a4paper, % 纸张大小
+    %     left=3.18cm, % 左间距
+    %     right=3.18cm, % 右间距
+    %     top=2.54cm, % 上间距
+    %     bottom=2.54cm, % 下间距
+    %     heightrounded,
+    % }
+
+    % 应在最后加载
+    \RequirePackage[pdfborder={0 0 0}]{hyperref} % 超链接支持
+    % \hypersetup {
+        % colorlinks=true,
+        % linkcolor=blue,
+        % filecolor=magenta,
+        % urlcolor=cyan,
+    % }
+    % \href{url}{text} % 插入超链接
+    % \ref{fig_label} % 增强引用
+    % \tableofcontents % 插入目录, 并自动使目录项成为超链接
+}
+\makeatother
