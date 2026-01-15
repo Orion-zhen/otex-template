@@ -1,31 +1,103 @@
 \ProvidesPackage{otex}[Orion's Custom Package]
 
 % ==========================================
-%  1. 基础宏包与颜色配置
+%  模块化加载控制 (Modular Loading Control)
 % ==========================================
-\RequirePackage[table]{xcolor} % 颜色支持
-% 预定义颜色方案
-\definecolor{code_background}{rgb}{0.95, 0.95, 0.95} % 代码块背景: 浅灰
-\definecolor{code_keyword}{rgb}{0.16, 0.32, 0.75}    % 关键字: 蓝色
-\definecolor{code_comment}{rgb}{0.12, 0.38, 0.17}    % 注释: 深绿
-\definecolor{code_string}{rgb}{0.63, 0.12, 0.94}     % 字符串: 紫色
-\definecolor{code_identifier}{rgb}{0.0, 0.0, 0.0}    % 标识符: 黑色
-\definecolor{code_number}{rgb}{0.5, 0.5, 0.5}        % 行号: 灰色
+% 第一步: 定义功能模块开关标志
+\newif\ifotex@loadlayout    % geometry, fancyhdr
+\newif\ifotex@loadfonts     % fontspec, setmainfont
+\newif\ifotex@loadctex      % ctex 宏包
+\newif\ifotex@loadtheorems  % amsthm 环境定义
+\newif\ifotex@loadhyperref  % hyperref
+\newif\ifotex@loadcaption   % caption, subcaption
+\newif\ifotex@loadalgo      % algorithm2e
+\newif\ifotex@loadmath      % amsmath 等数学宏包
+\newif\ifotex@loadgraphics  % tikz, graphicx 等绘图工具
+\newif\ifotex@loadlistings  % listings 代码高亮
+\newif\ifotex@loadtables    % booktabs 等表格增强
 
-% ==========================================
-%  2. 数学公式增强 (Math Enhancements)
-% ==========================================
-%  功能: 提供更强大的数学公式排版支持
-\RequirePackage{amsmath}     % 基础数学宏包 (AMS)
-\RequirePackage{amssymb}     % 数学符号库 (如 \mathbb)
-\RequirePackage{mathtools}   % amsmath 的扩展修复和增强
-\RequirePackage{amsthm}      % 定理环境支持
+% 第二步: 粒度化覆盖选项 (Granular Override Options)
+% 布局
+\DeclareOption{layout}{\otex@loadlayouttrue}
+\DeclareOption{nolayout}{\otex@loadlayoutfalse}
+\DeclareOption{geometry}{\otex@loadlayouttrue}
+\DeclareOption{nogeometry}{\otex@loadlayoutfalse}
 
-% 常用数学配置说明:
-% \begin{align} ... \end{align} 用于多行对齐公式
-% \begin{gather} ... \end{gather} 用于多行居中公式
-% \mathbb{R} 实数集 R, \mathcal{L} 损失函数 L
-% \DeclarePairedDelimiter 可用于定义自适应括号
+% 字体
+\DeclareOption{fonts}{\otex@loadfontstrue}
+\DeclareOption{nofonts}{\otex@loadfontsfalse}
+
+% CTeX
+\DeclareOption{ctex}{\otex@loadctextrue}
+\DeclareOption{noctex}{\otex@loadctexfalse}
+
+% 定理环境
+\DeclareOption{theorems}{\otex@loadtheoremstrue}
+\DeclareOption{notheorems}{\otex@loadtheoremsfalse}
+
+% 超链接
+\DeclareOption{hyperref}{\otex@loadhyperreftrue}
+\DeclareOption{nohyperref}{\otex@loadhyperreffalse}
+
+% 图表标题
+\DeclareOption{caption}{\otex@loadcaptiontrue}
+\DeclareOption{nocaption}{\otex@loadcaptionfalse}
+
+% 算法
+\DeclareOption{algo}{\otex@loadalgotrue}
+\DeclareOption{noalgo}{\otex@loadalgofalse}
+\DeclareOption{algorithms}{\otex@loadalgotrue}
+\DeclareOption{noalgorithms}{\otex@loadalgofalse}
+
+% 无害模块 (通常开启，但允许关闭)
+\DeclareOption{math}{\otex@loadmathtrue}
+\DeclareOption{nomath}{\otex@loadmathfalse}
+\DeclareOption{graphics}{\otex@loadgraphicstrue}
+\DeclareOption{nographics}{\otex@loadgraphicsfalse}
+\DeclareOption{listings}{\otex@loadlistingstrue}
+\DeclareOption{nolistings}{\otex@loadlistingsfalse}
+\DeclareOption{tables}{\otex@loadtablestrue}
+\DeclareOption{notables}{\otex@loadtablesfalse}
+
+% 第三步: 基于文档类白名单的智能默认值设置
+\newif\ifotex@isstandardclass \otex@isstandardclassfalse
+\@ifclassloaded{article}{\otex@isstandardclasstrue}{}
+\@ifclassloaded{report}{\otex@isstandardclasstrue}{}
+\@ifclassloaded{book}{\otex@isstandardclasstrue}{}
+\@ifclassloaded{ctexart}{\otex@isstandardclasstrue}{}
+\@ifclassloaded{ctexrep}{\otex@isstandardclasstrue}{}
+\@ifclassloaded{ctexbook}{\otex@isstandardclasstrue}{}
+
+\ifotex@isstandardclass
+    % 白名单内的标准类: 默认开启所有功能
+    \otex@loadlayouttrue
+    \otex@loadfontstrue
+    \otex@loadctextrue
+    \otex@loadtheoremstrue
+    \otex@loadhyperreftrue
+    \otex@loadcaptiontrue
+    \otex@loadalgotrue
+    \otex@loadmathtrue
+    \otex@loadgraphicstrue
+    \otex@loadlistingstrue
+    \otex@loadtablestrue
+\else
+    % 未知类 (可能是期刊模板): 仅开启无害功能，关闭风险功能
+    \PackageWarning{otex}{Non-standard class detected! Defaulting to Safe Mode (Risky features disabled).}
+    \otex@loadlayoutfalse       % 风险: 页面布局
+    \otex@loadfontsfalse        % 风险: 字体配置
+    \otex@loadctexfalse         % 风险: CTeX
+    \otex@loadtheoremsfalse     % 风险: 定理环境
+    \otex@loadhyperreffalse     % 风险: 超链接
+    \otex@loadcaptionfalse      % 风险: 图表标题
+    \otex@loadalgofalse         % 风险: 算法环境
+    
+    % 无害: 数学、绘图、代码、表格增强
+    \otex@loadmathtrue
+    \otex@loadgraphicstrue
+    \otex@loadlistingstrue
+    \otex@loadtablestrue
+\fi
 
 % ==========================================
 %  3. 本地化与名称配置 (Localization & Names)
@@ -78,9 +150,47 @@
     \renewcommand{\solutionname}{Solution}
     \renewcommand{\exercisename}{Exercise}
     \renewcommand{\casename}{Case}
-    \renewcommand{\proofname}{Proof}
 }
+
 \ProcessOptions\relax
+
+% ==========================================
+%  1. 基础宏包与颜色配置
+% ==========================================
+\RequirePackage[table]{xcolor} % 颜色支持
+% 预定义颜色方案
+\definecolor{code_background}{rgb}{0.95, 0.95, 0.95} % 代码块背景: 浅灰
+\definecolor{code_keyword}{rgb}{0.16, 0.32, 0.75}    % 关键字: 蓝色
+\definecolor{code_comment}{rgb}{0.12, 0.38, 0.17}    % 注释: 深绿
+\definecolor{code_string}{rgb}{0.63, 0.12, 0.94}     % 字符串: 紫色
+\definecolor{code_identifier}{rgb}{0.0, 0.0, 0.0}    % 标识符: 黑色
+\definecolor{code_number}{rgb}{0.5, 0.5, 0.5}        % 行号: 灰色
+
+% 第四步: 冲突熔断检查 (Post-Process Conflict Prevention)
+% 如果相关包已被加载，强制关闭对应模块以避免选项冲突
+\@ifpackageloaded{geometry}{\otex@loadlayoutfalse \PackageInfo{otex}{Package 'geometry' detected. Disabling otex layout.}}{}
+\@ifpackageloaded{hyperref}{\otex@loadhyperreffalse \PackageInfo{otex}{Package 'hyperref' detected. Disabling otex hyperref.}}{}
+\@ifpackageloaded{caption}{\otex@loadcaptionfalse \PackageInfo{otex}{Package 'caption' detected. Disabling otex caption.}}{}
+\@ifpackageloaded{algorithm}{\otex@loadalgofalse \PackageInfo{otex}{Package 'algorithm' detected. Disabling otex algorithm2e.}}{}
+% 检查定理环境是否已定义
+\@ifundefined{theorem}{}{\otex@loadtheoremsfalse \PackageInfo{otex}{Theorem environment detected. Disabling otex theorems.}}
+
+% ==========================================
+%  2. 数学公式增强 (Math Enhancements)
+% ==========================================
+%  功能: 提供更强大的数学公式排版支持
+\ifotex@loadmath
+    \RequirePackage{amsmath}     % 基础数学宏包 (AMS)
+    \RequirePackage{amssymb}     % 数学符号库 (如 \mathbb)
+    \RequirePackage{mathtools}   % amsmath 的扩展修复和增强
+    \RequirePackage{amsthm}      % 定理环境支持
+\fi
+
+% 常用数学配置说明:
+% \begin{align} ... \end{align} 用于多行对齐公式
+% \begin{gather} ... \end{gather} 用于多行居中公式
+% \mathbb{R} 实数集 R, \mathcal{L} 损失函数 L
+% \DeclarePairedDelimiter 可用于定义自适应括号
 
 % 修复 CTeX 可能覆盖中文名的问题 (如果需要强制覆盖)
 \ifotex@english
@@ -102,43 +212,46 @@
 % ==========================================
 %  4. 定理环境注册 (Theorem Environments)
 % ==========================================
-\newtheoremstyle{mystyle}   % 定义样式名称
-  {3pt}                     % 上间距
-  {3pt}                     % 下间距
-  {\normalfont}             % 正文字体
-  {}                        % 缩进量
-  {\bfseries}               % 定理头字体 (粗体)
-  {:}                       % 标点
-  {.5em}                    % 标点后间距
-  {}                        % 头部说明 (默认)
-
-\theoremstyle{mystyle}      % 使用定义好的样式
-
-% 核心环境 (共享 section 编号)
-\newtheorem{theorem}{\theoremname}[section]
-\newtheorem{lemma}[theorem]{\lemmaname}
-\newtheorem{proposition}[theorem]{\propositionname}
-\newtheorem{corollary}[theorem]{\corollaryname}
-\newtheorem{definition}[theorem]{\definitionname}
-\newtheorem{example}[theorem]{\examplename}
-\newtheorem{remark}[theorem]{\remarkname}
-\newtheorem{assumption}[theorem]{\assumptionname}
-\newtheorem{conjecture}[theorem]{\conjecturename}
-\newtheorem{axiom}[theorem]{\axiomname}
-\newtheorem{problem}[theorem]{\problemname}
-\newtheorem{exercise}[theorem]{\exercisename}
-\newtheorem{case}[theorem]{\casename}
-
-% 特殊环境
-% Solution 通常不编号或独立编号，这里设置为无编号环境
-\newtheorem*{solution}{\solutionname}
+\ifotex@loadtheorems
+    \newtheoremstyle{mystyle}     % 定义样式名称
+        {3pt}                     % 上间距
+        {3pt}                     % 下间距
+        {\normalfont}             % 正文字体
+        {}                        % 缩进量
+        {\bfseries}               % 定理头字体 (粗体)
+        {:}                       % 标点
+        {.5em}                    % 标点后间距
+        {}                        % 头部说明 (默认)
+    \theoremstyle{mystyle}        % 使用定义好的样式
+    
+    % 核心环境 (共享 section 编号)
+    \newtheorem{theorem}{\theoremname}[section]
+    \newtheorem{lemma}[theorem]{\lemmaname}
+    \newtheorem{proposition}[theorem]{\propositionname}
+    \newtheorem{corollary}[theorem]{\corollaryname}
+    \newtheorem{definition}[theorem]{\definitionname}
+    \newtheorem{example}[theorem]{\examplename}
+    \newtheorem{remark}[theorem]{\remarkname}
+    \newtheorem{assumption}[theorem]{\assumptionname}
+    \newtheorem{conjecture}[theorem]{\conjecturename}
+    \newtheorem{axiom}[theorem]{\axiomname}
+    \newtheorem{problem}[theorem]{\problemname}
+    \newtheorem{exercise}[theorem]{\exercisename}
+    \newtheorem{case}[theorem]{\casename}
+    
+    % 特殊环境
+    % Solution 通常不编号或独立编号，这里设置为无编号环境
+    \newtheorem*{solution}{\solutionname}
+\fi
 
 % ==========================================
 %  4. 算法与伪代码 (Algorithms)
 % ==========================================
 %  功能: 排版算法伪代码
 %  文档: http://mirrors.ctan.org/macros/latex/contrib/algorithm2e/doc/algorithm2e.pdf
-\RequirePackage[ruled,linesnumbered,vlined]{algorithm2e}
+\ifotex@loadalgo
+    \RequirePackage[ruled,linesnumbered,vlined]{algorithm2e}
+\fi
 % 配置:
 % ruled: 标题在上方, 有双横线
 % linesnumbered: 显示行号
@@ -158,55 +271,65 @@
 % ==========================================
 %  5. 代码高亮 (Code Highlighting)
 % ==========================================
-\RequirePackage{listings}
-\lstset{
-    backgroundcolor=\color{code_background}, % 背景色
-    basicstyle=\ttfamily\small,              % 字体: 等宽 + 小号
-    keywordstyle=\color{code_keyword}\bfseries, % 关键字: 颜色 + 粗体
-    commentstyle=\color{code_comment}\itshape,  % 注释: 颜色 + 斜体
-    stringstyle=\color{code_string},         % 字符串
-    identifierstyle=\color{code_identifier}, % 标识符
-    numberstyle=\tiny\color{code_number},    % 行号样式
-    numbers=left,                            % 行号位置: 左侧
-    stepnumber=1,                            % 行号步长: 每一行都显示
-    frame=single,                            % 边框: 单线框
-    rulecolor=\color{gray!30},               % 边框颜色
-    frameround=tttt,                         % 圆角边框
-    breaklines=true,                         % 自动代码换行
-    tabsize=4,                               % 制表符宽度
-    showspaces=false,                        % 不显示空格符号
-    showstringspaces=false,                  % 字符串中不显示空格
-    extendedchars=true,                      % 扩展字符支持
-    captionpos=b,                            % 标题位置: 底部
-    escapeinside={(*@}{@*)},                 % 逃逸字符, 用于在代码中写LaTeX
-}
-% 支持中文代码的补丁 (xelatex下通常不需要特别处理，但为了保险)
-\lstset{inputencoding=utf8}
+\ifotex@loadlistings
+    \RequirePackage{listings}
+    \lstset{
+        backgroundcolor=\color{code_background}, % 背景色
+        basicstyle=\ttfamily\small,              % 字体: 等宽 + 小号
+        keywordstyle=\color{code_keyword}\bfseries, % 关键字: 颜色 + 粗体
+        commentstyle=\color{code_comment}\itshape,  % 注释: 颜色 + 斜体
+        stringstyle=\color{code_string},         % 字符串
+        identifierstyle=\color{code_identifier}, % 标识符
+        numberstyle=\tiny\color{code_number},    % 行号样式
+        numbers=left,                            % 行号位置: 左侧
+        stepnumber=1,                            % 行号步长: 每一行都显示
+        frame=single,                            % 边框: 单线框
+        rulecolor=\color{gray!30},               % 边框颜色
+        frameround=tttt,                         % 圆角边框
+        breaklines=true,                         % 自动代码换行
+        tabsize=4,                               % 制表符宽度
+        showspaces=false,                        % 不显示空格符号
+        showstringspaces=false,                  % 字符串中不显示空格
+        extendedchars=true,                      % 扩展字符支持
+        captionpos=b,                            % 标题位置: 底部
+        escapeinside={(*@}{@*)},                 % 逃逸字符, 用于在代码中写LaTeX
+    }
+    % 支持中文代码的补丁 (xelatex下通常不需要特别处理，但为了保险)
+    \lstset{inputencoding=utf8}
+\fi
 
 % ==========================================
 %  6. 图表与浮动体 (Figures & Tables)
 % ==========================================
-\RequirePackage{graphicx}    % 图片支持
-\RequirePackage{caption}     % 标题样式控制
-\RequirePackage{subcaption}  % 子图支持
-\RequirePackage{booktabs}    % 三线表 (\toprule, \midrule, \bottomrule)
-\RequirePackage{multirow}    % 表格行合并
-\RequirePackage{array}       % 增强的列格式
-\RequirePackage{float}       % 强力浮动体控制 (使用 [H] 禁止浮动)
-\RequirePackage{longtable}   % 长表格
-\RequirePackage{wrapfig}     % 图文环绕
+\ifotex@loadgraphics
+    \RequirePackage{graphicx}    % 图片支持
+\fi
 
-% 标题设置
-\captionsetup{
-    font=small,              % 标题字体小一号
-    labelfont=bf,            % 标签(如Figure 1)加粗
-    labelsep=colon,          % 分隔符用冒号
-    textfont=it              % 标题文本用斜体
-}
+\ifotex@loadcaption
+    \RequirePackage{caption}     % 标题样式控制
+    \RequirePackage{subcaption}  % 子图支持
+    % 标题设置
+    \captionsetup{
+        font=small,              % 标题字体小一号
+        labelfont=bf,            % 标签(如Figure 1)加粗
+        labelsep=colon,          % 分隔符用冒号
+        textfont=it              % 标题文本用斜体
+    }
+\fi
+
+\ifotex@loadtables
+    \RequirePackage{booktabs}    % 三线表 (\toprule, \midrule, \bottomrule)
+    \RequirePackage{multirow}    % 表格行合并
+    \RequirePackage{array}       % 增强的列格式
+    \RequirePackage{float}       % 强力浮动体控制 (使用 [H] 禁止浮动)
+    \RequirePackage{longtable}   % 长表格
+    \RequirePackage{wrapfig}     % 图文环绕
+\fi
 
 % ==========================================
 %  7. 列表与枚举 (Lists)
 % ==========================================
+% 注: enumitem 是通用功能，总是加载
 \RequirePackage[inline]{enumitem}    % 列表定制
 % 配置: \setlist[itemize]{...} 全局配置
 % 用法: \begin{enumerate}[label=(\arabic*)] ... \end{enumerate}
@@ -214,76 +337,86 @@
 % ==========================================
 %  8. 单位与物理量 (SI Units)
 % ==========================================
+% 注: siunitx 是通用功能，总是加载
 \RequirePackage{siunitx}
 % 用法: \SI{10}{\meter\per\second} -> 10 m/s
 
 % ==========================================
 %  9. TikZ 绘图系统 (TikZ & PGF) - 核心新增
 % ==========================================
-\RequirePackage{tcolorbox}   % 彩色盒子
+\ifotex@loadgraphics
+    \RequirePackage{tcolorbox}   % 彩色盒子
 
-% 功能: 极其强大的绘图工具
-\RequirePackage{tikz}
-\usetikzlibrary{
-    shapes,         % 形状库: ellipse, node styles
-    arrows.meta,    % 箭头库: 提供更多箭头样式 (Stepper, Latex, etc.)
-    positioning,    % 定位库: below = of node1
-    calc,           % 计算库: ($ (a) + (b) $)
-    patterns,       % 填充纹理: north east lines
-    decorations.pathreplacing, % 路径装饰: brace (大括号)
-    decorations.markings,      % 标记装饰: 在线上加箭头
-    quotes,         % 引用语法: "label"
-    fit,            % 自适应节点: fit=(a)(b)
-    backgrounds,    % 背景层: on background layer
-    shadows,        % 阴影: drop shadow
-    trees,          % 树形图
-    mindmap         % 思维导图
-}
+    % 功能: 极其强大的绘图工具
+    \RequirePackage{tikz}
+    \usetikzlibrary{
+        shapes,         % 形状库: ellipse, node styles
+        arrows.meta,    % 箭头库: 提供更多箭头样式 (Stepper, Latex, etc.)
+        positioning,    % 定位库: below = of node1
+        calc,           % 计算库: ($ (a) + (b) $)
+        patterns,       % 填充纹理: north east lines
+        decorations.pathreplacing, % 路径装饰: brace (大括号)
+        decorations.markings,      % 标记装饰: 在线上加箭头
+        quotes,         % 引用语法: "label"
+        fit,            % 自适应节点: fit=(a)(b)
+        backgrounds,    % 背景层: on background layer
+        shadows,        % 阴影: drop shadow
+        trees,          % 树形图
+        mindmap         % 思维导图
+    }
 
-% --- PGFPlots 高级绘图库 ---
-% 功能: 专业级函数绘图与数据可视化
-\RequirePackage{pgfplots}
-\pgfplotsset{compat=1.18}   % 使用最新兼容模式
-\usepgfplotslibrary{
-    fillbetween,            % 区域填充
-    polar                   % 极坐标图
-}
+    % --- PGFPlots 高级绘图库 ---
+    % 功能: 专业级函数绘图与数据可视化
+    \RequirePackage{pgfplots}
+    \pgfplotsset{compat=1.18}   % 使用最新兼容模式
+    \usepgfplotslibrary{
+        fillbetween,            % 区域填充
+        polar                   % 极坐标图
+    }
 
-% --- TikZ 常用样式预定义 ---
-% 1. 基础节点样式
-\tikzset{
-    base/.style = {draw, align=center, minimum height=2em, minimum width=2em},
-    % 矩形框 (例如: 流程图处理块)
-    process/.style = {base, rectangle, rounded corners, fill=orange!10},
-    % 判断框 (例如: 流程图判断)
-    decision/.style = {base, diamond, aspect=2, fill=blue!10, inner sep=0pt},
-    % 输入输出 (平行四边形)
-    io/.style = {base, trapezium, trapezium left angle=70, trapezium right angle=110, fill=green!10},
-    % 开始/结束 (胶囊形)
-    startstop/.style = {base, rounded rectangle, fill=red!10},
-    % 箭头样式
-    arrow/.style = {thick, ->, >=Stealth},
-    % 连接线样式
-    line/.style = {thick}
-}
+    % --- TikZ 常用样式预定义 ---
+    % 1. 基础节点样式
+    \tikzset{
+        base/.style = {draw, align=center, minimum height=2em, minimum width=2em},
+        % 矩形框 (例如: 流程图处理块)
+        process/.style = {base, rectangle, rounded corners, fill=orange!10},
+        % 判断框 (例如: 流程图判断)
+        decision/.style = {base, diamond, aspect=2, fill=blue!10, inner sep=0pt},
+        % 输入输出 (平行四边形)
+        io/.style = {base, trapezium, trapezium left angle=70, trapezium right angle=110, fill=green!10},
+        % 开始/结束 (胶囊形)
+        startstop/.style = {base, rounded rectangle, fill=red!10},
+        % 箭头样式
+        arrow/.style = {thick, ->, >=Stealth},
+        % 连接线样式
+        line/.style = {thick}
+    }
+\fi
 
 % ==========================================
 %  10. 中文支持与排版优化 (Chinese Support)
 % ==========================================
 % CTeX 宏包配置
-\RequirePackage[UTF8, heading=true, scheme=chinese]{ctex}
-\RequirePackage{fontspec}
+\ifotex@loadctex
+    \RequirePackage[UTF8, heading=true, scheme=chinese]{ctex}
+\fi
 
-% 字体设置 (建议根据系统安装字体调整)
-% Win/Linux通用常用配置:
-\setmainfont{Times New Roman}
-\setsansfont{Arial}
-% \setmonofont{Maple Mono NF}
-% % 中文字体 - 优先匹配系统常见字体
-% % 注意: 如果编译报错"Font not found", 请修改为系统实际存在的字体名
-\setCJKmainfont{SimSun}      % 宋体
-\setCJKsansfont{Source Han Sans CN}      % 黑体
-% \setCJKmonofont{Source Han Sans CN}    % 黑体
+\ifotex@loadfonts
+    \RequirePackage{fontspec}
+    % 字体设置 (建议根据系统安装字体调整)
+    % Win/Linux通用常用配置:
+    \setmainfont{Times New Roman}
+    \setsansfont{Arial}
+    % \setmonofont{Maple Mono NF}
+
+    \ifotex@loadctex
+        % % 中文字体 - 优先匹配系统常见字体
+        % % 注意: 如果编译报错"Font not found", 请修改为系统实际存在的字体名
+        \setCJKmainfont{SimSun}      % 宋体
+        \setCJKsansfont{Source Han Sans CN}      % 黑体
+        % \setCJKmonofont{Source Han Sans CN}    % 黑体
+    \fi
+\fi
 
 % 微排版优化
 \RequirePackage{microtype}
@@ -294,41 +427,45 @@
 %  11. 页面布局与页眉页脚 (Layout)
 % ==========================================
 % 仅在 article 类生效，避免冲突
-\@ifclassloaded{article}{
-    \RequirePackage{geometry}
-    \geometry{
-        a4paper,
-        left=2.5cm,
-        right=2.5cm,
-        top=2.5cm,
-        bottom=2.5cm
-    }
-    
-    \RequirePackage{fancyhdr}
-    \pagestyle{fancy}
-    \fancyhf{}
-    \lhead{\leftmark}       % 左页眉: 章节名
-    \chead{}                % 中页眉: 空
-    \rhead{\thepage}        % 右页眉: 页码
-    \lfoot{}                % 左页脚
-    \cfoot{}                % 中页脚
-    \rfoot{}                % 右页脚
-}{}
+\ifotex@loadlayout
+    \@ifclassloaded{article}{
+        \RequirePackage{geometry}
+        \geometry{
+            a4paper,
+            left=2.5cm,
+            right=2.5cm,
+            top=2.5cm,
+            bottom=2.5cm
+        }
+
+        \RequirePackage{fancyhdr}
+        \pagestyle{fancy}
+        \fancyhf{}
+        \lhead{\leftmark}       % 左页眉: 章节名
+        \chead{}                % 中页眉: 空
+        \rhead{\thepage}        % 右页眉: 页码
+        \lfoot{}                % 左页脚
+        \cfoot{}                % 中页脚
+        \rfoot{}                % 右页脚
+    }{}
+\fi
 
 % ==========================================
 %  12. 引用与PDF元数据 (Hyperref)
 % ==========================================
-\RequirePackage{cite} % [1-3] 样式引用
-\RequirePackage[pdfborder={0 0 0}]{hyperref} % 超链接
-\hypersetup{
-    colorlinks=true,        % 激活彩色链接
-    linkcolor=blue,         % 内部链接(目录, 公式引用)颜色
-    filecolor=magenta,      % 文件链接颜色
-    urlcolor=cyan,          % URL链接颜色
-    citecolor=green!50!black, % 引用颜色([1])
-    pdftitle={Generated Document},
-    pdfauthor={Orion},
-}
+\ifotex@loadhyperref
+    \RequirePackage{cite} % [1-3] 样式引用
+    \RequirePackage[pdfborder={0 0 0}]{hyperref} % 超链接
+    \hypersetup{
+        colorlinks=true,        % 激活彩色链接
+        linkcolor=blue,         % 内部链接(目录, 公式引用)颜色
+        filecolor=magenta,      % 文件链接颜色
+        urlcolor=cyan,          % URL链接颜色
+        citecolor=green!50!black, % 引用颜色([1])
+        pdftitle={Generated Document},
+        pdfauthor={Orion},
+    }
+\fi
 
 % ==========================================
 %  13. 自定义命令 (Custom Commands)
