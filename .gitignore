@@ -10,3 +10,4 @@
 *.xdv
 
 build/
+_minted/
