@@ -1,177 +1,267 @@
 \ProvidesPackage{otex}[Orion's Custom Package]
 
-\RequirePackage{xcolor} % 颜色配置
-% 代码块颜色配置:
-\definecolor{code_background}{rgb}{0.95, 0.95, 0.95} % 浅灰色背景
-\definecolor{code_keyword}{rgb}{0.16, 0.32, 0.75}    % 蓝色关键字
-\definecolor{code_comment}{rgb}{0.12, 0.38, 0.17}    % 深绿色注释
-\definecolor{code_string}{rgb}{0.63, 0.12, 0.94}     % 紫色字符串
-\definecolor{code_identifier}{rgb}{0.0, 0.0, 0.0}    % 黑色标识符
-\definecolor{code_number}{rgb}{0.0, 0.0, 0.0}        % 黑色数字
+% ==========================================
+%  1. 基础宏包与颜色配置
+% ==========================================
+\RequirePackage[table]{xcolor} % 颜色支持
+% 预定义颜色方案
+\definecolor{code_background}{rgb}{0.95, 0.95, 0.95} % 代码块背景: 浅灰
+\definecolor{code_keyword}{rgb}{0.16, 0.32, 0.75}    % 关键字: 蓝色
+\definecolor{code_comment}{rgb}{0.12, 0.38, 0.17}    % 注释: 深绿
+\definecolor{code_string}{rgb}{0.63, 0.12, 0.94}     % 字符串: 紫色
+\definecolor{code_identifier}{rgb}{0.0, 0.0, 0.0}    % 标识符: 黑色
+\definecolor{code_number}{rgb}{0.5, 0.5, 0.5}        % 行号: 灰色
 
-\RequirePackage{listings} % 代码高亮
-\lstset {
-    backgroundcolor=\color{code_background},      % 设置背景色
-    basicstyle=\ttfamily\small,                   % 基本样式，小号等宽字体
-    keywordstyle=\color{code_keyword},            % 关键字样式
-    commentstyle=\color{code_comment}\itshape,    % 注释样式，斜体
-    stringstyle=\color{code_string},              % 字符串样式
-    identifierstyle=\color{code_identifier},      % 标识符样式
-    numberstyle=\color{code_number},              % 行号样式
-    numbers=left,                                 % 在左侧显示行号
-    stepnumber=1,                                 % 行号步长
-    frame=single,                                 % 给代码块加框
-    frameround=tttt,                              % 框的四个角都为圆角
-    breaklines=true,                              % 自动换行
-    tabsize=4,                                    % 制表符宽度
-    showspaces=false,                             % 不显示空格
-    showstringspaces=false                        % 不显示字符串中的空格
+% ==========================================
+%  2. 数学公式增强 (Math Enhancements)
+% ==========================================
+%  功能: 提供更强大的数学公式排版支持
+\RequirePackage{amsmath}     % 基础数学宏包 (AMS)
+\RequirePackage{amssymb}     % 数学符号库 (如 \mathbb)
+\RequirePackage{mathtools}   % amsmath 的扩展修复和增强
+\RequirePackage{amsthm}      % 定理环境支持
+
+% 常用数学配置说明:
+% \begin{align} ... \end{align} 用于多行对齐公式
+% \begin{gather} ... \end{gather} 用于多行居中公式
+% \mathbb{R} 实数集 R, \mathcal{L} 损失函数 L
+% \DeclarePairedDelimiter 可用于定义自适应括号
+
+% ==========================================
+%  3. 定理环境配置 (Theorem Environments)
+% ==========================================
+%  功能: 自动编号的定理、引理、定义等环境
+%  语法: \begin{theorem}[标题] ... \end{theorem}
+\newtheoremstyle{mystyle}   % 定义样式名称
+  {3pt}                     % 上间距
+  {3pt}                     % 下间距
+  {\normalfont}             % 正文字体
+  {}                        % 缩进量
+  {\bfseries}               % 定理头字体 (粗体)
+  {:}                       % 标点
+  {.5em}                    % 标点后间距
+  {}                        % 头部说明 (默认)
+
+\theoremstyle{mystyle}      % 使用定义好的样式
+
+% 定义具体环境 (中文名称)
+\newtheorem{theorem}{定理}[section]     % 定理,跟随 section 编号, 如 1.1
+\newtheorem{lemma}[theorem]{引理}       % 引理,共享定理编号
+\newtheorem{proposition}[theorem]{命题} % 命题
+\newtheorem{corollary}[theorem]{推论}   % 推论
+\newtheorem{definition}[theorem]{定义}  % 定义
+\newtheorem{example}[theorem]{例}       % 例
+\newtheorem{remark}[theorem]{注}        % 注
+\newtheorem{assumption}[theorem]{假设}  % 假设
+
+% ==========================================
+%  4. 算法与伪代码 (Algorithms)
+% ==========================================
+%  功能: 排版算法伪代码
+%  文档: http://mirrors.ctan.org/macros/latex/contrib/algorithm2e/doc/algorithm2e.pdf
+\RequirePackage[ruled,linesnumbered,vlined]{algorithm2e}
+% 配置:
+% ruled: 标题在上方, 有双横线
+% linesnumbered: 显示行号
+% vlined: 代码块垂直连接线
+%
+% 用法示例:
+% \begin{algorithm}[H]
+%     \SetAlgoLined
+%     \KwIn{输入}
+%     \KwOut{输出}
+%     \While{条件}{
+%         操作\;
+%     }
+%     \caption{算法标题}
+% \end{algorithm}
+
+% ==========================================
+%  5. 代码高亮 (Code Highlighting)
+% ==========================================
+\RequirePackage{listings}
+\lstset{
+    backgroundcolor=\color{code_background}, % 背景色
+    basicstyle=\ttfamily\small,              % 字体: 等宽 + 小号
+    keywordstyle=\color{code_keyword}\bfseries, % 关键字: 颜色 + 粗体
+    commentstyle=\color{code_comment}\itshape,  % 注释: 颜色 + 斜体
+    stringstyle=\color{code_string},         % 字符串
+    identifierstyle=\color{code_identifier}, % 标识符
+    numberstyle=\tiny\color{code_number},    % 行号样式
+    numbers=left,                            % 行号位置: 左侧
+    stepnumber=1,                            % 行号步长: 每一行都显示
+    frame=single,                            % 边框: 单线框
+    rulecolor=\color{gray!30},               % 边框颜色
+    frameround=tttt,                         % 圆角边框
+    breaklines=true,                         % 自动代码换行
+    tabsize=4,                               % 制表符宽度
+    showspaces=false,                        % 不显示空格符号
+    showstringspaces=false,                  % 字符串中不显示空格
+    extendedchars=true,                      % 扩展字符支持
+    captionpos=b,                            % 标题位置: 底部
+    escapeinside={(*@}{@*)},                 % 逃逸字符, 用于在代码中写LaTeX
 }
-% 一般代码块配置:
-% \begin{lstlisting}[language=Python, caption={示例代码}, label={lst:example}]
-% # 代码内容
-% \end{lstlisting}
-% 从文件导入代码块:
-% \lstinputlisting[language=Python, firstline=2, lastline=12]{main.py}
-% 行内代码
-% \lstinline|mycodes|
+% 支持中文代码的补丁 (xelatex下通常不需要特别处理，但为了保险)
+\lstset{inputencoding=utf8}
 
-\RequirePackage{amsmath} % 使用 align(*) 对齐多行公式
-% 一般多行对齐配置:
-% \begin{align}
-%     x + y &= z \\ % 使用 \\ 换行
-%     2x - y &= 10 % 使用 & 来标记对齐点
-% \end{align}
+% ==========================================
+%  6. 图表与浮动体 (Figures & Tables)
+% ==========================================
+\RequirePackage{graphicx}    % 图片支持
+\RequirePackage{caption}     % 标题样式控制
+\RequirePackage{subcaption}  % 子图支持
+\RequirePackage{booktabs}    % 三线表 (\toprule, \midrule, \bottomrule)
+\RequirePackage{multirow}    % 表格行合并
+\RequirePackage{array}       % 增强的列格式
+\RequirePackage{float}       % 强力浮动体控制 (使用 [H] 禁止浮动)
+\RequirePackage{longtable}   % 长表格
+\RequirePackage{wrapfig}     % 图文环绕
 
-\RequirePackage{siunitx} % SI 单位支持
-% \SI{5}{\meter} % 显示为 5 m
-% \SI{1}{\newton\meter}  % 显示为 1 N·m
-% \SI{1}{\meter\per\second}  % 显示为 1 m/s
-% \SI{5.0 \pm 0.1}{\meter}  % 显示为 5.0 ± 0.1 m
+% 标题设置
+\captionsetup{
+    font=small,              % 标题字体小一号
+    labelfont=bf,            % 标签(如Figure 1)加粗
+    labelsep=colon,          % 分隔符用冒号
+    textfont=it              % 标题文本用斜体
+}
 
-\RequirePackage{caption} % 图片标题
-% \captionsetup{
-%     font=small,            % 设置标题字体大小
-%     labelfont=bf,          % 设置标签字体为粗体
-%     labelsep=colon,        % 设置标签与标题之间的分隔符
-%     justification=centering % 设置标题对齐方式
-% }
+% ==========================================
+%  7. 列表与枚举 (Lists)
+% ==========================================
+\RequirePackage{enumitem}    % 列表定制
+% 配置: \setlist[itemize]{...} 全局配置
+% 用法: \begin{enumerate}[label=(\arabic*)] ... \end{enumerate}
 
-\RequirePackage{graphicx} % 图片支持
-% \graphicspath{{images/}} % 配置图片路径
-% \includegraphics{picture} % 插入图片, 建议不要带扩展名
-% 一般图像配置:
-% \begin{figure}[h] % h: here; t: top; b: bottom; p: new page
-%     \centering
-%     \includegraphics[width=0.8\textwidth]{picture}
-%     \caption{图片标题}
-%     \label{fig:picture}
-% \end{figure}
+% ==========================================
+%  8. 单位与物理量 (SI Units)
+% ==========================================
+\RequirePackage{siunitx}
+% 用法: \SI{10}{\meter\per\second} -> 10 m/s
 
-\RequirePackage{subcaption} % 子图支持
-% 一般子图配置:
-% \begin{figure}[htbp] % h: here; t: top; b: bottom; p: new page
-%     \centering
-%     \begin{subfigure}[htbp]{0.45\textwidth}
-%         \includegraphics[width=0.4\textwidth]{picture1}
-%         \caption{子图1标题}
-%         \label{fig:sub1}
-%     \end{subfigure}
-%     \hfill
-%     \begin{subfigure}[htbp]{0.45\textwidth}
-%         \includegraphics[width=0.4\textwidth]{picture2}
-%         \caption{子图2标题}
-%         \label{fig:sub2}
-%     \end{subfigure}
-%     \caption{整体图片标题}
-%     \label{fig:overall}
-% \end{figure}
+% ==========================================
+%  9. TikZ 绘图系统 (TikZ & PGF) - 核心新增
+% ==========================================
+\RequirePackage{tcolorbox}   % 彩色盒子
 
-\RequirePackage{booktabs} % 增强表格
-% 一般表格配置:
-% \begin{table}[htbp]
-%     \centering
-%     \caption{表格标题}
-%     \label{tab:table}
-%     \begin{tabular}{ccc} % {ccc} 是各列的对齐方式, l: left; c: center; r: right
-%         \toprule % 顶部粗线
-%         第一列 & 第二列 & 第三列 \\ % 同样地, \\ 换行, & 标记对齐点
-%         \midrule % 中间粗线
-%         第一行第一列 & 第一行第二列 & 第一行第三列 \\
-%         第二行第一列 & 第二行第二列 & 第二行第三列 \\
-%         \bottomrule % 底部粗线
-%     \end{tabular}
-% \end{table}
+% 功能: 极其强大的绘图工具
+\RequirePackage{tikz}
+\usetikzlibrary{
+    shapes,         % 形状库: ellipse, node styles
+    arrows.meta,    % 箭头库: 提供更多箭头样式 (Stepper, Latex, etc.)
+    positioning,    % 定位库: below = of node1
+    calc,           % 计算库: ($ (a) + (b) $)
+    patterns,       % 填充纹理: north east lines
+    decorations.pathreplacing, % 路径装饰: brace (大括号)
+    decorations.markings,      % 标记装饰: 在线上加箭头
+    quotes,         % 引用语法: "label"
+    fit,            % 自适应节点: fit=(a)(b)
+    backgrounds,    % 背景层: on background layer
+    shadows,        % 阴影: drop shadow
+    trees,          % 树形图
+    mindmap         % 思维导图
+}
 
-\RequirePackage{enumitem} % 增强列表
-% 一般列表配置:
-% \begin{enumerate}[label=\ding{112}, leftmargin=2cm] % 列表项目符号
-%     \item 第一项
-%     \item 第二项
-%     \item 第三项
-% \end{enumerate}
+% --- PGFPlots 高级绘图库 ---
+% 功能: 专业级函数绘图与数据可视化
+\RequirePackage{pgfplots}
+\pgfplotsset{compat=1.18}   % 使用最新兼容模式
+\usepgfplotslibrary{
+    fillbetween,            % 区域填充
+    polar                   % 极坐标图
+}
 
-\RequirePackage{tcolorbox} % 彩色盒子, 用于强调或突出显示
-% 一般彩色盒子配置:
-% \begin{tcolorbox}[colback=yellow!10!white, colframe=yellow!50!black, title=注意]
-% colback: 背景颜色
-% colframe: 边框颜色
-% 这是一个提示框。
-% \end{tcolorbox}
+% --- TikZ 常用样式预定义 ---
+% 1. 基础节点样式
+\tikzset{
+    base/.style = {draw, align=center, minimum height=2em, minimum width=2em},
+    % 矩形框 (例如: 流程图处理块)
+    process/.style = {base, rectangle, rounded corners, fill=orange!10},
+    % 判断框 (例如: 流程图判断)
+    decision/.style = {base, diamond, aspect=2, fill=blue!10, inner sep=0pt},
+    % 输入输出 (平行四边形)
+    io/.style = {base, trapezium, trapezium left angle=70, trapezium right angle=110, fill=green!10},
+    % 开始/结束 (胶囊形)
+    startstop/.style = {base, rounded rectangle, fill=red!10},
+    % 箭头样式
+    arrow/.style = {thick, ->, >=Stealth},
+    % 连接线样式
+    line/.style = {thick}
+}
 
-\RequirePackage{cite} % 优化引用的显示，如 [1-3]
+% ==========================================
+%  10. 中文支持与排版优化 (Chinese Support)
+% ==========================================
+% CTeX 宏包配置
+\RequirePackage[UTF8, heading=true, scheme=chinese]{ctex}
+\RequirePackage{xeCJK}
+\RequirePackage{fontspec}
 
-\RequirePackage{multirow} % 允许表格合并行
-\RequirePackage{array}    % 提供更多的表格列控制功能
+% 字体设置 (建议根据系统安装字体调整)
+% Win/Linux通用常用配置:
+\setmainfont{Times New Roman}
+\setsansfont{Arial}
+% \setmonofont{Maple Mono NF}
+% % 中文字体 - 优先匹配系统常见字体
+% % 注意: 如果编译报错"Font not found", 请修改为系统实际存在的字体名
+\setCJKmainfont{SimSun}      % 宋体
+\setCJKsansfont{Source Han Sans CN}      % 黑体
+% \setCJKmonofont{Source Han Sans CN}    % 黑体
 
-\RequirePackage[UTF8, heading=true]{ctex} % 中文支持
+% 微排版优化
+\RequirePackage{microtype}
+% 首行缩进 (即使是章节后的第一段)
+\RequirePackage{indentfirst}
 
-\RequirePackage{xeCJK} % 中文字体设置
-\RequirePackage{fontspec} % 字体设置, 与 pdflatex 不兼容
-\setmainfont{Times New Roman} % 设置默认字体, 需要 ttf-ms-fonts
-\setCJKmainfont{SimSun} % 设置中文字体, 需要预先安装!
-
-\RequirePackage{microtype}[ % 微调排版效果
-    protrustion=true, % 标点悬挂, 让行尾标点稍微突出一点, 视觉更整齐
-    expansion=true, % 字体伸缩, 微调字宽
-    final % 确保在草稿模式下也启用
-]
-
-\makeatletter
+% ==========================================
+%  11. 页面布局与页眉页脚 (Layout)
+% ==========================================
+% 仅在 article 类生效，避免冲突
 \@ifclassloaded{article}{
-    % 仅在 article 文档中加载以下包
-    \RequirePackage{fancyhdr} % 页眉页脚支持
-    % 一般页眉页脚配置:
-    % \pagestyle{fancy}
-    % \fancyhf{} % 清空页眉页脚
-    % \lhead{左侧页眉内容}
-    % \chead{中央页眉内容}
-    % \rhead{右侧页眉内容}
-    % \lfoot{左侧页脚内容}
-    % \cfoot{中央页脚内容}
-    % \rfoot{右侧页脚内容}
+    \RequirePackage{geometry}
+    \geometry{
+        a4paper,
+        left=2.5cm,
+        right=2.5cm,
+        top=2.5cm,
+        bottom=2.5cm
+    }
     
-    \RequirePackage{geometry} % 页面布局
-    % 一般页面配置:
-    % \geometry {
-    %     a4paper, % 纸张大小
-    %     left=3.18cm, % 左间距
-    %     right=3.18cm, % 右间距
-    %     top=2.54cm, % 上间距
-    %     bottom=2.54cm, % 下间距
-    %     heightrounded,
-    % }
+    \RequirePackage{fancyhdr}
+    \pagestyle{fancy}
+    \fancyhf{}
+    \lhead{\leftmark}       % 左页眉: 章节名
+    \rhead{\thepage}        % 右页眉: 页码
+}{}
 
-    % 应在最后加载
-    \RequirePackage[pdfborder={0 0 0}]{hyperref} % 超链接支持
-    % \hypersetup {
-        % colorlinks=true,
-        % linkcolor=blue,
-        % filecolor=magenta,
-        % urlcolor=cyan,
-    % }
-    % \href{url}{text} % 插入超链接
-    % \ref{fig_label} % 增强引用
-    % \tableofcontents % 插入目录, 并自动使目录项成为超链接
+% ==========================================
+%  12. 引用与PDF元数据 (Hyperref)
+% ==========================================
+\RequirePackage{cite} % [1-3] 样式引用
+\RequirePackage[pdfborder={0 0 0}]{hyperref} % 超链接
+\hypersetup{
+    colorlinks=true,        % 激活彩色链接
+    linkcolor=blue,         % 内部链接(目录, 公式引用)颜色
+    filecolor=magenta,      % 文件链接颜色
+    urlcolor=cyan,          % URL链接颜色
+    citecolor=green!50!black, % 引用颜色([1])
+    pdftitle={Generated Document},
+    pdfauthor={Orion},
 }
-\makeatother
+
+% ==========================================
+%  13. 自定义命令 (Custom Commands)
+% ==========================================
+% 语义化字体切换
+\newcommand{\zh}[1]{{\CJKfamily{zhsong}#1}} % 强制宋体
+\newcommand{\en}[1]{{\fontfamily{lmr}\selectfont#1}} % 强制英文字体
+
+% 强调关键字: 红色加粗
+\newcommand{\keyword}[1]{\textbf{\textcolor{red!80!black}{#1}}}
+
+% 行内代码简化: 灰色背景+等宽
+\newcommand{\code}[1]{\colorbox{gray!10}{\texttt{#1}}}
+
+% 待办事项: 醒目黄底红字
+\newcommand{\todo}[1]{\par\noindent\colorbox{yellow}{\textbf{TODO: } #1}\par}
+
+\endinput
