@@ -1,4 +1,4 @@
-\ProvidesPackage{otex}
+\ProvidesPackage{otex}[Orion's Custom Package]
 
 \RequirePackage{xcolor} % 颜色配置
 % 代码块颜色配置:
@@ -119,14 +119,23 @@
 % 这是一个提示框。
 % \end{tcolorbox}
 
-\RequirePackage[UTF8]{ctex} % 中文支持
+\RequirePackage{cite} % 优化引用的显示，如 [1-3]
+
+\RequirePackage{multirow} % 允许表格合并行
+\RequirePackage{array}    % 提供更多的表格列控制功能
+
+\RequirePackage[UTF8, heading=true]{ctex} % 中文支持
 
 \RequirePackage{xeCJK} % 中文字体设置
 \RequirePackage{fontspec} % 字体设置, 与 pdflatex 不兼容
 \setmainfont{Times New Roman} % 设置默认字体, 需要 ttf-ms-fonts
-% \setCJKmainfont{思源宋体} % 设置中文字体
+\setCJKmainfont{SimSun} % 设置中文字体, 需要预先安装!
 
-\RequirePackage{microtype} % 微调排版效果
+\RequirePackage{microtype}[ % 微调排版效果
+    protrustion=true, % 标点悬挂, 让行尾标点稍微突出一点, 视觉更整齐
+    expansion=true, % 字体伸缩, 微调字宽
+    final % 确保在草稿模式下也启用
+]
 
 \makeatletter
 \@ifclassloaded{article}{
