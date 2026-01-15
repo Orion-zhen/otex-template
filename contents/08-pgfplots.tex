@@ -13,7 +13,7 @@ PGFPlots is a package built on top of TikZ, specifically designed for plotting s
 \vspace{0.5em}
 \subsubsection{代码展示 (Code)}
 
-\begin{lstlisting}[language=TeX]
+\begin{minted}{latex}
 \begin{tikzpicture}
     \begin{axis}[
         title={My Plot},
@@ -24,7 +24,7 @@ PGFPlots is a package built on top of TikZ, specifically designed for plotting s
     \addplot[blue, domain=-2:2] {x^2};
     \end{axis}
 \end{tikzpicture}
-\end{lstlisting}
+\end{minted}
 
 \subsubsection{语法详解 (Syntax)}
 
@@ -61,13 +61,13 @@ PGFPlots can also draw impressive 3D surface plots.
 \vspace{0.5em}
 \subsubsection{代码展示 (Code)}
 
-\begin{lstlisting}[language=TeX]
+\begin{minted}{latex}
 \begin{tikzpicture}
     \begin{axis}[colormap/viridis]
     \addplot3[surf, domain=-2:2] {exp(-x^2-y^2)};
     \end{axis}
 \end{tikzpicture}
-\end{lstlisting}
+\end{minted}
 
 \subsubsection{语法详解 (Syntax)}
 

@@ -15,6 +15,7 @@
 \newif\ifotex@loadmath      % amsmath 等数学宏包
 \newif\ifotex@loadgraphics  % tikz, graphicx 等绘图工具
 \newif\ifotex@loadlistings  % listings 代码高亮
+\newif\ifotex@loadminted    % minted 代码高亮 (需 -shell-escape)
 \newif\ifotex@loadtables    % booktabs 等表格增强
 
 % 第二步: 粒度化覆盖选项 (Granular Override Options)
@@ -61,6 +62,8 @@
 \DeclareOption{nographics}{\otex@loadgraphicsfalse}
 \DeclareOption{listings}{\otex@loadlistingstrue}
 \DeclareOption{nolistings}{\otex@loadlistingsfalse}
+\DeclareOption{minted}{\otex@loadmintedtrue}
+\DeclareOption{nominted}{\otex@loadmintedfalse}
 \DeclareOption{tables}{\otex@loadtablestrue}
 \DeclareOption{notables}{\otex@loadtablesfalse}
 
@@ -85,7 +88,9 @@
     \otex@loadalgotrue
     \otex@loadmathtrue
     \otex@loadgraphicstrue
+    \otex@loadgraphicstrue
     \otex@loadlistingstrue
+    \otex@loadmintedtrue
     \otex@loadtablestrue
 \else
     % 未知类 (可能是期刊模板): 仅开启无害功能，关闭风险功能
@@ -103,6 +108,7 @@
     \otex@loadmathtrue
     \otex@loadgraphicstrue
     \otex@loadlistingstrue
+    \otex@loadmintedfalse       % 风险: Shell-escape 依赖
     \otex@loadtablestrue
 \fi
 
@@ -180,6 +186,7 @@
 \@ifpackageloaded{cleveref}{\otex@loadclevereffalse \PackageInfo{otex}{Package 'cleveref' detected. Disabling otex cleveref.}}{}
 \@ifpackageloaded{caption}{\otex@loadcaptionfalse \PackageInfo{otex}{Package 'caption' detected. Disabling otex caption.}}{}
 \@ifpackageloaded{algorithm}{\otex@loadalgofalse \PackageInfo{otex}{Package 'algorithm' detected. Disabling otex algorithm2e.}}{}
+\@ifpackageloaded{minted}{\otex@loadmintedfalse \PackageInfo{otex}{Package 'minted' detected. Disabling otex minted.}}{}
 % 检查定理环境是否已定义
 \@ifundefined{theorem}{}{\otex@loadtheoremsfalse \PackageInfo{otex}{Theorem environment detected. Disabling otex theorems.}}
 
@@ -279,6 +286,9 @@
 % ==========================================
 %  5. 代码高亮 (Code Highlighting)
 % ==========================================
+% 提供 listings (纯LaTeX) 和 minted (Python/Pygments) 两种方案
+% 建议: 能用 -shell-escape 编译时优先使用 minted
+
 \ifotex@loadlistings
     \RequirePackage{listings}
     \lstset{
@@ -300,10 +310,30 @@
         showstringspaces=false,                  % 字符串中不显示空格
         extendedchars=true,                      % 扩展字符支持
         captionpos=b,                            % 标题位置: 底部
-        escapeinside={(*@}{@*)},                 % 逃逸字符, 用于在代码中写LaTeX
+        escapeinside={(*@}{@*)},                 % 逃逸字符
+        inputencoding=utf8
     }
-    % 支持中文代码的补丁 (xelatex下通常不需要特别处理，但为了保险)
-    \lstset{inputencoding=utf8}
+\fi
+
+\ifotex@loadminted
+    % 检查 shell-escape 是否开启 (简单检查)
+    \ifnum\shellescape=1
+        \RequirePackage{minted}
+        \usemintedstyle{friendly} % 风格类似: friendly, pastie, vs
+        \setminted{
+            bgcolor=code_background, % 背景色
+            fontsize=\small,
+            linenos,                 % 行号
+            breaklines,              % 自动换行
+            tabsize=4,
+            frame=lines,             % 上下边框
+            framesep=2mm,
+            autogobble               % 自动去除缩进
+        }
+    \else
+        \PackageWarning{otex}{Shell-escape not enabled! Minted disabled. Falling back to listings if enabled.}
+        \otex@loadmintedfalse
+    \fi
 \fi
 
 % ==========================================
@@ -552,7 +582,46 @@
 \newcommand{\keyword}[1]{\textbf{\textcolor{red!80!black}{#1}}}
 
 % 行内代码简化: 灰色背景+等宽
-\newcommand{\code}[1]{\colorbox{gray!10}{\texttt{#1}}}
+% --- 行内代码: \code ---
+% 功能: 统一的行内代码高亮/格式化
+% 用法: \code{print("Hello")}
+%
+% 行为差异:
+% - minted 模式: 使用 \mintinline{text}{...}, 支持自动换行, 稍微更慢
+% - listings 模式: 使用 \colorbox + \texttt, 简单快速, 不支持复杂高亮
+%
+% [高级用法] 如果你需要特定语言的行内高亮 (仅 minted 模式有效):
+% 请直接使用: \mintinline{python}{def foo()}
+%
+\newcommand{\code}[1]{%
+    \ifotex@loadminted
+        % 使用 text 词法分析器作为通用默认值, 避免特定语法报错
+        \mintinline[bgcolor=code_background,breaklines,fontsize=\small]{text}{#1}%
+    \else
+        \colorbox{code_background}{\texttt{\small #1}}%
+    \fi
+}
+
+% --- 统一接口: \inputcode ---
+% 功能: 从外部文件导入代码，自动适配 listings 或 minted 后端
+% 用法: \inputcode{语言}{文件路径}
+% 示例: \inputcode{python}{scripts/demo.py}
+%
+% 行为差异:
+% - listings: 使用 \lstinputlisting, 样式受 \lstset 控制
+% - minted: 使用 \inputminted, 样式受 \setminted 控制
+%
+\newcommand{\inputcode}[2]{%
+    \ifotex@loadminted
+        \inputminted{#1}{#2}%
+    \else
+        \ifotex@loadlistings
+            \lstinputlisting[language=#1]{#2}%
+        \else
+            \PackageError{otex}{No code highlighting package loaded!}{Enable 'listings' or 'minted'.}
+        \fi
+    \fi
+}
 
 % 待办事项: 醒目黄底红字
 \newcommand{\todo}[1]{\par\noindent\colorbox{yellow}{\textbf{TODO: } #1}\par}

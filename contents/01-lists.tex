@@ -13,13 +13,13 @@ Unordered lists are used to display a collection of items with no specific order
 \vspace{0.5em}
 \subsubsection{代码展示 (Code)}
 
-\begin{lstlisting}[language=TeX]
+\begin{minted}{latex}
 \begin{itemize}
     \item Default item
     \item[--] Custom dash item
     \item[\textcolor{red}{$\bullet$}] Red bullet item
 \end{itemize}
-\end{lstlisting}
+\end{minted}
 
 \subsubsection{语法详解 (Syntax)}
 
@@ -51,7 +51,7 @@ Ordered lists are used to display sequential steps or rankings. They can automat
 \vspace{0.5em}
 \subsubsection{代码展示 (Code)}
 
-\begin{lstlisting}[language=TeX]
+\begin{minted}{latex}
 \begin{enumerate}[label=\textbf{Step \arabic*.}]
     \item First step
     \item Second step
@@ -60,7 +60,7 @@ Ordered lists are used to display sequential steps or rankings. They can automat
         \item Sub-step B
     \end{enumerate}
 \end{enumerate}
-\end{lstlisting}
+\end{minted}
 
 \subsubsection{语法详解 (Syntax)}
 
@@ -96,12 +96,12 @@ Description lists are used to explain terms or define concepts, where each item 
 \vspace{0.5em}
 \subsubsection{代码展示 (Code)}
 
-\begin{lstlisting}[language=TeX]
+\begin{minted}{latex}
 \begin{description}
     \item[LaTeX] A document preparation system.
     \item[CLI] Command Line Interface.
 \end{description}
-\end{lstlisting}
+\end{minted}
 
 \subsubsection{语法详解 (Syntax)}
 
@@ -129,7 +129,7 @@ Nested lists allow creating sub-lists within list items. LaTeX automatically han
 \vspace{0.5em}
 \subsubsection{代码展示 (Code)}
 
-\begin{lstlisting}[language=TeX]
+\begin{minted}{latex}
 \begin{enumerate}
     \item First top-level item
     \begin{enumerate}
@@ -141,7 +141,7 @@ Nested lists allow creating sub-lists within list items. LaTeX automatically han
     \end{enumerate}
     \item Second top-level item
 \end{enumerate}
-\end{lstlisting}
+\end{minted}
 
 \subsubsection{语法详解 (Syntax)}
 
@@ -178,7 +178,7 @@ Using the \texttt{enumitem} package, you can easily modify list symbols, numberi
 \vspace{0.5em}
 \subsubsection{代码展示 (Code)}
 
-\begin{lstlisting}[language=TeX]
+\begin{minted}{latex}
 % Resume numbering from previous list
 \begin{enumerate}[resume]
     \item Third item (continued)
@@ -194,7 +194,7 @@ Using the \texttt{enumitem} package, you can easily modify list symbols, numberi
     \item Item V
     \item Item VI
 \end{enumerate}
-\end{lstlisting}
+\end{minted}
 
 \subsubsection{语法详解 (Syntax)}
 
@@ -237,14 +237,14 @@ Inline lists are used to intersperse list items within paragraph text, typically
 \vspace{0.5em}
 \subsubsection{代码展示 (Code)}
 
-\begin{lstlisting}[language=TeX]
+\begin{minted}{latex}
 Three things to remember:
 \begin{enumerate*}[label=(\arabic*)]
     \item practice,
     \item practice, and
     \item more practice.
 \end{enumerate*}
-\end{lstlisting}
+\end{minted}
 
 \subsubsection{语法详解 (Syntax)}
 
@@ -276,13 +276,13 @@ Create to-do lists using symbols provided by \texttt{amssymb}.
 \vspace{0.5em}
 \subsubsection{代码展示 (Code)}
 
-\begin{lstlisting}[language=TeX]
+\begin{minted}{latex}
 \begin{itemize}[label=$\square$]
     \item Unchecked task
     \item[$\boxtimes$] Checked task
     \item Another pending task
 \end{itemize}
-\end{lstlisting}
+\end{minted}
 
 \subsubsection{语法详解 (Syntax)}
 

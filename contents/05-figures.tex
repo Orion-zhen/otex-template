@@ -13,14 +13,14 @@ Inserting images is a basic requirement for document typesetting. LaTeX uses the
 \vspace{0.5em}
 \subsubsection{代码展示 (Code)}
 
-\begin{lstlisting}[language=TeX]
+\begin{minted}{latex}
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.4\textwidth]{example-image-a}
     \caption{Standard Figure}
     \label{fig:std}
 \end{figure}
-\end{lstlisting}
+\end{minted}
 
 \subsubsection{语法详解 (Syntax)}
 
@@ -52,7 +52,7 @@ When comparing multiple images, subfigures are useful.
 \vspace{0.5em}
 \subsubsection{代码展示 (Code)}
 
-\begin{lstlisting}[language=TeX]
+\begin{minted}{latex}
 \begin{figure}[htbp]
     \centering
     \begin{subfigure}[b]{0.3\textwidth}
@@ -66,7 +66,7 @@ When comparing multiple images, subfigures are useful.
     \end{subfigure}
     \caption{Comparison}
 \end{figure}
-\end{lstlisting}
+\end{minted}
 
 \subsubsection{语法详解 (Syntax)}
 
@@ -104,7 +104,7 @@ When text needs to wrap around an image (common in magazine or textbook layouts)
 \vspace{0.5em}
 \subsubsection{代码展示 (Code)}
 
-\begin{lstlisting}[language=TeX]
+\begin{minted}{latex}
 \begin{wrapfigure}{r}{0.3\textwidth}
     \centering
     \includegraphics[width=0.25\textwidth]{example-image}
@@ -112,7 +112,7 @@ When text needs to wrap around an image (common in magazine or textbook layouts)
 \end{wrapfigure}
 This text wraps around the figure on the right. 
 Make sure there is enough text content here...
-\end{lstlisting}
+\end{minted}
 
 \subsubsection{语法详解 (Syntax)}
 

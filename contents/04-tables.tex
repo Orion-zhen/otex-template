@@ -13,7 +13,7 @@ Scientific papers recommend using "Three-line Tables", which use only top, middl
 \vspace{0.5em}
 \subsubsection{代码展示 (Code)}
 
-\begin{lstlisting}[language=TeX]
+\begin{minted}{latex}
 \begin{table}[htbp]
     \centering
     \caption{Comparison of Metrics}
@@ -26,17 +26,17 @@ Scientific papers recommend using "Three-line Tables", which use only top, middl
         \bottomrule
     \end{tabular}
 \end{table}
-\end{lstlisting}
+\end{minted}
 
 \subsubsection{语法详解 (Syntax)}
 
 \textbf{Tabular 环境基础}:
-\begin{lstlisting}[language=TeX]
+\begin{minted}{latex}
 \begin{tabular}{col_spec}
     Cell 1 & Cell 2 \\ 
     ...
 \end{tabular}
-\end{lstlisting}
+\end{minted}
 
 \begin{itemize}
     \item \textbf{列格式 (Column Specifiers)}: 定义在 \code{\textbackslash begin\{tabular\}} 后的花括号中。
@@ -84,9 +84,9 @@ The core of advanced tables lies in "merging". The key is to understand that a t
 Column merging is done via \code{\textbackslash multicolumn}. It is also used to change the alignment of a single cell.
 
 \textbf{语法 (Syntax):}
-\begin{lstlisting}[language=TeX]
+\begin{minted}{latex}
 \multicolumn{number}{align}{text}
-\end{lstlisting}
+\end{minted}
 \begin{itemize}
     \item \code{number}: 要合并的列数 (Number of columns to merge)。
     \item \code{align}: 新的对齐方式 (e.g., \code{c}, \code{l}, \code{r}, \code{|c|})。
@@ -96,7 +96,7 @@ Column merging is done via \code{\textbackslash multicolumn}. It is also used to
 \textbf{示例分析 (Example Analysis):}
 我们想把第一行的两个单元格合并。
 
-\begin{lstlisting}[language=TeX]
+\begin{minted}{latex}
 \begin{tabular}{|c|c|}
     \hline
     % 合并2列，居中对齐，内容为 "Title"
@@ -105,7 +105,7 @@ Column merging is done via \code{\textbackslash multicolumn}. It is also used to
     Cell A & Cell B \\
     \hline
 \end{tabular}
-\end{lstlisting}
+\end{minted}
 
 \begin{center}
 \begin{tabular}{|c|c|}
@@ -124,9 +124,9 @@ Column merging is done via \code{\textbackslash multicolumn}. It is also used to
 Row merging requires the \code{multirow} package.
 
 \textbf{语法 (Syntax):}
-\begin{lstlisting}[language=TeX]
+\begin{minted}{latex}
 \multirow{number}{width}{text}
-\end{lstlisting}
+\end{minted}
 \begin{itemize}
     \item \code{number}: 要合并的行数。
     \item \code{width}: 单元格宽度，通常填 \code{*} 让其自动适应。
@@ -140,7 +140,7 @@ When using \code{\textbackslash multirow}, the corresponding cell in the \textbf
 
 \textbf{示例分析 (Example Analysis):}
 
-\begin{lstlisting}[language=TeX]
+\begin{minted}{latex}
 \begin{tabular}{|c|c|}
     \hline
     % 第1行：声明合并2行，内容 "Common"
@@ -149,7 +149,7 @@ When using \code{\textbackslash multirow}, the corresponding cell in the \textbf
      & Row 2 Data \\ 
     \hline
 \end{tabular}
-\end{lstlisting}
+\end{minted}
 
 \begin{center}
 \begin{tabular}{|c|c|}
@@ -181,7 +181,7 @@ Let's build a complex "Schedule" with multi-level headers.
 
 \textbf{代码实现 (Implementation):}
 
-\begin{lstlisting}[language=TeX]
+\begin{minted}{latex}
 \begin{table}[htbp]
 \centering
 \caption{Complex Schedule Construction}
@@ -216,7 +216,7 @@ Let's build a complex "Schedule" with multi-level headers.
     \bottomrule
 \end{tabular}
 \end{table}
-\end{lstlisting}
+\end{minted}
 
 \subsubsection{最终效果 (Final Effect)}
 
@@ -244,7 +244,7 @@ Let's build a complex "Schedule" with multi-level headers.
 
 \vspace{0.5em}
 \subsubsection{代码展示 (Code)}
-\begin{lstlisting}[language=TeX]
+\begin{minted}{latex}
 % \usepackage[table]{xcolor}
 \begin{tabular}{l c}
     \toprule
@@ -256,7 +256,7 @@ Let's build a complex "Schedule" with multi-level headers.
     Banana & \cellcolor{red!10} \$0.80 \\
     \bottomrule
 \end{tabular}
-\end{lstlisting}
+\end{minted}
 
 \subsubsection{颜色格式详解 (Color Syntax)}
 \code{xcolor} 提供了强大的颜色混合语法。
@@ -270,11 +270,11 @@ Let's build a complex "Schedule" with multi-level headers.
         \item \code{blue!50!green}: 50\% 蓝色 + 50\% 绿色 (Mix Blue and Green).
     \end{itemize}
     \item \textbf{自定义颜色 (Custom Colors)}:
-    \begin{lstlisting}[language=TeX]
+    \begin{minted}{latex}
 \definecolor{myblue}{RGB}{0, 100, 200}    % 0-255 RGB
 \definecolor{myred}{HTML}{FF0000}         % Hex
 \definecolor{mygray}{gray}{0.9}           % 0-1 Grayscale
-    \end{lstlisting}
+    \end{minted}
 \end{itemize}
 
 \subsubsection{效果展示 (Effect)}
@@ -296,7 +296,7 @@ Let's build a complex "Schedule" with multi-level headers.
 \subsubsection{功能介绍 (Introduction)}
 对于超过一页的表格，使用 \code{longtable} 环境。
 
-\begin{lstlisting}[language=TeX]
+\begin{minted}{latex}
 \begin{longtable}{l p{8cm}}
     \caption{Long Table} \\
     \toprule
@@ -313,7 +313,7 @@ Let's build a complex "Schedule" with multi-level headers.
     Row 1 & Data... \\
     Row 2 & Data... \\
 \end{longtable}
-\end{lstlisting}
+\end{minted}
 
 \subsubsection{效果展示 (Effect)}
 \begin{longtable}{l p{8cm}}

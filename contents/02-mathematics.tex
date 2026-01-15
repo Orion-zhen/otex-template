@@ -13,7 +13,7 @@ One of LaTeX's most powerful features is typesetting mathematics. We can use the
 \vspace{0.5em}
 \subsubsection{代码展示 (Code)}
 
-\begin{lstlisting}[language=TeX]
+\begin{minted}{latex}
 % Single numbered equation
 \begin{equation}
     E = mc^2 \label{eq:einstein}
@@ -24,7 +24,7 @@ One of LaTeX's most powerful features is typesetting mathematics. We can use the
     f(x) &= (x+a)(x+b) \nonumber \\
          &= x^2 + (a+b)x + ab
 \end{align}
-\end{lstlisting}
+\end{minted}
 
 \subsubsection{语法详解 (Syntax)}
 
@@ -59,7 +59,7 @@ Matrices and piecewise functions are common structures in linear algebra and cal
 \vspace{0.5em}
 \subsubsection{代码展示 (Code)}
 
-\begin{lstlisting}[language=TeX]
+\begin{minted}{latex}
 $$
     \mathbf{A} = \begin{pmatrix} 
         1 & 0 \\ 
@@ -71,7 +71,7 @@ $$
         -x & \text{if } x < 0
     \end{cases}
 $$
-\end{lstlisting}
+\end{minted}
 
 \subsubsection{语法详解 (Syntax)}
 
@@ -109,7 +109,7 @@ Calculus formulas often involve complex limits, sums, and integrals with subscri
 \vspace{0.5em}
 \subsubsection{代码展示 (Code)}
 
-\begin{lstlisting}[language=TeX]
+\begin{minted}{latex}
 % Limit and Summation
 $$ \lim_{x \to \infty} \frac{1}{x} = 0, \quad \sum_{n=1}^{\infty} \frac{1}{n^2} = \frac{\pi^2}{6} $$
 
@@ -118,7 +118,7 @@ $$ \int_{a}^{b} f(x) \,dx = F(b) - F(a) $$
 
 % Triple Integral
 $$ \iiint_{V} \rho(x,y,z) \,dx\,dy\,dz $$
-\end{lstlisting}
+\end{minted}
 
 \subsubsection{语法详解 (Syntax)}
 
@@ -152,7 +152,7 @@ $$ \iiint_{V} \rho(x,y,z) \,dx\,dy\,dz $$
 \vspace{0.5em}
 \subsubsection{代码展示 (Code)}
 
-\begin{lstlisting}[language=TeX]
+\begin{minted}{latex}
 \begin{definition}[Prime Number]
     A natural number greater than 1 that has no positive divisors other than 1 and itself.
 \end{definition}
@@ -164,7 +164,7 @@ $$ \iiint_{V} \rho(x,y,z) \,dx\,dy\,dz $$
 \begin{proof}
     Suppose there are finitely many primes $p_1, \dots, p_n$. Let $P = p_1 \cdots p_n + 1$. Then $P$ is not divisible by any $p_i$, contradiction.
 \end{proof}
-\end{lstlisting}
+\end{minted}
 
 \subsubsection{语法详解 (Syntax)}
 
@@ -181,14 +181,14 @@ $$ \iiint_{V} \rho(x,y,z) \,dx\,dy\,dz $$
 
 You can change the environment names by passing package options or redefining macros.
 
-\begin{lstlisting}[language=TeX]
+\begin{minted}{latex}
 % Option 1: Use English names (Theorem, Definition, etc.)
 % \usepackage[english]{otex}
 
 % Option 2: Manually redefine specific names
 \renewcommand{\algorithmcfname}{算法} % Rename algorithm
 \renewcommand{\theoremname}{MyTheorem} % Custom theorem name
-\end{lstlisting}
+\end{minted}
 
 \subsubsection{效果展示 (Effect)}
 
@@ -217,7 +217,7 @@ LaTeX provides a vast array of mathematical symbols. Below are examples of commo
 \vspace{0.5em}
 \subsubsection{代码展示 (Code)}
 
-\begin{lstlisting}[language=TeX]
+\begin{minted}{latex}
 $$
     \alpha, \beta, \gamma, \Delta, \pi, \theta, \phi
 $$
@@ -227,7 +227,7 @@ $$
 $$
     A \subseteq B, \quad A \cup B, \quad A \cap B, \quad x \neq y
 $$
-\end{lstlisting}
+\end{minted}
 
 \subsubsection{语法详解 (Syntax)}
 
