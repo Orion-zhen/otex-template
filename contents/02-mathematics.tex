@@ -1,0 +1,253 @@
+% ==========================================================
+\section{Mathematics (数学公式)}
+% ==========================================================
+
+\subsection{Equations and Alignments (方程与对齐)}
+
+\subsubsection{功能介绍 (Introduction)} 
+
+LaTeX 最强大的功能之一是排版数学公式。我们可以使用 \texttt{equation} 环境进行自动编号，使用 \texttt{align} 环境进行多行公式对齐。
+
+One of LaTeX's most powerful features is typesetting mathematics. We can use the \texttt{equation} environment for automatic numbering and the \texttt{align} environment for multi-line equation alignment.
+
+\vspace{0.5em}
+\subsubsection{代码展示 (Code)}
+
+\begin{lstlisting}[language=TeX]
+% Single numbered equation
+\begin{equation}
+    E = mc^2 \label{eq:einstein}
+\end{equation}
+
+% Aligned equations
+\begin{align}
+    f(x) &= (x+a)(x+b) \nonumber \\
+         &= x^2 + (a+b)x + ab
+\end{align}
+\end{lstlisting}
+
+\subsubsection{语法详解 (Syntax)}
+
+\begin{itemize}
+    \item \code{equation}: 生成带编号的单行公式。
+    \item \code{align}: 生成多行公式，使用 \code{\&} 指定对齐位置，反斜杠加反斜杠换行。
+    \item \code{nonumber}: 阻止当前行生成编号。
+    \item \code{label}: 添加引用标签。
+\end{itemize}
+
+\subsubsection{效果展示 (Effect)}
+
+\begin{equation}
+    E = mc^2 \label{eq:einstein}
+\end{equation}
+
+\begin{align}
+    f(x) &= (x+a)(x+b) \nonumber \\
+         &= x^2 + (a+b)x + ab
+\end{align}
+
+% ----------------------------------------------------------
+
+\subsection{Matrices and Cases (矩阵与分段函数)}
+
+\subsubsection{功能介绍 (Introduction)} 
+
+矩阵和分段函数是线性代数和微积分中常见的结构。
+
+Matrices and piecewise functions are common structures in linear algebra and calculus.
+
+\vspace{0.5em}
+\subsubsection{代码展示 (Code)}
+
+\begin{lstlisting}[language=TeX]
+$$
+    \mathbf{A} = \begin{pmatrix} 
+        1 & 0 \\ 
+        0 & 1 
+    \end{pmatrix}, 
+    \quad
+    |x| = \begin{cases}
+        x & \text{if } x \ge 0 \\
+        -x & \text{if } x < 0
+    \end{cases}
+$$
+\end{lstlisting}
+
+\subsubsection{语法详解 (Syntax)}
+
+\begin{itemize}
+    \item \code{pmatrix}: 圆括号矩阵 \code{()}。
+    \item \code{bmatrix}: 方括号矩阵 \code{[]}。
+    \item \code{cases}: 分段函数环境，自动添加左大括号。
+    \item \code{\\text}: 在数学模式中插入普通文本。
+\end{itemize}
+
+\subsubsection{效果展示 (Effect)}
+
+$$
+    \mathbf{A} = \begin{pmatrix} 
+        1 & 0 \\ 
+        0 & 1 
+    \end{pmatrix}, 
+    \quad
+    |x| = \begin{cases}
+        x & \text{if } x \ge 0 \\
+        -x & \text{if } x < 0
+    \end{cases}
+$$
+
+% ----------------------------------------------------------
+
+\subsection{Calculus and Integrals (微积分与积分)}
+
+\subsubsection{功能介绍 (Introduction)}
+
+微积分公式通常包含极限、求和、积分等复杂的上下标结构。使用 \texttt{\$\$} 可以让这些公式独立成行显示。
+
+Calculus formulas often involve complex limits, sums, and integrals with subscripts and superscripts. Using \texttt{\$\$} displays these formulas on their own lines.
+
+\vspace{0.5em}
+\subsubsection{代码展示 (Code)}
+
+\begin{lstlisting}[language=TeX]
+% Limit and Summation
+$$ \lim_{x \to \infty} \frac{1}{x} = 0, \quad \sum_{n=1}^{\infty} \frac{1}{n^2} = \frac{\pi^2}{6} $$
+
+% Definite Integral
+$$ \int_{a}^{b} f(x) \,dx = F(b) - F(a) $$
+
+% Triple Integral
+$$ \iiint_{V} \rho(x,y,z) \,dx\,dy\,dz $$
+\end{lstlisting}
+
+\subsubsection{语法详解 (Syntax)}
+
+\begin{itemize}
+    \item \code{\\lim}, \code{\\sum}, \code{\\int}: 分别表示极限、求和、积分。
+    \item \code{\_\{...\}}: 下标 (Lower limit)。
+    \item \code{\^\{...\}}: 上标 (Upper limit)。
+    \item \code{\\to}: 趋近箭头 ($\to$)。
+    \item \code{\\infty}: 无穷符号 ($\infty$)。
+    \item \code{\\,}: 插入一个小间距 (thin space)，常用于微分算子 $dx$ 前。
+\end{itemize}
+
+\subsubsection{效果展示 (Effect)}
+
+$$ \lim_{x \to \infty} \frac{1}{x} = 0, \quad \sum_{n=1}^{\infty} \frac{1}{n^2} = \frac{\pi^2}{6} $$
+
+$$ \int_{a}^{b} f(x) \,dx = F(b) - F(a) $$
+
+$$ \iiint_{V} \rho(x,y,z) \,dx\,dy\,dz $$
+
+% ----------------------------------------------------------
+
+\subsection{Theorem Environments (定理环境)}
+
+\subsubsection{功能介绍 (Introduction)}
+
+\texttt{otex.sty} 预定义了常用的数学环境，如定理、定义、引理和证明。这些环境会自动处理编号和格式。
+
+\texttt{otex.sty} predefines common mathematical environments such as theorems, definitions, lemmas, and proofs. These environments automatically handle numbering and formatting.
+
+\vspace{0.5em}
+\subsubsection{代码展示 (Code)}
+
+\begin{lstlisting}[language=TeX]
+\begin{definition}[Prime Number]
+    A natural number greater than 1 that has no positive divisors other than 1 and itself.
+\end{definition}
+
+\begin{theorem}[Euclid]
+    There are infinitely many prime numbers.
+\end{theorem}
+
+\begin{proof}
+    Suppose there are finitely many primes $p_1, \dots, p_n$. Let $P = p_1 \cdots p_n + 1$. Then $P$ is not divisible by any $p_i$, contradiction.
+\end{proof}
+\end{lstlisting}
+
+\subsubsection{语法详解 (Syntax)}
+
+\begin{itemize}
+    \item \code{definition}: 定义环境。
+    \item \code{theorem}: 定理环境，可选参数 \code{[Name]} 用于指定定理名称。
+    \item \code{proof}: 证明环境，自动以 Q.E.D. 方块结尾。
+    \item 更多可用环境: \code{lemma} (引理), \code{proposition} (命题), \code{corollary} (推论), \code{example} (例), \code{remark} (注).
+\end{itemize}
+
+\paragraph{配置定理名称 (Configuring Names)}
+
+可以通过加载宏包时的选项或重定义宏来修改环境名称。
+
+You can change the environment names by passing package options or redefining macros.
+
+\begin{lstlisting}[language=TeX]
+% Option 1: Use English names (Theorem, Definition, etc.)
+% \usepackage[english]{otex}
+
+% Option 2: Manually redefine specific names
+\renewcommand{\algorithmcfname}{算法} % Rename algorithm
+\renewcommand{\theoremname}{MyTheorem} % Custom theorem name
+\end{lstlisting}
+
+\subsubsection{效果展示 (Effect)}
+
+\begin{definition}[Prime Number]
+    A natural number greater than 1 that has no positive divisors other than 1 and itself.
+\end{definition}
+
+\begin{theorem}[Euclid]
+    There are infinitely many prime numbers.
+\end{theorem}
+
+\begin{proof}
+    Suppose there are finitely many primes $p_1, \dots, p_n$. Let $P = p_1 \cdots p_n + 1$. Then $P$ is not divisible by any $p_i$, contradiction.
+\end{proof}
+
+% ----------------------------------------------------------
+
+\subsection{Greek Letters and Special Symbols (希腊字母与特殊符号)}
+
+\subsubsection{功能介绍 (Introduction)}
+
+LaTeX 提供了大量的数学符号。以下是一些常用的希腊字母和关系符号的示例。
+
+LaTeX provides a vast array of mathematical symbols. Below are examples of common Greek letters and relation symbols.
+
+\vspace{0.5em}
+\subsubsection{代码展示 (Code)}
+
+\begin{lstlisting}[language=TeX]
+$$
+    \alpha, \beta, \gamma, \Delta, \pi, \theta, \phi
+$$
+$$
+    \forall x \in \mathbb{R}, \exists y \text{ s.t. } y > x
+$$
+$$
+    A \subseteq B, \quad A \cup B, \quad A \cap B, \quad x \neq y
+$$
+\end{lstlisting}
+
+\subsubsection{语法详解 (Syntax)}
+
+\begin{itemize}
+    \item 希腊字母: \code{\\alpha}, \code{\\beta}, \code{\\Delta} (大写), 等。
+    \item 逻辑符号: \code{\\forall} ($\forall$), \code{\\exists} ($\exists$)。
+    \item 集合符号: \code{\\in} ($\in$), \code{\\subseteq} ($\subseteq$), \code{\\cup} ($\cup$), \code{\\cap} ($\cap$)。
+    \item \code{\\mathbb}: 黑板粗体，常用于表示数集 (需 \code{amssymb} 宏包)。
+\end{itemize}
+
+\subsubsection{效果展示 (Effect)}
+
+$$
+    \alpha, \beta, \gamma, \Delta, \pi, \theta, \phi
+$$
+$$
+    \forall x \in \mathbb{R}, \exists y \text{ s.t. } y > x
+$$
+$$
+    A \subseteq B, \quad A \cup B, \quad A \cap B, \quad x \neq y
+$$
+
+% ==========================================================

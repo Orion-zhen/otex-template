@@ -1,0 +1,97 @@
+% ==========================================================
+\section{Tables (表格)}
+% ==========================================================
+
+\subsection{Professional Tables (专业表格)}
+
+\subsubsection{功能介绍 (Introduction)} 
+
+科技论文中推荐使用所有的 ``三线表''，即仅使用顶部、中部和底部三条横线，去除垂直分割线。
+
+Scientific papers recommend using "Three-line Tables", which use only top, middle, and bottom horizontal lines, removing vertical separators.
+
+\vspace{0.5em}
+\subsubsection{代码展示 (Code)}
+
+\begin{lstlisting}[language=TeX]
+\begin{table}[htbp]
+    \centering
+    \caption{Comparison of Metrics}
+    \begin{tabular}{l c r}
+        \toprule
+        \textbf{Model} & \textbf{Accuracy} & \textbf{Time (s)} \\
+        \midrule
+        Baseline & 85.2\% & 12.5 \\
+        Ours & 92.1\% & 15.3 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+\end{lstlisting}
+
+\subsubsection{语法详解 (Syntax)}
+
+\begin{itemize}
+    \item \code{booktabs}: 提供 \code{\\toprule} (顶部横线), \code{\\midrule} (中部横线), \code{\\bottomrule} (底部横线) 命令。
+    \item \code{tabular}: 基础表格环境。
+    \item \code{l c r}: 列对齐方式 (Left, Center, Right)。
+\end{itemize}
+
+\subsubsection{效果展示 (Effect)}
+
+\begin{table}[htbp]
+    \centering
+    \caption{Comparison of Accuracy and Performance}
+    \begin{tabular}{l c r}
+        \toprule
+        \textbf{Model} & \textbf{Accuracy} & \textbf{Inference Time (ms)} \\
+        \midrule
+        ResNet-50 & 76.1\% & 24 \\
+        ViT-Base & 81.3\% & 45 \\
+        \textbf{Ours-Pro} & \textbf{83.5\%} & 38 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\subsection{Complex Tables (复杂表格)}
+
+\subsubsection{功能介绍 (Introduction)} 
+
+复杂表格可能包含合并行、合并列以及彩色背景。
+
+Complex tables may contain merged rows, merged columns, and colored backgrounds.
+
+\vspace{0.5em}
+\subsubsection{代码展示 (Code)}
+
+\begin{lstlisting}[language=TeX]
+\begin{tabular}{|c|c|c|}
+    \hline
+    \multirow{2}{*}{Group} & \multicolumn{2}{c|}{Data} \\ \cline{2-3}
+     & Val 1 & Val 2 \\ \hline
+    A & 10 & 20 \\ \hline
+\end{tabular}
+\end{lstlisting}
+
+\subsubsection{语法详解 (Syntax)}
+
+\begin{itemize}
+    \item \code{\\multirow\{rows\}\{width\}\{text\}}: 合并行。
+    \item \code{\\multicolumn\{cols\}\{align\}\{text\}}: 合并列。
+    \item \code{\\cline{start-end}}: 绘制部分横线。
+\end{itemize}
+
+\subsubsection{效果展示 (Effect)}
+
+\begin{table}[htbp]
+    \centering
+    \caption{Merged Rows and Columns}
+    \begin{tabular}{c|c|c}
+        \toprule
+        \multirow{2}{*}{\textbf{Region}} & \multicolumn{2}{c}{\textbf{Statistics}} \\ \cmidrule{2-3}
+         & \textbf{Population} & \textbf{Growth} \\ 
+        \midrule
+        North & 1.5M & +2.1\% \\
+        South & 2.1M & +1.5\% \\
+        \bottomrule
+    \end{tabular}
+\end{table}

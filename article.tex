@@ -1,35 +1,56 @@
 \documentclass{article}
-\usepackage{otex}
+\usepackage[english]{otex}
 
-\geometry {
-    a4paper, % 纸张大小
-    left=3.18cm, % 左间距
-    right=3.18cm, % 右间距
-    top=2.54cm, % 上间距
-    bottom=2.54cm, % 下间距
-    heightrounded,
+\ctexset{
+    % otex宏包的[english]选项已自动处理了以下名称的英文本地化 (如 Contents, References 等)
+    % 仅保留自定义的格式设置:
+    section/format += \raggedright % (可选) 让章节标题左对齐而不是居中
 }
 
-\title{Example Article}
-\author{Orion\thanks{org.orion}}
+% 文档元数据
+\title{Orion's LaTeX Encyclopedia \\ \large \zh{LaTeX 权威指南与百科全书}}
+\author{Orion \thanks{Email: orion@example.com}}
 \date{\today}
 
 \begin{document}
 
-\maketitle % 生成标题页
-\newpage % 换页
-\tableofcontents % 生成目录
-\newpage % 换页
-\section{Abstract}
+\maketitle
 
-This is an example article.
+\begin{abstract}
+    \noindent \textbf{Abstract:} This document serves as a comprehensive encyclopedia for LaTeX usage, designed to demonstrate the full capabilities of the \texttt{otex} package. It adopts a bilingual format (Chinese and English) and a structured four-step demonstration process for each feature: Introduction, Code, Explanation, and Effect. Topics covered include lists, mathematics, code algorithms, tables, figures, references, TikZ graphics, and advanced PGFPlots.
+    
+    \vspace{0.5em}
+    \noindent \textbf{\zh{摘要：}} 本文档是一部全面的 LaTeX 使用百科全书，旨在展示 \texttt{otex} 宏包的强大功能。文档采用中英文双语格式，并对每个功能通过标准化的四步流程进行演示：功能介绍、代码展示、语法详解和效果展示。涵盖的主题包括列表、数学公式、算法代码、表格、插图、引用系统、TikZ 绘图以及高级 PGFPlots 数据可视化。
+\end{abstract}
 
-\section{Intruduction}
+\tableofcontents
+\newpage
 
-\begin{lstlisting}[language=Python, caption={Example Python code}, label={lst:example:Python}]
-print("Hello, world!")
-\end{lstlisting}
+\input{contents/01-lists}
 
-The code \ref{lst:example:Python} is an example Python code.
+\newpage
+\input{contents/02-mathematics}
+
+\newpage
+\input{contents/03-code}
+
+\newpage
+\input{contents/04-tables}
+
+\newpage
+\input{contents/05-figures}
+
+\newpage
+\input{contents/06-references}
+
+\newpage
+\input{contents/07-tikz}
+
+\newpage
+\input{contents/08-pgfplots}
+
+\newpage
+\bibliographystyle{plain}
+\bibliography{ref}
 
 \end{document}

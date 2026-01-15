@@ -1,0 +1,96 @@
+% ==========================================================
+\section{Code and Algorithms (代码与算法)}
+% ==========================================================
+
+\subsection{Code Listings (代码块)}
+
+\subsubsection{功能介绍 (Introduction)} 
+
+展示源代码时，通常需要语法高亮、行号和等宽字体。我们使用 \texttt{listings} 宏包来实现。
+
+When displaying source code, syntax highlighting, line numbers, and monospaced fonts are usually required. We use the \texttt{listings} package to achieve this.
+
+\vspace{0.5em}
+\subsubsection{代码展示 (Code)}
+
+\begin{lstlisting}[language=TeX]
+\begin{lstlisting}[language=Python, caption={Python Example}, label={lst:py}]
+def factorial(n):
+    if n == 0:
+        return 1
+    return n * factorial(n-1)
+\end{lstlisting }
+\end{lstlisting} % Note: Space added in end tag to avoid nesting error
+
+\subsubsection{语法详解 (Syntax)}
+
+\begin{itemize}
+    \item \code{language}: 指定代码语言 (如 Python, C++, Java)。
+    \item \code{caption}: 添加代码块标题。
+    \item \code{label}: 添加引用标签。
+    \item 样式配置在 \texttt{otex.sty} 中定义。
+\end{itemize}
+
+\subsubsection{效果展示 (Effect)}
+
+\begin{lstlisting}[language=Python, caption={Python Recursive Factorial}, label={lst:py}]
+def factorial(n):
+    """Calculate the factorial of n recursively."""
+    if n == 0:
+        return 1
+    else:
+        return n * factorial(n-1)
+\end{lstlisting}
+
+% ----------------------------------------------------------
+
+\subsection{Algorithms (伪代码)}
+
+\subsubsection{功能介绍 (Introduction)} 
+
+算法伪代码提供了一种结构化的方式来描述算法逻辑，独立于具体编程语言。
+
+Algorithm pseudocode provides a structured way to describe algorithmic logic, independent of specific programming languages.
+
+\vspace{0.5em}
+\subsubsection{代码展示 (Code)}
+
+\begin{lstlisting}[language=TeX]
+\begin{algorithm}[H]
+    \SetAlgoLined
+    \KwIn{List $L$}
+    \KwOut{Sorted List $L$}
+    \While{unsorted}{
+        Find minimum element $m$\;
+        Move $m$ to sorted portion\;
+    }
+    \caption{Selection Sort}
+\end{algorithm}
+\end{lstlisting}
+
+\subsubsection{语法详解 (Syntax)}
+
+\begin{itemize}
+    \item \code{algorithm2e}: 使用的宏包。
+    \item \code{\\KwIn}, \code{\\KwOut}: 输入输出关键字。
+    \item \code{\\While}, \code{\\If}: 控制流结构。
+    \item \code{\\;}: 语句结束的分号。
+\end{itemize}
+
+\subsubsection{效果展示 (Effect)}
+
+\begin{algorithm}[H]
+    \SetAlgoLined
+    \KwIn{Array $A$ of $n$ elements}
+    \KwOut{Sorted Array $A$}
+    \For{$i \gets 0$ \KwTo $n-2$}{
+        $min \gets i$\;
+        \For{$j \gets i+1$ \KwTo $n-1$}{
+            \If{$A[j] < A[min]$}{
+                $min \gets j$\;
+            }
+        }
+        Swap $A[i]$ and $A[min]$\;
+    }
+    \caption{Selection Sort Algorithm}
+\end{algorithm}

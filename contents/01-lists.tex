@@ -1,0 +1,301 @@
+% ==========================================================
+\section{Lists and Enumerations (列表与枚举)}
+% ==========================================================
+
+\subsection{Unordered Lists (无序列表)}
+
+\subsubsection{功能介绍 (Introduction)} 
+
+无序列表用于展示没有特定顺序的项目集合。默认使用圆点作为符号，但可以通过 \texttt{enumitem} 宏包进行高度定制。
+
+Unordered lists are used to display a collection of items with no specific order. They use bullets by default but can be highly customized using the \texttt{enumitem} package.
+
+\vspace{0.5em}
+\subsubsection{代码展示 (Code)}
+
+\begin{lstlisting}[language=TeX]
+\begin{itemize}
+    \item Default item
+    \item[--] Custom dash item
+    \item[\textcolor{red}{$\bullet$}] Red bullet item
+\end{itemize}
+\end{lstlisting}
+
+\subsubsection{语法详解 (Syntax)}
+
+\begin{itemize}
+    \item \code{\\begin\{itemize\}}: 开启无序列表环境。
+    \item \code{\\item}: 开始一个新列表项。
+    \item \code{[label]}: 可选参数，用于覆盖默认符号 (需 \texttt{enumitem})。
+    \item \code{\\bullet}: 默认的圆点符号。
+\end{itemize}
+
+\subsubsection{效果展示 (Effect)}
+
+\begin{itemize}
+    \item Default item
+    \item[--] Custom dash item
+    \item[\textcolor{red}{$\bullet$}] Red bullet item
+\end{itemize}
+
+% ----------------------------------------------------------
+
+\subsection{Ordered Lists (有序列表)}
+
+\subsubsection{功能介绍 (Introduction)} 
+
+有序列表用于展示有顺序的步骤或排行。可以自动生成数字、字母或罗马数字编号。
+
+Ordered lists are used to display sequential steps or rankings. They can automatically generate numbers, letters, or Roman numerals.
+
+\vspace{0.5em}
+\subsubsection{代码展示 (Code)}
+
+\begin{lstlisting}[language=TeX]
+\begin{enumerate}[label=\textbf{Step \arabic*.}]
+    \item First step
+    \item Second step
+    \begin{enumerate}[label=(\alph*)]
+        \item Sub-step A
+        \item Sub-step B
+    \end{enumerate}
+\end{enumerate}
+\end{lstlisting}
+
+\subsubsection{语法详解 (Syntax)}
+
+\begin{itemize}
+    \item \code{\\begin\{enumerate\}}: 开启有序列表环境。
+    \item \code{label=\\arabic*}: 设置标签样式，\code{\\arabic*} 代表阿拉伯数字 (1, 2, 3)。
+    \item \code{\\alph*}: 小写字母 (a, b, c)。
+    \item \code{\\Roman*}: 大写罗马数字 (I, II, III)。
+    \item \code{Step}: 可以在编号前后添加自定义文本。
+\end{itemize}
+
+\subsubsection{效果展示 (Effect)}
+
+\begin{enumerate}[label=\textbf{Step \arabic*.}]
+    \item First step
+    \item Second step
+    \begin{enumerate}[label=(\alph*)]
+        \item Sub-step A
+        \item Sub-step B
+    \end{enumerate}
+\end{enumerate}
+
+% ----------------------------------------------------------
+
+\subsection{Description Lists (描述列表)}
+
+\subsubsection{功能介绍 (Introduction)} 
+
+描述列表用于解释术语或定义概念，每个项目由一个加粗的标签和一段描述文本组成。
+
+Description lists are used to explain terms or define concepts, where each item consists of a bold label and a description text.
+
+\vspace{0.5em}
+\subsubsection{代码展示 (Code)}
+
+\begin{lstlisting}[language=TeX]
+\begin{description}
+    \item[LaTeX] A document preparation system.
+    \item[CLI] Command Line Interface.
+\end{description}
+\end{lstlisting}
+
+\subsubsection{语法详解 (Syntax)}
+
+\begin{itemize}
+    \item \code{\\item[Label]}: 方括号内的内容会作为标签加粗显示。
+\end{itemize}
+
+\subsubsection{效果展示 (Effect)}
+
+\begin{description}
+    \item[LaTeX] A document preparation system used for high-quality typesetting.
+    \item[CLI] Command Line Interface, interaction with computer programs via text.
+\end{description}
+
+% ----------------------------------------------------------
+
+\subsection{Nested Lists (嵌套列表)}
+
+\subsubsection{功能介绍 (Introduction)}
+
+嵌套列表允许在列表项中创建子列表。LaTeX 自动为不同层级的列表处理标签样式（如：1 $\to$ (a) $\to$ i $\to$ A）。
+
+Nested lists allow creating sub-lists within list items. LaTeX automatically handles label styles for different levels (e.g., 1 $\to$ (a) $\to$ i $\to$ A).
+
+\vspace{0.5em}
+\subsubsection{代码展示 (Code)}
+
+\begin{lstlisting}[language=TeX]
+\begin{enumerate}
+    \item First top-level item
+    \begin{enumerate}
+        \item First sub-item
+        \item Second sub-item
+        \begin{enumerate}
+            \item Deeply nested item
+        \end{enumerate}
+    \end{enumerate}
+    \item Second top-level item
+\end{enumerate}
+\end{lstlisting}
+
+\subsubsection{语法详解 (Syntax)}
+
+\begin{itemize}
+    \item 嵌套列表最大深度默认为 4 层。
+    \item \code{enumerate} 默认标签顺序：1, (a), i, A。
+    \item \code{itemize} 默认标签顺序：$\bullet$, --, $\ast$, $\cdot$。
+\end{itemize}
+
+\subsubsection{效果展示 (Effect)}
+
+\begin{enumerate}
+    \item First top-level item
+    \begin{enumerate}
+        \item First sub-item
+        \item Second sub-item
+        \begin{enumerate}
+            \item Deeply nested item
+        \end{enumerate}
+    \end{enumerate}
+    \item Second top-level item
+\end{enumerate}
+
+% ----------------------------------------------------------
+
+\subsection{Custom List Styles (自定义列表样式)}
+
+\subsubsection{功能介绍 (Introduction)}
+
+利用 \texttt{enumitem} 宏包，可以轻松修改列表的符号、编号样式、间距等。
+
+Using the \texttt{enumitem} package, you can easily modify list symbols, numbering styles, spacing, etc.
+
+\vspace{0.5em}
+\subsubsection{代码展示 (Code)}
+
+\begin{lstlisting}[language=TeX]
+% Resume numbering from previous list
+\begin{enumerate}[resume]
+    \item Third item (continued)
+\end{enumerate}
+
+% Custom symbol and color
+\begin{itemize}[label=\textcolor{blue}{\textbullet}]
+    \item Blue bullet item
+\end{itemize}
+
+% Roman numerals with custom format
+\begin{enumerate}[label=\Roman*., start=5]
+    \item Item V
+    \item Item VI
+\end{enumerate}
+\end{lstlisting}
+
+\subsubsection{语法详解 (Syntax)}
+
+\begin{itemize}
+    \item \code{resume}: 接续上前一个同类型列表的编号。
+    \item \code{start=N}: 强制从数字 N 开始编号。
+    \item \code{label=\\textcolor\{color\}\{symbol\}}: 自定义标签颜色和符号。
+\end{itemize}
+
+\subsubsection{效果展示 (Effect)}
+
+\begin{enumerate}
+    \item Previous item 1
+    \item Previous item 2
+\end{enumerate}
+
+\begin{enumerate}[resume]
+    \item Third item (continued numbering)
+\end{enumerate}
+
+\begin{itemize}[label=\textcolor{blue}{\textbullet}]
+    \item Blue bullet item
+\end{itemize}
+
+\begin{enumerate}[label=\Roman*., start=5]
+    \item Item V
+    \item Item VI
+\end{enumerate}
+
+% ----------------------------------------------------------
+
+\subsection{Inline Lists (行内列表)}
+
+\subsubsection{功能介绍 (Introduction)}
+
+行内列表用于在段落文字中穿插列表项，通常用于枚举短语。需要 \texttt{enumitem} 的 \texttt{inline} 选项（本模板已默认加载）。
+
+Inline lists are used to intersperse list items within paragraph text, typically for enumerating phrases. Requires the \texttt{inline} option of \texttt{enumitem} (loaded by default in this template).
+
+\vspace{0.5em}
+\subsubsection{代码展示 (Code)}
+
+\begin{lstlisting}[language=TeX]
+Three things to remember:
+\begin{enumerate*}[label=(\arabic*)]
+    \item practice,
+    \item practice, and
+    \item more practice.
+\end{enumerate*}
+\end{lstlisting}
+
+\subsubsection{语法详解 (Syntax)}
+
+\begin{itemize}
+    \item \code{enumerate*}: 行内有序列表环境 (需 \texttt{enumitem[inline]})。
+    \item \code{itemize*}: 行内无序列表环境。
+    \item 适用于将列表项作为句子的一部分流畅展示。
+\end{itemize}
+
+\subsubsection{效果展示 (Effect)}
+
+Three things to remember:
+\begin{enumerate*}[label=(\arabic*)]
+    \item practice,
+    \item practice, and
+    \item more practice.
+\end{enumerate*}
+
+% ----------------------------------------------------------
+
+\subsection{Checklists (任务清单)}
+
+\subsubsection{功能介绍 (Introduction)}
+
+使用 \texttt{amssymb} 提供的符号创建待办事项清单。
+
+Create to-do lists using symbols provided by \texttt{amssymb}.
+
+\vspace{0.5em}
+\subsubsection{代码展示 (Code)}
+
+\begin{lstlisting}[language=TeX]
+\begin{itemize}[label=$\square$]
+    \item Unchecked task
+    \item[$\boxtimes$] Checked task
+    \item Another pending task
+\end{itemize}
+\end{lstlisting}
+
+\subsubsection{语法详解 (Syntax)}
+
+\begin{itemize}
+    \item \code{\\square}: 空方框符号 (需 \texttt{amssymb})。
+    \item \code{\\boxtimes}: 带叉方框符号。
+    \item \code{\\checkmark}: 对勾符号。
+\end{itemize}
+
+\subsubsection{效果展示 (Effect)}
+
+\begin{itemize}[label=$\square$]
+    \item Unchecked task
+    \item[$\boxtimes$] Checked task
+    \item Another pending task
+\end{itemize}

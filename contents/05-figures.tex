@@ -1,0 +1,133 @@
+% ==========================================================
+\section{Figures (图片)}
+% ==========================================================
+
+\subsection{Standard Figures (标准插图)}
+
+\subsubsection{功能介绍 (Introduction)} 
+
+插入图片是文档排版的基本需求。LaTeX 使用 \texttt{figure} 浮动体环境来管理图片位置。
+
+Inserting images is a basic requirement for document typesetting. LaTeX uses the \texttt{figure} floating environment to manage image placement.
+
+\vspace{0.5em}
+\subsubsection{代码展示 (Code)}
+
+\begin{lstlisting}[language=TeX]
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.4\textwidth]{example-image-a}
+    \caption{Standard Figure}
+    \label{fig:std}
+\end{figure}
+\end{lstlisting}
+
+\subsubsection{语法详解 (Syntax)}
+
+\begin{itemize}
+    \item \code{\\includegraphics[options]\{file\}}: 插入图片。
+    \item \code{width=0.4\\textwidth}: 设置宽度为文本宽度的 40\%。
+    \item \code{[htbp]}: 推荐的位置参数 (Here, Top, Bottom, Page)。
+\end{itemize}
+
+\subsubsection{效果展示 (Effect)}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.4\textwidth]{example-image-a}
+    \caption{Standard Figure Example}
+    \label{fig:std}
+\end{figure}
+
+% ----------------------------------------------------------
+
+\subsection{Subfigures (子图)}
+
+\subsubsection{功能介绍 (Introduction)} 
+
+当需要对比多张图片时，可以使用子图功能。
+
+When comparing multiple images, subfigures are useful.
+
+\vspace{0.5em}
+\subsubsection{代码展示 (Code)}
+
+\begin{lstlisting}[language=TeX]
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{example-image-b}
+        \caption{Left}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{example-image-c}
+        \caption{Right}
+    \end{subfigure}
+    \caption{Comparison}
+\end{figure}
+\end{lstlisting}
+
+\subsubsection{语法详解 (Syntax)}
+
+\begin{itemize}
+    \item \code{subcaption}: 宏包提供的 \code{subfigure} 环境。
+    \item \code{\\hfill}: 在两个子图之间插入弹性空格以撑满行宽。
+\end{itemize}
+
+\subsubsection{效果展示 (Effect)}
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{example-image-b}
+        \caption{Method A}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{example-image-c}
+        \caption{Method B}
+    \end{subfigure}
+    \caption{Subfigure Comparison Example}
+\end{figure}
+
+% ----------------------------------------------------------
+
+\subsection{Text Wrapping (图文环绕)}
+
+\subsubsection{功能介绍 (Introduction)} 
+
+当需要文字环绕图片排列时（常见于杂志或教材排版），可以使用 \texttt{wrapfigure} 环境。请注意，不需要环绕的文字段落长度必须足够包围图片。
+
+When text needs to wrap around an image (common in magazine or textbook layouts), use the \texttt{wrapfigure} environment. Note that the text paragraph must be long enough to wrap around the image.
+
+\vspace{0.5em}
+\subsubsection{代码展示 (Code)}
+
+\begin{lstlisting}[language=TeX]
+\begin{wrapfigure}{r}{0.3\textwidth}
+    \centering
+    \includegraphics[width=0.25\textwidth]{example-image}
+    \caption{Wrapped Image}
+\end{wrapfigure}
+This text wraps around the figure on the right. 
+Make sure there is enough text content here...
+\end{lstlisting}
+
+\subsubsection{语法详解 (Syntax)}
+
+\begin{itemize}
+    \item \code{\\begin\{wrapfigure\}\{align\}\{width\}}: 开启环绕环境。
+    \item \code{align}: 对齐方式，\code{r} (right), \code{l} (left)。大写 \code{R}/\code{L} 表示浮动。
+    \item \code{width}: 图片占用的总宽度。
+\end{itemize}
+
+\subsubsection{效果展示 (Effect)}
+
+\begin{wrapfigure}{r}{0.3\textwidth}
+    \centering
+    \includegraphics[width=0.25\textwidth]{example-image}
+    \caption{Wrapped Image}
+\end{wrapfigure}
+Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Etiam lobortis facilisis sem. Nullam nec mi et neque pharetra sollicitudin. Praesent imperdiet mi nec ante. Donec ullamcorper, felis non sodales commodo, lectus velit ultrices augue, a dignissim nibh lectus placerat pede. Vivamus nunc nunc, molestie ut, ultricies vel, semper in, velit. Ut porta, leo ut ultricies aliquam, odio wisi commodo quam, vel accumsan dolor wisi et ante. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
+\par % Ensure paragraph ends to clear wrapping correctly if needed

@@ -1,0 +1,66 @@
+% ==========================================================
+\section{References and Alerts (引用与提示)}
+% ==========================================================
+
+\subsection{Citations and Cross-References (引用)}
+
+\subsubsection{功能介绍 (Introduction)} 
+
+自动化管理参考文献和交叉引用是 LaTeX 的核心优势。
+
+Automated management of bibliography and cross-references is a core strength of LaTeX.
+
+\vspace{0.5em}
+\subsubsection{代码展示 (Code)}
+
+\begin{lstlisting}[language=TeX]
+See Figure \ref{fig:std} on page \pageref{fig:std}.
+As shown in \cite{shannon1948}, information theory...
+\end{lstlisting}
+
+\subsubsection{语法详解 (Syntax)}
+
+\begin{itemize}
+    \item \code{\\ref\{key\}}: 引用编号。
+    \item \code{\\pageref\{key\}}: 引用页码。
+    \item \code{\\cite\{key\}}: 引用参考文献。
+\end{itemize}
+
+\subsubsection{效果展示 (Effect)} 
+
+See Figure \ref{fig:std} on page \pageref{fig:std}. \\
+
+As shown in \cite{shannon1948}, information theory is fundamental to modern communication.
+
+% ----------------------------------------------------------
+
+\subsection{Alert Boxes (提示框)}
+
+\subsubsection{功能介绍 (Introduction)} 
+
+使用 \texttt{tcolorbox} 创建醒目的提示框。
+
+Use \texttt{tcolorbox} to create eye-catching alert boxes.
+
+\vspace{0.5em}
+\subsubsection{代码展示 (Code)}
+
+\begin{lstlisting}[language=TeX]
+\begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Warning]
+    This is a warning!
+\end{tcolorbox}
+\end{lstlisting}
+
+\subsubsection{语法详解 (Syntax)}
+
+\begin{itemize}
+    \item \code{colback}: 背景色。
+    \item \code{colframe}: 边框色。
+    \item \code{title}: 盒子标题。
+\end{itemize}
+
+\subsubsection{效果展示 (Effect)}
+
+\begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Warning]
+    Please pay attention to this critical warning.
+\end{tcolorbox}
