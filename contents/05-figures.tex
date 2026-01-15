@@ -25,8 +25,8 @@ Inserting images is a basic requirement for document typesetting. LaTeX uses the
 \subsubsection{语法详解 (Syntax)}
 
 \begin{itemize}
-    \item \code{\\includegraphics[options]\{file\}}: 插入图片。
-    \item \code{width=0.4\\textwidth}: 设置宽度为文本宽度的 40\%。
+    \item \code{\textbackslash includegraphics[options]\{file\}}: 插入图片。
+    \item \code{width=0.4\textbackslash textwidth}: 设置宽度为文本宽度的 40\%。
     \item \code{[htbp]}: 推荐的位置参数 (Here, Top, Bottom, Page)。
 \end{itemize}
 
@@ -72,7 +72,7 @@ When comparing multiple images, subfigures are useful.
 
 \begin{itemize}
     \item \code{subcaption}: 宏包提供的 \code{subfigure} 环境。
-    \item \code{\\hfill}: 在两个子图之间插入弹性空格以撑满行宽。
+    \item \code{\textbackslash hfill}: 在两个子图之间插入弹性空格以撑满行宽。
 \end{itemize}
 
 \subsubsection{效果展示 (Effect)}
@@ -117,7 +117,7 @@ Make sure there is enough text content here...
 \subsubsection{语法详解 (Syntax)}
 
 \begin{itemize}
-    \item \code{\\begin\{wrapfigure\}\{align\}\{width\}}: 开启环绕环境。
+    \item \code{\textbackslash begin\{wrapfigure\}\{align\}\{width\}}: 开启环绕环境。
     \item \code{align}: 对齐方式，\code{r} (right), \code{l} (left)。大写 \code{R}/\code{L} 表示浮动。
     \item \code{width}: 图片占用的总宽度。
 \end{itemize}
