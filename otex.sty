@@ -170,6 +170,7 @@
 % ==========================================
 %  1. 基础宏包与颜色配置
 % ==========================================
+\RequirePackage{pdftexcmds} % Portable shell escape detection
 \RequirePackage[table]{xcolor} % 颜色支持
 % 预定义颜色方案
 \definecolor{code_background}{rgb}{0.95, 0.95, 0.95} % 代码块背景: 浅灰
@@ -316,8 +317,8 @@
 \fi
 
 \ifotex@loadminted
-    % 检查 shell-escape 是否开启 (简单检查)
-    \ifnum\shellescape=1
+    % 检查 shell-escape 是否开启 (使用 pdftexcmds 提供的兼容性宏)
+    \ifnum\pdf@shellescape=1
         \RequirePackage{minted}
         \usemintedstyle{friendly} % 风格类似: friendly, pastie, vs
         \setminted{
