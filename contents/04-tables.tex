@@ -30,10 +30,29 @@ Scientific papers recommend using "Three-line Tables", which use only top, middl
 
 \subsubsection{语法详解 (Syntax)}
 
+\textbf{Tabular 环境基础}:
+\begin{lstlisting}[language=TeX]
+\begin{tabular}{col_spec}
+    Cell 1 & Cell 2 \\ 
+    ...
+\end{tabular}
+\end{lstlisting}
+
 \begin{itemize}
-    \item \code{booktabs}: 提供 \code{\\toprule} (顶部横线), \code{\\midrule} (中部横线), \code{\\bottomrule} (底部横线) 命令。
-    \item \code{tabular}: 基础表格环境。
-    \item \code{l c r}: 列对齐方式 (Left, Center, Right)。
+    \item \textbf{列格式 (Column Specifiers)}: 定义在 \code{\textbackslash begin\{tabular\}} 后的花括号中。
+    \begin{itemize}
+        \item \code{l}: 左对齐 (Left-aligned column)。
+        \item \code{c}: 居中对齐 (Centered column)。
+        \item \code{r}: 右对齐 (Right-aligned column)。
+        \item \code{p\{width\}}: 指定宽度的段落列，内容会自动换行 (Paragraph column with fixed width, supports auto-wrapping)。
+        \item \code{|}: 绘制垂直分割线 (Vertical line)。例如 \code{|c|c|} 表示两列都有边框。
+    \end{itemize}
+    \item \textbf{行与列分隔}:
+    \begin{itemize}
+        \item \code{\&}: 分隔同一行中的不同列 (Separates columns).
+        \item \code{\textbackslash \textbackslash}: 结束当前行 (Ends the current row).
+    \end{itemize}
+    \item \code{booktabs}: 提供 \code{\textbackslash toprule}, \code{\textbackslash midrule}, \code{\textbackslash bottomrule} 以绘制不同粗细的专业横线，替代标准的 \code{\textbackslash hline}。
 \end{itemize}
 
 \subsubsection{效果展示 (Effect)}
@@ -52,46 +71,274 @@ Scientific papers recommend using "Three-line Tables", which use only top, middl
     \end{tabular}
 \end{table}
 
-\subsection{Complex Tables (复杂表格)}
+\subsection{Column and Row Merging Fundamentals (行列合并基础)}
 
-\subsubsection{功能介绍 (Introduction)} 
+表格的高级功能核心在于“合并”。理解合并的关键在于：\textbf{表格本质上是一个网格，合并操作只是让某个单元格占据了邻近单元格的空间，但并未改变网格的底层逻辑。}
 
-复杂表格可能包含合并行、合并列以及彩色背景。
+The core of advanced tables lies in "merging". The key is to understand that a table is a grid; merging simply allows a cell to occupy the space of its neighbors without changing the underlying grid logic.
 
-Complex tables may contain merged rows, merged columns, and colored backgrounds.
+\subsubsection{合并列 (\textbackslash multicolumn)}
 
-\vspace{0.5em}
-\subsubsection{代码展示 (Code)}
+合并列通过 \code{\textbackslash multicolumn} 命令实现。它不仅用于合并，也常用于改变单个单元格的对齐方式（例如表头居中，数据居左）。
+
+Column merging is done via \code{\textbackslash multicolumn}. It is also used to change the alignment of a single cell.
+
+\textbf{语法 (Syntax):}
+\begin{lstlisting}[language=TeX]
+\multicolumn{number}{align}{text}
+\end{lstlisting}
+\begin{itemize}
+    \item \code{number}: 要合并的列数 (Number of columns to merge)。
+    \item \code{align}: 新的对齐方式 (e.g., \code{c}, \code{l}, \code{r}, \code{|c|})。
+    \item \code{text}: 单元格内容。
+\end{itemize}
+
+\textbf{示例分析 (Example Analysis):}
+我们想把第一行的两个单元格合并。
 
 \begin{lstlisting}[language=TeX]
-\begin{tabular}{|c|c|c|}
+\begin{tabular}{|c|c|}
     \hline
-    \multirow{2}{*}{Group} & \multicolumn{2}{c|}{Data} \\ \cline{2-3}
-     & Val 1 & Val 2 \\ \hline
-    A & 10 & 20 \\ \hline
+    % 合并2列，居中对齐，内容为 "Title"
+    \multicolumn{2}{|c|}{Merged Header} \\ 
+    \hline
+    Cell A & Cell B \\
+    \hline
 \end{tabular}
 \end{lstlisting}
 
-\subsubsection{语法详解 (Syntax)}
+\begin{center}
+\begin{tabular}{|c|c|}
+    \hline
+    \multicolumn{2}{|c|}{\textbf{Merged Header}} \\ 
+    \hline
+    Cell A & Cell B \\
+    \hline
+\end{tabular}
+\end{center}
+
+\subsubsection{合并行 (\textbackslash multirow)}
+
+合并行需要 \code{multirow} 宏包，命令为 \code{\textbackslash multirow}。
+
+Row merging requires the \code{multirow} package.
+
+\textbf{语法 (Syntax):}
+\begin{lstlisting}[language=TeX]
+\multirow{number}{width}{text}
+\end{lstlisting}
+\begin{itemize}
+    \item \code{number}: 要合并的行数。
+    \item \code{width}: 单元格宽度，通常填 \code{*} 让其自动适应。
+    \item \code{text}: 单元格内容。
+\end{itemize}
+
+\textbf{重要规则 (Crucial Rule):}
+当使用了 \code{\textbackslash multirow\{2\}\{...\}} 时，当前行占据了位置。\textbf{在下一行对应的位置必须留空}（即直接写 \code{\&} 而不填内容），否则内容会重叠。
+
+When using \code{\textbackslash multirow}, the corresponding cell in the \textbf{next rows} must be left empty.
+
+\textbf{示例分析 (Example Analysis):}
+
+\begin{lstlisting}[language=TeX]
+\begin{tabular}{|c|c|}
+    \hline
+    % 第1行：声明合并2行，内容 "Common"
+    \multirow{2}{*}{Common} & Row 1 Data \\ \cline{2-2}
+    % 第2行：第一列留空！因为被上面占用了
+     & Row 2 Data \\ 
+    \hline
+\end{tabular}
+\end{lstlisting}
+
+\begin{center}
+\begin{tabular}{|c|c|}
+    \hline
+    \multirow{2}{*}{Common} & Row 1 Data \\ \cline{2-2}
+     & Row 2 Data \\ 
+    \hline
+\end{tabular}
+\end{center}
+
+注意使用 \code{\textbackslash cline\{2-2\}} 来只画第2列的横线，否则会穿过 "Common" 文本。
+
+Notice using \code{\textbackslash cline\{2-2\}} to draw a horizontal line only across the 2nd column.
+
+\subsection{Step-by-Step Complex Table (手把手构建复杂表格)}
+
+让我们构建一个复杂的“课程表”，包含多级表头。
+
+Let's build a complex "Schedule" with multi-level headers.
+
+\textbf{目标结构 (Goal Logic):}
+\begin{itemize}
+    \item 总共4列。
+    \item 表头第1列是 "Day" (需要跨越3行: Header 1, 2, 3)。
+    \item 表头第2-4列是 "Schedule" (跨越3列)。
+    \item "Schedule" 下面分为 "Morning" (跨越1列, 跨越2行) 和 "Afternoon" (跨越2列)。
+    \item "Afternoon" 下面分为 "13:00" 和 "15:00"。
+\end{itemize}
+
+\textbf{代码实现 (Implementation):}
+
+\begin{lstlisting}[language=TeX]
+\begin{table}[htbp]
+\centering
+\caption{Complex Schedule Construction}
+\begin{tabular}{l c c c}
+    \toprule
+    % --- Row 1 ---
+    % Col 1: Day (跨3行)
+    % Col 2-4: Schedule (跨3列)
+    \multirow{3}{*}{\textbf{Day}} & \multicolumn{3}{c}{\textbf{Schedule}} \\ 
+    % 绘制横线: 从第2列到第4列 (不穿过Day)
+    \cmidrule(lr){2-4}
+    
+    % --- Row 2 ---
+    % Col 1: 空 (Day占位)
+    % Col 2: Morning (跨2行)
+    % Col 3-4: Afternoon (跨2列)
+     & \multirow{2}{*}{\textbf{Morning}} & \multicolumn{2}{c}{\textbf{Afternoon}} \\ 
+    % 绘制横线: 从第3列到第4列 (Morning下方不画线)
+    \cmidrule(lr){3-4}
+    
+    % --- Row 3 ---
+    % Col 1: 空 (Day占位)
+    % Col 2: 空 (Morning占位)
+    % Col 3: 13:00
+    % Col 4: 15:00
+     & & \textbf{13:00} & \textbf{15:00} \\ 
+    \midrule
+    
+    % --- Data Rows ---
+    Mon & Math & Physics & History \\
+    Tue & CS & \multicolumn{2}{c}{Lab (3 hours)} \\ % 数据也可以合并
+    \bottomrule
+\end{tabular}
+\end{table}
+\end{lstlisting}
+
+\subsubsection{最终效果 (Final Effect)}
+
+\begin{table}[htbp]
+\centering
+\caption{Complex Schedule Construction}
+\begin{tabular}{l c c c}
+    \toprule
+    \multirow{3}{*}{\textbf{Day}} & \multicolumn{3}{c}{\textbf{Schedule}} \\ 
+    \cmidrule(lr){2-4}
+     & \multirow{2}{*}{\textbf{Morning}} & \multicolumn{2}{c}{\textbf{Afternoon}} \\ 
+    \cmidrule(lr){3-4}
+     & & \textbf{13:00} & \textbf{15:00} \\ 
+    \midrule
+    Mon & Math & Physics & History \\
+    Tue & CS & \multicolumn{2}{c}{Lab (3 hours)} \\
+    \bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Colored Tables (彩色表格)}
+
+\subsubsection{功能介绍 (Introduction)}
+通过 \code{xcolor} 宏包的 \code{table} 选项，可以轻松为表格添加背景色。
+
+\vspace{0.5em}
+\subsubsection{代码展示 (Code)}
+\begin{lstlisting}[language=TeX]
+% \usepackage[table]{xcolor}
+\begin{tabular}{l c}
+    \toprule
+    % 行颜色
+    \rowcolor{blue!10} \textbf{Item} & \textbf{Cost} \\
+    \midrule
+    Apple & \$1.00 \\
+    % 单元格颜色覆盖行颜色
+    Banana & \cellcolor{red!10} \$0.80 \\
+    \bottomrule
+\end{tabular}
+\end{lstlisting}
+
+\subsubsection{颜色格式详解 (Color Syntax)}
+\code{xcolor} 提供了强大的颜色混合语法。
 
 \begin{itemize}
-    \item \code{\\multirow\{rows\}\{width\}\{text\}}: 合并行。
-    \item \code{\\multicolumn\{cols\}\{align\}\{text\}}: 合并列。
-    \item \code{\\cline{start-end}}: 绘制部分横线。
+    \item \textbf{基础颜色}: \code{red}, \code{blue}, \code{green}, \code{black}, \code{white}, \code{yellow}, \code{cyan}, \code{magenta}.
+    \item \textbf{透明度/混合 (Mixing)}: 
+    \begin{itemize}
+        \item \code{blue!40}: 40\% 蓝色 + 60\% 白色 (40\% Blue, 60\% White).
+        \item \code{red!30!black}: 30\% 红色 + 70\% 黑色 (30\% Red mixed with Black).
+        \item \code{blue!50!green}: 50\% 蓝色 + 50\% 绿色 (Mix Blue and Green).
+    \end{itemize}
+    \item \textbf{自定义颜色 (Custom Colors)}:
+    \begin{lstlisting}[language=TeX]
+\definecolor{myblue}{RGB}{0, 100, 200}    % 0-255 RGB
+\definecolor{myred}{HTML}{FF0000}         % Hex
+\definecolor{mygray}{gray}{0.9}           % 0-1 Grayscale
+    \end{lstlisting}
 \end{itemize}
 
 \subsubsection{效果展示 (Effect)}
-
 \begin{table}[htbp]
     \centering
-    \caption{Merged Rows and Columns}
-    \begin{tabular}{c|c|c}
+    \caption{Colorful Table Example}
+    \begin{tabular}{l c}
         \toprule
-        \multirow{2}{*}{\textbf{Region}} & \multicolumn{2}{c}{\textbf{Statistics}} \\ \cmidrule{2-3}
-         & \textbf{Population} & \textbf{Growth} \\ 
+        \rowcolor{blue!10} \textbf{Item} & \textbf{Cost} \\
         \midrule
-        North & 1.5M & +2.1\% \\
-        South & 2.1M & +1.5\% \\
+        Apple & \$1.00 \\
+        Banana & \cellcolor{red!10} \$0.80 \\
         \bottomrule
     \end{tabular}
 \end{table}
+
+\subsection{Long Tables (跨页长表格)}
+
+\subsubsection{功能介绍 (Introduction)}
+对于超过一页的表格，使用 \code{longtable} 环境。
+
+\begin{lstlisting}[language=TeX]
+\begin{longtable}{l p{8cm}}
+    \caption{Long Table} \\
+    \toprule
+    Header 1 & Header 2 \\
+    \midrule
+    \endfirsthead
+    % ... (后续页表头定义) ...
+    \endhead
+    % ... (页脚定义) ...
+    \endfoot
+    % ... (最后页脚定义) ...
+    \endlastfoot
+    
+    Row 1 & Data... \\
+    Row 2 & Data... \\
+\end{longtable}
+\end{lstlisting}
+
+\subsubsection{效果展示 (Effect)}
+\begin{longtable}{l p{8cm}}
+    \caption{Long Table Example} \\
+    \toprule
+    \textbf{Header 1} & \textbf{Header 2} \\
+    \midrule
+    \endfirsthead
+    \multicolumn{2}{c}%
+    {{\bfseries \tablename\ \thetable{} -- continued}} \\
+    \toprule
+    \textbf{Header 1} & \textbf{Header 2} \\
+    \midrule
+    \endhead
+    \midrule
+    \multicolumn{2}{r}{{Continued...}} \\
+    \bottomrule
+    \endfoot
+    \bottomrule
+    \endlastfoot
+    
+    Row 1 & Data for row 1 which might be long. \\
+    Row 2 & Data for row 2 which might be long. \\
+    Row 3 & Data for row 3 which might be long. \\
+    Row 4 & Data for row 4 which might be long. \\
+    Row 5 & Data for row 5 which might be long. \\
+    Row 6 & Data for row 6 which might be long. \\
+\end{longtable}
