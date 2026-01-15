@@ -28,10 +28,80 @@
 % \DeclarePairedDelimiter 可用于定义自适应括号
 
 % ==========================================
-%  3. 定理环境配置 (Theorem Environments)
+%  3. 本地化与名称配置 (Localization & Names)
 % ==========================================
-%  功能: 自动编号的定理、引理、定义等环境
-%  语法: \begin{theorem}[标题] ... \end{theorem}
+%  功能: 集中管理所有中英文关键词
+%  语法: 这里的名称变量将在后续环境定义中使用
+
+% --- 默认名称 (Default Names - Chinese) ---
+% 定理类
+\newcommand{\theoremname}{定理}
+\newcommand{\lemmaname}{引理}
+\newcommand{\propositionname}{命题}
+\newcommand{\corollaryname}{推论}
+\newcommand{\definitionname}{定义}
+\newcommand{\examplename}{例}
+\newcommand{\remarkname}{注}
+\newcommand{\assumptionname}{假设}
+\newcommand{\conjecturename}{猜想}
+\newcommand{\axiomname}{公理}
+\newcommand{\problemname}{问题}
+\newcommand{\solutionname}{解答}
+\newcommand{\exercisename}{练习}
+\newcommand{\casename}{情形}
+% \proofname 已经在 amsthm 中定义，这里均需重定义以确保一致性
+
+% 文档元素类 (覆盖 LaTeX/CTeX 默认值)
+% 注意: CTeX 会在 \begin{document} 时应用其中文配置, 
+% 所以我们需要在 \AtBeginDocument 中强制应用我们的修改, 
+% 或者修改 CTeX 内部的宏. 但最简单的是使用 \renewcommand 在 English 选项中覆盖,
+% 而默认中文使用 CTeX 的默认值(如果合适)或这里覆盖.
+% 为了统一管理，我们在这里明确定义中文名，确保一致性.
+% (注: \contentsname 等通常由 babel 或 ctex 管理, 直接重定义即可)
+
+% --- 选项配置 (Options) ---
+\newif\ifotex@english % 如果使用 english 选项导入 otex 包
+\DeclareOption{english}{
+    \otex@englishtrue
+    % Theorem-like
+    \renewcommand{\theoremname}{Theorem}
+    \renewcommand{\lemmaname}{Lemma}
+    \renewcommand{\propositionname}{Proposition}
+    \renewcommand{\corollaryname}{Corollary}
+    \renewcommand{\definitionname}{Definition}
+    \renewcommand{\examplename}{Example}
+    \renewcommand{\remarkname}{Remark}
+    \renewcommand{\assumptionname}{Assumption}
+    \renewcommand{\conjecturename}{Conjecture}
+    \renewcommand{\axiomname}{Axiom}
+    \renewcommand{\problemname}{Problem}
+    \renewcommand{\solutionname}{Solution}
+    \renewcommand{\exercisename}{Exercise}
+    \renewcommand{\casename}{Case}
+    \renewcommand{\proofname}{Proof}
+}
+\ProcessOptions\relax
+
+% 修复 CTeX 可能覆盖中文名的问题 (如果需要强制覆盖)
+\ifotex@english
+    \AtBeginDocument{
+        \renewcommand{\contentsname}{Contents}
+        \renewcommand{\listfigurename}{List of Figures}
+        \renewcommand{\listtablename}{List of Tables}
+        \renewcommand{\figurename}{Figure}
+        \renewcommand{\tablename}{Table}
+        % Handle both article (refname) and book/report (bibname) classes
+        \@ifundefined{refname}{}{\renewcommand{\refname}{References}}
+        \@ifundefined{bibname}{}{\renewcommand{\bibname}{References}}
+        \renewcommand{\appendixname}{Appendix}
+        \renewcommand{\indexname}{Index}
+        \renewcommand{\abstractname}{Abstract}
+    }
+\fi
+
+% ==========================================
+%  4. 定理环境注册 (Theorem Environments)
+% ==========================================
 \newtheoremstyle{mystyle}   % 定义样式名称
   {3pt}                     % 上间距
   {3pt}                     % 下间距
@@ -44,15 +114,24 @@
 
 \theoremstyle{mystyle}      % 使用定义好的样式
 
-% 定义具体环境 (中文名称)
-\newtheorem{theorem}{定理}[section]     % 定理,跟随 section 编号, 如 1.1
-\newtheorem{lemma}[theorem]{引理}       % 引理,共享定理编号
-\newtheorem{proposition}[theorem]{命题} % 命题
-\newtheorem{corollary}[theorem]{推论}   % 推论
-\newtheorem{definition}[theorem]{定义}  % 定义
-\newtheorem{example}[theorem]{例}       % 例
-\newtheorem{remark}[theorem]{注}        % 注
-\newtheorem{assumption}[theorem]{假设}  % 假设
+% 核心环境 (共享 section 编号)
+\newtheorem{theorem}{\theoremname}[section]
+\newtheorem{lemma}[theorem]{\lemmaname}
+\newtheorem{proposition}[theorem]{\propositionname}
+\newtheorem{corollary}[theorem]{\corollaryname}
+\newtheorem{definition}[theorem]{\definitionname}
+\newtheorem{example}[theorem]{\examplename}
+\newtheorem{remark}[theorem]{\remarkname}
+\newtheorem{assumption}[theorem]{\assumptionname}
+\newtheorem{conjecture}[theorem]{\conjecturename}
+\newtheorem{axiom}[theorem]{\axiomname}
+\newtheorem{problem}[theorem]{\problemname}
+\newtheorem{exercise}[theorem]{\exercisename}
+\newtheorem{case}[theorem]{\casename}
+
+% 特殊环境
+% Solution 通常不编号或独立编号，这里设置为无编号环境
+\newtheorem*{solution}{\solutionname}
 
 % ==========================================
 %  4. 算法与伪代码 (Algorithms)
@@ -128,7 +207,7 @@
 % ==========================================
 %  7. 列表与枚举 (Lists)
 % ==========================================
-\RequirePackage{enumitem}    % 列表定制
+\RequirePackage[inline]{enumitem}    % 列表定制
 % 配置: \setlist[itemize]{...} 全局配置
 % 用法: \begin{enumerate}[label=(\arabic*)] ... \end{enumerate}
 
@@ -193,7 +272,6 @@
 % ==========================================
 % CTeX 宏包配置
 \RequirePackage[UTF8, heading=true, scheme=chinese]{ctex}
-\RequirePackage{xeCJK}
 \RequirePackage{fontspec}
 
 % 字体设置 (建议根据系统安装字体调整)
@@ -230,7 +308,11 @@
     \pagestyle{fancy}
     \fancyhf{}
     \lhead{\leftmark}       % 左页眉: 章节名
+    \chead{}                % 中页眉: 空
     \rhead{\thepage}        % 右页眉: 页码
+    \lfoot{}                % 左页脚
+    \cfoot{}                % 中页脚
+    \rfoot{}                % 右页脚
 }{}
 
 % ==========================================
@@ -252,7 +334,7 @@
 %  13. 自定义命令 (Custom Commands)
 % ==========================================
 % 语义化字体切换
-\newcommand{\zh}[1]{{\CJKfamily{zhsong}#1}} % 强制宋体
+\providecommand{\zh}{}\renewcommand{\zh}[1]{{\CJKfamily{zhsong}#1}} % 强制宋体
 \newcommand{\en}[1]{{\fontfamily{lmr}\selectfont#1}} % 强制英文字体
 
 % 强调关键字: 红色加粗
