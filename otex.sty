@@ -9,6 +9,7 @@
 \newif\ifotex@loadctex      % ctex 宏包
 \newif\ifotex@loadtheorems  % amsthm 环境定义
 \newif\ifotex@loadhyperref  % hyperref
+\newif\ifotex@loadcleveref  % cleveref (智能引用)
 \newif\ifotex@loadcaption   % caption, subcaption
 \newif\ifotex@loadalgo      % algorithm2e
 \newif\ifotex@loadmath      % amsmath 等数学宏包
@@ -38,6 +39,10 @@
 % 超链接
 \DeclareOption{hyperref}{\otex@loadhyperreftrue}
 \DeclareOption{nohyperref}{\otex@loadhyperreffalse}
+
+% 智能引用 (默认随 hyperref 联动)
+\DeclareOption{cleveref}{\otex@loadclevereftrue}
+\DeclareOption{nocleveref}{\otex@loadclevereffalse}
 
 % 图表标题
 \DeclareOption{caption}{\otex@loadcaptiontrue}
@@ -75,6 +80,7 @@
     \otex@loadctextrue
     \otex@loadtheoremstrue
     \otex@loadhyperreftrue
+    \otex@loadclevereftrue
     \otex@loadcaptiontrue
     \otex@loadalgotrue
     \otex@loadmathtrue
@@ -89,6 +95,7 @@
     \otex@loadctexfalse         % 风险: CTeX
     \otex@loadtheoremsfalse     % 风险: 定理环境
     \otex@loadhyperreffalse     % 风险: 超链接
+    \otex@loadclevereffalse     % 风险: 智能引用 (依赖 hyperref)
     \otex@loadcaptionfalse      % 风险: 图表标题
     \otex@loadalgofalse         % 风险: 算法环境
     
@@ -170,6 +177,7 @@
 % 如果相关包已被加载，强制关闭对应模块以避免选项冲突
 \@ifpackageloaded{geometry}{\otex@loadlayoutfalse \PackageInfo{otex}{Package 'geometry' detected. Disabling otex layout.}}{}
 \@ifpackageloaded{hyperref}{\otex@loadhyperreffalse \PackageInfo{otex}{Package 'hyperref' detected. Disabling otex hyperref.}}{}
+\@ifpackageloaded{cleveref}{\otex@loadclevereffalse \PackageInfo{otex}{Package 'cleveref' detected. Disabling otex cleveref.}}{}
 \@ifpackageloaded{caption}{\otex@loadcaptionfalse \PackageInfo{otex}{Package 'caption' detected. Disabling otex caption.}}{}
 \@ifpackageloaded{algorithm}{\otex@loadalgofalse \PackageInfo{otex}{Package 'algorithm' detected. Disabling otex algorithm2e.}}{}
 % 检查定理环境是否已定义
@@ -468,7 +476,73 @@
 \fi
 
 % ==========================================
-%  13. 自定义命令 (Custom Commands)
+%  13. 智能交叉引用 (Cleveref)
+% ==========================================
+%  功能: 自动识别引用类型, 生成智能引用格式
+%  警告: 必须在 hyperref 之后加载!
+%  文档: http://mirrors.ctan.org/macros/latex/contrib/cleveref/cleveref.pdf
+\ifotex@loadcleveref
+    % 如果 hyperref 未开启, 强制关闭 cleveref 并发出警告
+    \ifotex@loadhyperref\else
+        \PackageWarning{otex}{cleveref requires hyperref! Auto-disabling cleveref.}
+        \otex@loadclevereffalse
+    \fi
+\fi
+
+\ifotex@loadcleveref
+    \RequirePackage[capitalise,nameinlink]{cleveref}
+    % 选项说明:
+    % - capitalise: 引用文本首字母大写 (Figure 1, not figure 1)
+    % - nameinlink: 将类型名也包含在超链接中 (整个 "Figure 1" 可点击)
+    % - noabbrev: 使用完整名称而非缩写 (可选, 默认使用缩写如 fig.)
+    
+    % --- 中英文本地化配置 ---
+    \ifotex@english
+        % 英文环境: 使用默认英文格式 (如 Figure, Table, Equation)
+        % cleveref 的默认英文配置已经足够好, 无需额外设置
+    \else
+        % 中文环境: 自定义中文引用格式
+        % 格式: \crefname{环境名}{单数形式}{复数形式}
+        \crefname{figure}{图}{图}
+        \crefname{table}{表}{表}
+        \crefname{equation}{式}{式}
+        \crefname{section}{节}{节}
+        \crefname{chapter}{章}{章}
+        \crefname{appendix}{附录}{附录}
+        
+        % 定理环境 (如果开启了 theorems 模块)
+        \ifotex@loadtheorems
+            \crefname{theorem}{定理}{定理}
+            \crefname{lemma}{引理}{引理}
+            \crefname{proposition}{命题}{命题}
+            \crefname{corollary}{推论}{推论}
+            \crefname{definition}{定义}{定义}
+            \crefname{example}{例}{例}
+            \crefname{remark}{注}{注}
+            \crefname{assumption}{假设}{假设}
+            \crefname{conjecture}{猜想}{猜想}
+            \crefname{axiom}{公理}{公理}
+            \crefname{problem}{问题}{问题}
+            \crefname{exercise}{练习}{练习}
+        \fi
+        
+        % 算法环境 (如果开启了 algo 模块)
+        \ifotex@loadalgo
+            \crefname{algocf}{算法}{算法}  % algorithm2e 使用 algocf 环境名
+        \fi
+    \fi
+\fi
+
+% 用法示例:
+% \cref{fig:example}      -> "Figure 1" or "图 1"
+% \Cref{fig:example}      -> "Figure 1" (句首大写, 英文环境)
+% \cref{eq:1,eq:2,eq:3}   -> "Equations 1 to 3" or "式 1 至 3"
+% \crefrange{sec:1}{sec:3} -> "Sections 1 to 3" or "节 1 至 3"
+% \cpageref{fig:1}        -> "page 5" or "第 5 页"
+% \labelcref{thm:main}    -> 仅显示编号 "1.2", 不显示类型名
+
+% ==========================================
+%  14. 自定义命令 (Custom Commands)
 % ==========================================
 % 语义化字体切换
 \providecommand{\zh}{}\renewcommand{\zh}[1]{{\CJKfamily{zhsong}#1}} % 强制宋体
