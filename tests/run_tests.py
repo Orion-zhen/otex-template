@@ -72,7 +72,18 @@ def run_test_case(case_path, engine):
         xdv_file = os.path.join(output_subdir, f"{case_name}.xdv")
         dvi_file = os.path.join(output_subdir, f"{case_name}.dvi")
         
-        has_output = os.path.exists(pdf_file) or os.path.exists(xdv_file) or os.path.exists(dvi_file)
+        # Strictly check for PDF output
+        if engine in ["xelatex", "lualatex", "pdflatex"]:
+             has_output = os.path.exists(pdf_file)
+             # Extra check for glossary tests: ensure .gls file exists and is not empty
+             if "glossary" in case_name and has_output:
+                 gls_file = os.path.join(output_subdir, f"{case_name}.gls")
+                 if not (os.path.exists(gls_file) and os.path.getsize(gls_file) > 0):
+                     has_output = False
+                     error_type = "MISSING_GLOSSARY"
+                     error_detail = "Glossary index (.gls) file missing or empty"
+        else:
+             has_output = os.path.exists(pdf_file) or os.path.exists(xdv_file) or os.path.exists(dvi_file)
         
         # Analyze log file for errors
         log_file = os.path.join(output_subdir, f"{case_name}.log")
