@@ -2,6 +2,13 @@
 
 \bool_if:NF \g_otex_load_fonts_bool { \endinput }
 
+\RequirePackage { fontspec }
+
+\tl_if_empty:NF \g_otex_fonts_dir_tl
+  {
+    \defaultfontfeatures+ { Path = \g_otex_fonts_dir_tl / }
+  }
+
 % Resolve auto preset
 \str_if_eq:VnT \g_otex_font_set_tl { auto }
   {
@@ -13,8 +20,6 @@
   }
 
 \str_if_eq:VnT \g_otex_font_set_tl { none } { \endinput }
-
-\RequirePackage { fontspec }
 
 % Helper
 \cs_new:Nn \otex_set_font:nnn

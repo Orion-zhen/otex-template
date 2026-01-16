@@ -37,6 +37,7 @@
 \tl_new:N \g_otex_font_cjk_main_tl
 \tl_new:N \g_otex_pdf_title_tl
 \tl_new:N \g_otex_pdf_author_tl
+\tl_new:N \g_otex_fonts_dir_tl
 
 % Key Definitions
 \keys_define:nn { otex }
@@ -93,6 +94,7 @@
 
     pdf-title   .tl_set:N   = \g_otex_pdf_title_tl,   pdf-title   .initial:n = {Generated~Document},
     pdf-author  .tl_set:N   = \g_otex_pdf_author_tl,  pdf-author  .initial:n = {Orion},
+    fonts-dir   .tl_set:N   = \g_otex_fonts_dir_tl,
   }
 
 \ProcessKeysOptions { otex }
