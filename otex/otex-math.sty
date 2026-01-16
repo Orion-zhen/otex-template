@@ -1,4 +1,4 @@
-\ProvidesExplPackage {otex/otex-math} {2026-01-16} {1.1} {Orion's Math Enhancements - Minimalist}
+\ProvidesExplPackage {otex/otex-math} {2026-01-16} {1.1} {Orion's Math Enhancements}
 
 \otex_require:nnnn { amsmath } {} {} {}
 \otex_require:nnnn { mathtools } {} {} {}
@@ -9,24 +9,24 @@
 % Logic: If pdfTeX or Conflict Class -> Standard. Else -> Unicode Math.
 \bool_new:N \l_otex_math_conflict_bool
 \clist_map_inline:nn { acmart, IEEEtran, elsarticle, CjC }
-  { \@ifclassloaded{#1}{ \bool_set_true:N \l_otex_math_conflict_bool } {} }
+{ \@ifclassloaded{#1}{ \bool_set_true:N \l_otex_math_conflict_bool } {} }
 
 \bool_lazy_or:nnTF { \sys_if_engine_pdftex_p: } { \l_otex_math_conflict_bool }
-  {
-    \otex_require:nnnn { amsmath } {} {} {}
-    % Load amssymb unless acmart (which has own symbols)
-    \@ifclassloaded{acmart} {} { \otex_require:nnnn { amssymb } {} {} {} }
+{
+  \otex_require:nnnn { amsmath } {} {} {}
+  % Load amssymb unless acmart (which has own symbols)
+  \@ifclassloaded{acmart} {} { \otex_require:nnnn { amssymb } {} {} {} }
+}
+{
+  % Unicode Math
+  \@ifpackageloaded{amssymb} { \msg_warning:nn { otex } { amssymb-conflict } } {}
+
+  \otex_require:nnnn { unicode-math } { math-style=ISO, bold-style=ISO } {} {}
+
+  \AtBeginDocument{
+    \otex_provide_command:Nnn \square { } { \mdlgwhtsquare }
+    \otex_provide_command:Nnn \boxtimes { } { \boxtimes }
   }
-  {
-     % Unicode Math
-     \@ifpackageloaded{amssymb} { \msg_warning:nn { otex } { amssymb-conflict } } {}
-     
-     \otex_require:nnnn { unicode-math } { math-style=ISO, bold-style=ISO } {} {}
-     
-     \AtBeginDocument{
-       \otex_provide_command:Nnn \square { } { \mdlgwhtsquare }
-       \otex_provide_command:Nnn \boxtimes { } { \boxtimes }
-     }
-  }
+}
 
 \endinput

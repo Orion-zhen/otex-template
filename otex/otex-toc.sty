@@ -1,15 +1,15 @@
-\ProvidesExplPackage {otex/otex-toc} {2026-01-16} {1.1} {Orion's TOC - Minimalist}
+\ProvidesExplPackage {otex/otex-toc} {2026-01-16} {1.1} {Orion's TOC}
 
 \bool_if:NF \g_otex_load_toc_bool { \endinput }
 
 \bool_new:N \l_otex_toc_conflict_bool
 \clist_map_inline:nn { acmart, IEEEtran, elsarticle, CjC }
-  { \@ifclassloaded{#1}{ \bool_set_true:N \l_otex_toc_conflict_bool }{} }
+{ \@ifclassloaded{#1}{ \bool_set_true:N \l_otex_toc_conflict_bool }{} }
 
 \bool_if:NF \l_otex_toc_conflict_bool
-  {
-     \otex_require:nnnn { tocloft } {} {} {}
-     \@ifpackageloaded{tocloft}{ \setcounter{tocdepth}{3} \setcounter{secnumdepth}{3} } {}
-  }
+{
+  \otex_require:nnnn { tocloft } {} {} {}
+  \@ifpackageloaded{tocloft}{ \setcounter{tocdepth}{3} \setcounter{secnumdepth}{3} } {}
+}
 
 \endinput

@@ -1,23 +1,23 @@
-\ProvidesExplPackage {otex/otex-algo} {2026-01-16} {1.1} {Orion's Algorithms - Minimalist}
+\ProvidesExplPackage {otex/otex-algo} {2026-01-16} {1.1} {Orion's Algorithms}
 
 \str_if_eq:VnTF \g_otex_algo_backend_tl { algorithmicx }
+{
+  \otex_require:nnnn { algorithm } {} {} {}
+  \otex_require:nnnn { algpseudocode } {} {} {}
+}
+{
+  \otex_require:nnnn { algorithm2e } { ruled, linesnumbered, vlined } { required={ruled} } {}
+  
+  % Define Input and Output commands
+  \bool_if:NTF \g_otex_english_bool
   {
-     \otex_require:nnnn { algorithm } {} {} {}
-     \otex_require:nnnn { algpseudocode } {} {} {}
+    \SetKwInput{Input}{Input}
+    \SetKwInput{Output}{Output}
   }
   {
-     \otex_require:nnnn { algorithm2e } { ruled, linesnumbered, vlined } { required={ruled} } {}
-     
-     % Define Input and Output commands
-     \bool_if:NTF \g_otex_english_bool
-     {
-        \SetKwInput{Input}{Input}
-        \SetKwInput{Output}{Output}
-     }
-     {
-        \SetKwInput{Input}{输入}
-        \SetKwInput{Output}{输出}
-     }
+    \SetKwInput{Input}{输入}
+    \SetKwInput{Output}{输出}
   }
+}
 
 \endinput

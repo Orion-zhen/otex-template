@@ -1,108 +1,109 @@
-\ProvidesExplPackage {otex/otex-fonts} {2026-01-16} {1.1} {Orion's Font Configuration - Minimalist}
+\ProvidesExplPackage {otex/otex-fonts} {2026-01-16} {1.1} {Orion's Font Configuration}
 
 \bool_if:NF \g_otex_load_fonts_bool { \endinput }
 
 \RequirePackage { fontspec }
 
 \tl_if_empty:NF \g_otex_fonts_dir_tl
-  {
-    \defaultfontfeatures+ { Path = \g_otex_fonts_dir_tl / }
-  }
+{
+  \defaultfontfeatures+ { Path = \g_otex_fonts_dir_tl / }
+}
 
 % Resolve auto preset
 \str_if_eq:VnT \g_otex_font_set_tl { auto }
+{
+  \tl_gset:Nn \g_otex_font_set_tl { none }
+  \clist_map_inline:nn { article, report, book, ctexart, ctexrep, ctexbook }
   {
-    \tl_gset:Nn \g_otex_font_set_tl { none }
-    \clist_map_inline:nn { article, report, book, ctexart, ctexrep, ctexbook }
+    \@ifclassloaded { #1 } 
+    { 
+      \str_if_eq:VnTF \c_sys_platform_str { windows }
+      { \tl_gset:Nn \g_otex_font_set_tl { windows } }
       {
-        \@ifclassloaded { #1 } 
-          { 
-            \str_if_eq:VnTF \c_sys_platform_str { windows }
-              { \tl_gset:Nn \g_otex_font_set_tl { windows } }
-              {
-                \str_if_eq:VnTF \c_sys_platform_str { macos }
-                  { \tl_gset:Nn \g_otex_font_set_tl { adobe } }
-                  { \tl_gset:Nn \g_otex_font_set_tl { linux } }
-              }
-          } {}
+        \str_if_eq:VnTF \c_sys_platform_str { macos }
+        { \tl_gset:Nn \g_otex_font_set_tl { adobe } }
+        { \tl_gset:Nn \g_otex_font_set_tl { linux } }
       }
+    }
+    {}
   }
+}
 
 \str_if_eq:VnT \g_otex_font_set_tl { none } { \endinput }
 
 % Helper
 \cs_new:Nn \otex_set_font:nnn
-  {
-    \tl_if_empty:NTF #1 { #2 { #3 } } { #2 { #1 } }
-  }
+{
+  \tl_if_empty:NTF #1 { #2 { #3 } } { #2 { #1 } }
+}
 
 % Presets
 \str_case:Vn \g_otex_font_set_tl
+{
+  {windows}
   {
-    {windows}
-    {
-      \otex_set_font:nnn \g_otex_font_main_tl \setmainfont { Times~New~Roman }
-      \otex_set_font:nnn \g_otex_font_sans_tl \setsansfont { Arial }
-      \otex_set_font:nnn \g_otex_font_mono_tl \setmonofont { Courier~New }
-    }
-    {linux}
-    {
-      \otex_set_font:nnn \g_otex_font_main_tl \setmainfont { Liberation~Serif }
-      \otex_set_font:nnn \g_otex_font_sans_tl \setsansfont { Liberation~Sans }
-      \otex_set_font:nnn \g_otex_font_mono_tl \setmonofont { Liberation~Mono }
-    }
-    {adobe}
-    {
-      \otex_set_font:nnn \g_otex_font_main_tl \setmainfont { Source~Serif~Pro }
-      \otex_set_font:nnn \g_otex_font_sans_tl \setsansfont { Source~Sans~Pro }
-      \otex_set_font:nnn \g_otex_font_mono_tl \setmonofont { Source~Code~Pro }
-    }
+    \otex_set_font:nnn \g_otex_font_main_tl \setmainfont { Times~New~Roman }
+    \otex_set_font:nnn \g_otex_font_sans_tl \setsansfont { Arial }
+    \otex_set_font:nnn \g_otex_font_mono_tl \setmonofont { Courier~New }
   }
+  {linux}
+  {
+    \otex_set_font:nnn \g_otex_font_main_tl \setmainfont { Liberation~Serif }
+    \otex_set_font:nnn \g_otex_font_sans_tl \setsansfont { Liberation~Sans }
+    \otex_set_font:nnn \g_otex_font_mono_tl \setmonofont { Liberation~Mono }
+  }
+  {adobe}
+  {
+    \otex_set_font:nnn \g_otex_font_main_tl \setmainfont { Source~Serif~Pro }
+    \otex_set_font:nnn \g_otex_font_sans_tl \setsansfont { Source~Sans~Pro }
+    \otex_set_font:nnn \g_otex_font_mono_tl \setmonofont { Source~Code~Pro }
+  }
+}
 
 % CJK Helper
 \cs_new:Nn \otex_set_cjk_font:nnn
-  {
-    \tl_if_empty:NTF #1 { #2 { #3 } } { #2 { #1 } }
-  }
+{
+  \tl_if_empty:NTF #1 { #2 { #3 } } { #2 { #1 } }
+}
 
 % CJK
 \bool_if:NT \g_otex_load_ctex_bool
+{
+  \@ifpackageloaded{xeCJK}
   {
-     \@ifpackageloaded{xeCJK}
-     {
-        % Determine preset defaults
-        \tl_set:Nn \l_tmpa_tl { SimSun }
-        \tl_set:Nn \l_tmpb_tl { SimHei }
-        \tl_set:Nn \l_tmpc_tl { FangSong }
-        \str_case:VnF \g_otex_font_set_tl
-          {
-            {linux} {
-              \tl_set:Nn \l_tmpa_tl { Noto~Serif~CJK~SC }
-              \tl_set:Nn \l_tmpb_tl { Noto~Sans~CJK~SC }
-              \tl_set:Nn \l_tmpc_tl { Noto~Sans~Mono~CJK~SC }
-            }
-            {adobe} {
-              \tl_set:Nn \l_tmpa_tl { Source~Han~Serif~CN }
-              \tl_set:Nn \l_tmpb_tl { Source~Han~Sans~CN }
-              \tl_set:Nn \l_tmpc_tl { Source~Han~Sans~CN }
-            }
-          }
-          {}
-        % Apply fonts with user overrides
-        \otex_set_cjk_font:nnn \g_otex_font_cjk_main_tl \setCJKmainfont { \l_tmpa_tl }
-        \otex_set_cjk_font:nnn \g_otex_font_cjk_sans_tl \setCJKsansfont { \l_tmpb_tl }
-        \otex_set_cjk_font:nnn \g_otex_font_cjk_mono_tl \setCJKmonofont { \l_tmpc_tl }
-     }
-     {}
+    % Determine preset defaults
+    \tl_set:Nn \l_tmpa_tl { SimSun }
+    \tl_set:Nn \l_tmpb_tl { SimHei }
+    \tl_set:Nn \l_tmpc_tl { FangSong }
+    \str_case:VnF \g_otex_font_set_tl
+    {
+      {linux} {
+        \tl_set:Nn \l_tmpa_tl { Noto~Serif~CJK~SC }
+        \tl_set:Nn \l_tmpb_tl { Noto~Sans~CJK~SC }
+        \tl_set:Nn \l_tmpc_tl { Noto~Sans~Mono~CJK~SC }
+      }
+      {adobe} {
+        \tl_set:Nn \l_tmpa_tl { Source~Han~Serif~CN }
+        \tl_set:Nn \l_tmpb_tl { Source~Han~Sans~CN }
+        \tl_set:Nn \l_tmpc_tl { Source~Han~Sans~CN }
+      }
+    }
+    {}
+    % Apply fonts with user overrides
+    \otex_set_cjk_font:nnn \g_otex_font_cjk_main_tl \setCJKmainfont { \l_tmpa_tl }
+    \otex_set_cjk_font:nnn \g_otex_font_cjk_sans_tl \setCJKsansfont { \l_tmpb_tl }
+    \otex_set_cjk_font:nnn \g_otex_font_cjk_mono_tl \setCJKmonofont { \l_tmpc_tl }
   }
+  {}
+}
 
 % Math
 \@ifpackageloaded{unicode-math}
-  {
-    \tl_if_empty:NTF \g_otex_font_math_tl
-      { \setmathfont { DejaVu~Math~TeX~Gyre } }
-      { \setmathfont { \g_otex_font_math_tl } }
-  }
-  {}
+{
+  \tl_if_empty:NTF \g_otex_font_math_tl
+  { \setmathfont { DejaVu~Math~TeX~Gyre } }
+  { \setmathfont { \g_otex_font_math_tl } }
+}
+{}
 
 \endinput

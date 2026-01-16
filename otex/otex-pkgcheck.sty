@@ -1,4 +1,4 @@
-\ProvidesExplPackage {otex/otex-pkgcheck} {2026-01-16} {1.1} {Orion's Smart Package Checker - Minimalist}
+\ProvidesExplPackage {otex/otex-pkgcheck} {2026-01-16} {1.1} {Orion's Smart Package Checker}
 
 \msg_new:nnn { otex } { pkg-conflict } { Package~'#1'~conflict:~'#2'.~Removing~option. }
 \msg_new:nnn { otex } { pkg-required } { Package~'#1'~missing~required:~'#2'. }
@@ -9,49 +9,49 @@
 % #3 = Conflict Options (clist)
 % #4 = Required Options (clist)
 \cs_new_protected:Npn \otex_require:nnnn #1#2#3#4
+{
+  \@ifpackageloaded { #1 }
   {
-    \@ifpackageloaded { #1 }
-      {
-         % Check conflicts
-         \clist_map_inline:nn { #3 }
-           {
-             \@ifpackagewith { #1 } { ##1 }
-               { \msg_warning:nnnn { otex } { pkg-conflict } { #1 } { ##1 } }
-               {}
-           }
-         % Check required
-         \clist_map_inline:nn { #4 }
-           {
-             \@ifpackagewith { #1 } { ##1 }
-               {}
-               { \msg_warning:nnnn { otex } { pkg-required } { #1 } { ##1 } }
-           }
-      }
-      {
-         \tl_if_empty:nTF { #2 }
-           { \RequirePackage { #1 } }
-           { \RequirePackage [ #2 ] { #1 } }
-      }
+    % Check conflicts
+    \clist_map_inline:nn { #3 }
+    {
+      \@ifpackagewith { #1 } { ##1 }
+      { \msg_warning:nnnn { otex } { pkg-conflict } { #1 } { ##1 } }
+      {}
+    }
+    % Check required
+    \clist_map_inline:nn { #4 }
+    {
+      \@ifpackagewith { #1 } { ##1 }
+      {}
+      { \msg_warning:nnnn { otex } { pkg-required } { #1 } { ##1 } }
+    }
   }
+  {
+    \tl_if_empty:nTF { #2 }
+    { \RequirePackage { #1 } }
+    { \RequirePackage [ #2 ] { #1 } }
+  }
+}
 
 % Alias for backward compatibility if needed, though we should update calls
 \cs_new_eq:NN \otex_smart_require:nnnn \otex_require:nnnn
 
 % Helper for merging config
 \cs_new_protected:Npn \otex_merge_setup:nn #1#2
-  {
-    \@ifpackageloaded { #1 } { #2 } { #2 } 
-  }
+{
+  \@ifpackageloaded { #1 } { #2 } { #2 } 
+}
 
 % Helper for providing commands
 \cs_new_protected:Npn \otex_provide_command:Nnn #1#2#3
-  {
-    \cs_if_exist:NF #1 { \DeclareDocumentCommand #1 { #2 } { #3 } }
-  }
+{
+  \cs_if_exist:NF #1 { \DeclareDocumentCommand #1 { #2 } { #3 } }
+}
 
 \cs_new_protected:Npn \otex_provide_env:nnnn #1#2#3#4
-  {
-     \cs_if_exist:cF { #1 } { \NewDocumentEnvironment { #1 } { #2 } { #3 } { #4 } }
-  }
+{
+  \cs_if_exist:cF { #1 } { \NewDocumentEnvironment { #1 } { #2 } { #3 } { #4 } }
+}
 
 \endinput

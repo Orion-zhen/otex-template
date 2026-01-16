@@ -1,24 +1,24 @@
-\ProvidesExplPackage {otex/otex-chinese} {2026-01-16} {1.1} {Orion's Chinese Support - Minimalist}
+\ProvidesExplPackage {otex/otex-chinese} {2026-01-16} {1.1} {Orion's Chinese Support}
 
 \bool_if:NF \g_otex_load_ctex_bool { \endinput }
 
 \bool_new:N \l_otex_safe_header_bool
 % Allowlist specific classes for full ctex heading support
 \clist_map_inline:nn { article, report, book, ctexart, ctexrep, ctexbook }
-  { \@ifclassloaded{#1} { \bool_set_true:N \l_otex_safe_header_bool } {} }
+{ \@ifclassloaded{#1} { \bool_set_true:N \l_otex_safe_header_bool } {} }
 
 \tl_new:N \l_otex_ctex_scheme_tl
 \bool_if:NTF \g_otex_english_bool
-  { \tl_set:Nn \l_otex_ctex_scheme_tl { plain } }
-  { \tl_set:Nn \l_otex_ctex_scheme_tl { chinese } }
+{ \tl_set:Nn \l_otex_ctex_scheme_tl { plain } }
+{ \tl_set:Nn \l_otex_ctex_scheme_tl { chinese } }
 
 \bool_if:NTF \l_otex_safe_header_bool
-  {
-    \otex_require:nnnn { ctex } { UTF8, scheme=\l_otex_ctex_scheme_tl, heading=true } {} {}
-  }
-  {
-    % Conflict or unknown class: Backoff to plain scheme and disable heading
-    \otex_require:nnnn { ctex } { UTF8, scheme=plain, heading=false } {} {}
-  }
+{
+  \otex_require:nnnn { ctex } { UTF8, scheme=\l_otex_ctex_scheme_tl, heading=true } {} {}
+}
+{
+  % Conflict or unknown class: Backoff to plain scheme and disable heading
+  \otex_require:nnnn { ctex } { UTF8, scheme=plain, heading=false } {} {}
+}
 
 \endinput

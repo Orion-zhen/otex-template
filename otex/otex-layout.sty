@@ -1,15 +1,15 @@
-\ProvidesExplPackage {otex/otex-layout} {2026-01-16} {1.1} {Orion's Layout - Minimalist}
+\ProvidesExplPackage {otex/otex-layout} {2026-01-16} {1.1} {Orion's Layout}
 
 \otex_require:nnnn { geometry } { a4paper, left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm } {} {}
 
 \otex_require:nnnn { fancyhdr } {} {} {}
 \@ifpackageloaded{fancyhdr}
-  {
-     \pagestyle{fancy}
-     \fancyhf{}
-     \lhead{\leftmark}
-     \rhead{\thepage}
-  }
-  {}
+{
+  \pagestyle{fancy}
+  \fancyhf{}
+  \lhead{\leftmark}
+  \rhead{\thepage}
+}
+{}
 
 \endinput

@@ -1,10 +1,10 @@
-\ProvidesExplPackage {otex/otex-floats} {2026-01-16} {1.1} {Orion's Floats - Minimalist}
+\ProvidesExplPackage {otex/otex-floats} {2026-01-16} {1.1} {Orion's Floats}
 
 \otex_require:nnnn { float } {} {} {}
 \otex_require:nnnn { flafter } {} {} {}
 
 \bool_if:NT \g_otex_float_section_bool
-  { \otex_require:nnnn { placeins } { section } {} {} }
+{ \otex_require:nnnn { placeins } { section } {} {} }
 
 % Float Parameters
 \cs_set:Npn \topfraction { 0.85 }

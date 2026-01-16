@@ -1,50 +1,50 @@
-\ProvidesExplPackage {otex/otex-refs} {2026-01-16} {1.1} {Orion's References - Minimalist}
+\ProvidesExplPackage {otex/otex-refs} {2026-01-16} {1.1} {Orion's References}
 
 \bool_if:NT \g_otex_load_hyperref_bool
-  {
-     \bool_if:NF \g_otex_load_bib_bool { \otex_require:nnnn { cite } {} {} {} }
+{
+  \bool_if:NF \g_otex_load_bib_bool { \otex_require:nnnn { cite } {} {} {} }
 
-     % Load hyperref if not loaded
-     \otex_require:nnnn { hyperref }
-       { pdfborder={0~0~0} }
-       {}
-       {}
+  % Load hyperref if not loaded
+  \otex_require:nnnn { hyperref }
+  { pdfborder={0~0~0} }
+  {}
+  {}
 
-     % Configure hyperref (only if we loaded it or if we want to force config? Minimalist: only if not configured? 
-     % Actually we usually want common colors. Let's apply setup via hook)
-     \AddToHook{begindocument/before}{
-         \hypersetup{
-             colorlinks = true,             
-             linkcolor  = blue!70!black,    
-             filecolor  = magenta,          
-             urlcolor   = cyan!70!black,    
-             citecolor  = green!40!black,   
-             pdftitle   = { \g_otex_pdf_title_tl },
-             pdfauthor  = { \g_otex_pdf_author_tl },
-             pdfcreator = { LaTeX~with~otex },
-         }
-     }
+  % Configure hyperref (only if we loaded it or if we want to force config? Minimalist: only if not configured? 
+  % Actually we usually want common colors. Let's apply setup via hook)
+  \AddToHook{begindocument/before}{
+    \hypersetup{
+      colorlinks = true,             
+      linkcolor  = blue!70!black,    
+      filecolor  = magenta,          
+      urlcolor   = cyan!70!black,    
+      citecolor  = green!40!black,   
+      pdftitle   = { \g_otex_pdf_title_tl },
+      pdfauthor  = { \g_otex_pdf_author_tl },
+      pdfcreator = { LaTeX~with~otex },
+    }
   }
+}
 
 \bool_if:NT \g_otex_load_cleveref_bool
+{
+  \bool_if:NTF \g_otex_load_hyperref_bool
   {
-      \bool_if:NTF \g_otex_load_hyperref_bool
-        {
-           \otex_require:nnnn { cleveref } { capitalise,nameinlink } {} {}
-           
-           \bool_if:NF \g_otex_english_bool
-             {
-               % Chinese localizations
-               \crefname{figure}{图}{图}
-               \crefname{table}{表}{表}
-               \crefname{equation}{式}{式}
-               \crefname{theorem}{定理}{定理}
-               \crefname{lemma}{引理}{引理}
-             }
-        }
-        {
-           % Warning? Or just silent backoff for minimalism.
-        }
+    \otex_require:nnnn { cleveref } { capitalise,nameinlink } {} {}
+
+    \bool_if:NF \g_otex_english_bool
+    {
+      % Chinese localizations
+      \crefname{figure}{图}{图}
+      \crefname{table}{表}{表}
+      \crefname{equation}{式}{式}
+      \crefname{theorem}{定理}{定理}
+      \crefname{lemma}{引理}{引理}
+    }
   }
+  {
+    % Warning? Or just silent backoff for minimalism.
+  }
+}
 
 \endinput

@@ -1,21 +1,22 @@
-\ProvidesExplPackage {otex/otex-bib} {2026-01-16} {1.1} {Orion's Bibliography - Minimalist}
+\ProvidesExplPackage {otex/otex-bib} {2026-01-16} {1.1} {Orion's Bibliography}
 
 \bool_new:N \l_otex_bib_configured_bool
 \clist_map_inline:nn { IEEEtran, acmart, elsarticle, CjC }
-  { \@ifclassloaded{#1}{\bool_set_true:N \l_otex_bib_configured_bool}{} }
+{ \@ifclassloaded{#1}{\bool_set_true:N \l_otex_bib_configured_bool}{} }
+
 \@ifpackageloaded{biblatex}{\bool_set_true:N \l_otex_bib_configured_bool}{}
 \@ifpackageloaded{natbib}{\bool_set_true:N \l_otex_bib_configured_bool}{}
 
 \bool_if:NF \l_otex_bib_configured_bool
+{
+  \str_case:VnF \g_otex_bib_backend_tl
   {
-     \str_case:VnF \g_otex_bib_backend_tl
-       {
-          {biblatex} { \otex_require:nnnn { biblatex } { backend=bibtex, style=\g_otex_bib_style_tl, sorting=none, doi=true } {} {} }
-          {natbib}   { \otex_require:nnnn { natbib } { numbers, sort&compress } {} {} }
-       }
-       {
-          \otex_require:nnnn { biblatex } { backend=biber, style=ieee } {} {}
-       }
+    {biblatex} { \otex_require:nnnn { biblatex } { backend=bibtex, style=\g_otex_bib_style_tl, sorting=none, doi=true } {} {} }
+    {natbib}   { \otex_require:nnnn { natbib } { numbers, sort&compress } {} {} }
   }
+  {
+    \otex_require:nnnn { biblatex } { backend=biber, style=ieee } {} {}
+  }
+}
 
 \endinput

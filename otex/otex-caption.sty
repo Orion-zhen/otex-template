@@ -1,12 +1,12 @@
-\ProvidesExplPackage {otex/otex-caption} {2026-01-16} {1.1} {Orion's Captions - Minimalist}
+\ProvidesExplPackage {otex/otex-caption} {2026-01-16} {1.1} {Orion's Captions}
 
 \otex_require:nnnn { caption } {} {} {}
 
 \@ifpackageloaded{caption}
-  {
-     \captionsetup{ font=small, labelfont=bf, labelsep=colon, textfont=it }
-  }
-  {}
+{
+  \captionsetup{ font=small, labelfont=bf, labelsep=colon, textfont=it }
+}
+{}
 
 % Subcaption check
 \bool_new:N \l_otex_subcap_conflict_bool
@@ -15,6 +15,6 @@
 \@ifpackageloaded{subfigure}{ \bool_set_true:N \l_otex_subcap_conflict_bool } {}
 
 \bool_if:NF \l_otex_subcap_conflict_bool
-  { \otex_require:nnnn { subcaption } {} {} {} }
+{ \otex_require:nnnn { subcaption } {} {} {} }
 
 \endinput

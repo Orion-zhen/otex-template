@@ -1,36 +1,36 @@
-\ProvidesExplPackage {otex/otex-code} {2026-01-16} {1.1} {Orion's Code Highlighting - Minimalist}
+\ProvidesExplPackage {otex/otex-code} {2026-01-16} {1.1} {Orion's Code Highlighting}
 
 \definecolor{code_bg}{rgb}{0.95, 0.95, 0.95}
 
 % Minted
 \bool_if:NT \g_otex_load_minted_bool
+{
+  \int_compare:nNnTF { \pdf@shellescape } = { 1 }
   {
-     \int_compare:nNnTF { \pdf@shellescape } = { 1 }
-       {
-           \otex_require:nnnn { minted } {} {} {}
-           \usemintedstyle{friendly}
-           \setminted{bgcolor=code_bg, fontsize=\small, linenos, breaklines, frame=lines}
-       }
-       {
-           \bool_gset_false:N \g_otex_load_minted_bool
-       }
+    \otex_require:nnnn { minted } {} {} {}
+    \usemintedstyle{friendly}
+    \setminted{bgcolor=code_bg, fontsize=\small, linenos, breaklines, frame=lines}
   }
+  {
+    \bool_gset_false:N \g_otex_load_minted_bool
+  }
+}
 
 % Listings (Fallback or primary if minted not loaded)
 \bool_if:NT \g_otex_load_listings_bool
-  {
-      \otex_require:nnnn { listings } {} {} {}
-      \lstset{
-          backgroundcolor=\color{code_bg},
-          basicstyle=\ttfamily\small,
-          keywordstyle=\bfseries\color{blue},
-          commentstyle=\itshape\color{green!40!black},
-          stringstyle=\color{purple},
-          frame=single,
-          breaklines=true,
-          numbers=left
-      }
+{
+  \otex_require:nnnn { listings } {} {} {}
+  \lstset{
+    backgroundcolor=\color{code_bg},
+    basicstyle=\ttfamily\small,
+    keywordstyle=\bfseries\color{blue},
+    commentstyle=\itshape\color{green!40!black},
+    stringstyle=\color{purple},
+    frame=single,
+    breaklines=true,
+    numbers=left
   }
+}
 
 % Fallback for minted environment if not loaded
 \bool_if:NF \g_otex_load_minted_bool
@@ -47,7 +47,7 @@
   % Map \mintinline to \lstinline
   % Usage: \mintinline[options]{language}{code}
   \ProvideDocumentCommand{\mintinline}{O{}m}{%
-     \lstinline[#1,language=#2]%
+    \lstinline[#1,language=#2]%
   }
 
   % Map listing float environment if not defined
@@ -62,8 +62,8 @@
 \otex_provide_command:Nnn \code { m }
   {
     \bool_if:NTF \g_otex_load_minted_bool
-      { \mintinline[bgcolor=code_bg,breaklines]{text}{#1} }
-      { \colorbox{code_bg}{\texttt{\small #1}} }
+    { \mintinline[bgcolor=code_bg,breaklines]{text}{#1} }
+    { \colorbox{code_bg}{\texttt{\small #1}} }
   }
 
 \endinput
