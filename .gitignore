@@ -4,8 +4,10 @@
 *.fdb_latexmk
 *.fls
 *.log
+*.nav
 *.out
 *.pdf
+*.snm
 *.toc
 *.xdv
 
