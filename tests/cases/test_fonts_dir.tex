@@ -1,0 +1,17 @@
+\documentclass{article}
+\usepackage[
+    fonts-dir=../custom_fonts,
+    font-set=none,
+    mono-font=MyMono.ttf,
+    math=false,
+    ctex=false
+]{otex}
+\usepackage{fontspec}
+
+% Manually set main font if we want, or just test mono
+\setmonofont{MyMono.ttf} 
+
+\begin{document}
+Test Font Loading from Directory.
+\texttt{This should be in Adwaita Mono Bold.}
+\end{document}
