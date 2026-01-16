@@ -49,9 +49,9 @@
     \cs_if_exist:NF #1 { \DeclareDocumentCommand #1 { #2 } { #3 } }
   }
 
-\cs_new_protected:Npn \otex_provide_env:nnn #1#2#3
+\cs_new_protected:Npn \otex_provide_env:nnnn #1#2#3#4
   {
-     \cs_if_exist:cF { #1 } { \NewDocumentEnvironment { #1 } { #2 } { #3 } { } }
+     \cs_if_exist:cF { #1 } { \NewDocumentEnvironment { #1 } { #2 } { #3 } { #4 } }
   }
 
 \endinput
