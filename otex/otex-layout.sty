@@ -1,0 +1,31 @@
+\ProvidesExplPackage {otex/otex-layout} {2025-01-16} {1.0} {Orion's Layout}
+
+% ==============================================================================
+% 页面布局与页眉页脚 (Layout)
+% ==============================================================================
+% 仅在 article 类生效，避免冲突
+
+\@ifclassloaded { article }
+  {
+    \RequirePackage { geometry }
+    \geometry{
+        a4paper,
+        left   = 2.5cm,
+        right  = 2.5cm,
+        top    = 2.5cm,
+        bottom = 2.5cm
+    }
+
+    \RequirePackage { fancyhdr }
+    \pagestyle { fancy }
+    \fancyhf{}
+    \lhead { \leftmark }       % 左页眉: 章节名
+    \chead {}                  % 中页眉: 空
+    \rhead { \thepage }        % 右页眉: 页码
+    \lfoot {}                  % 左页脚
+    \cfoot {}                  % 中页脚
+    \rfoot {}                  % 右页脚
+  }
+  {}
+
+\endinput

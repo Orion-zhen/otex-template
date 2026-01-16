@@ -1,0 +1,27 @@
+\ProvidesExplPackage {otex/otex-fonts} {2025-01-16} {1.0} {Orion's Font Configuration}
+
+% ==============================================================================
+% 字体配置模块 (Font Configuration)
+% ==============================================================================
+
+\bool_if:NT \g_otex_load_fonts_bool
+  {
+    \RequirePackage { fontspec }
+    
+    % 西文字体设置 (建议根据系统安装字体调整)
+    % Win/Linux通用常用配置:
+    \setmainfont { Times~New~Roman }
+    \setsansfont { Arial }
+    % \setmonofont{Maple Mono NF}
+
+    \bool_if:NT \g_otex_load_ctex_bool
+      {
+        % 中文字体 - 优先匹配系统常见字体
+        % 注意: 如果编译报错"Font not found", 请修改为系统实际存在的字体名
+        \setCJKmainfont { SimSun }             % 宋体
+        \setCJKsansfont { Source~Han~Sans~CN } % 黑体
+        % \setCJKmonofont{Source Han Sans CN}  % 黑体
+      }
+  }
+
+\endinput

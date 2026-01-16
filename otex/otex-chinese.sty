@@ -1,0 +1,21 @@
+\ProvidesExplPackage {otex/otex-chinese} {2025-01-16} {1.0} {Orion's Chinese Support}
+
+% ==============================================================================
+% 中文支持与排版优化 (Chinese Support)
+% ==============================================================================
+
+% CTeX 宏包配置
+\bool_if:NT \g_otex_load_ctex_bool
+  {
+    \bool_if:NTF \g_otex_english_bool
+      {
+        \RequirePackage [UTF8, scheme=plain, heading=true] { ctex }
+      }
+      {
+        \RequirePackage [UTF8, heading=true, scheme=chinese] { ctex }
+      }
+  }
+
+
+
+\endinput

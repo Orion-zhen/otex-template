@@ -1,635 +1,344 @@
-\ProvidesPackage{otex}[Orion's Custom Package]
+\NeedsTeXFormat{LaTeX2e}
+\RequirePackage{expl3}
+\ProvidesExplPackage {otex} {2025-01-16} {1.0} {Orion's Custom Package}
 
-% ==========================================
-%  模块化加载控制 (Modular Loading Control)
-% ==========================================
-% 第一步: 定义功能模块开关标志
-\newif\ifotex@loadlayout    % geometry, fancyhdr
-\newif\ifotex@loadfonts     % fontspec, setmainfont
-\newif\ifotex@loadctex      % ctex 宏包
-\newif\ifotex@loadtheorems  % amsthm 环境定义
-\newif\ifotex@loadhyperref  % hyperref
-\newif\ifotex@loadcleveref  % cleveref (智能引用)
-\newif\ifotex@loadcaption   % caption, subcaption
-\newif\ifotex@loadalgo      % algorithm2e
-\newif\ifotex@loadmath      % amsmath 等数学宏包
-\newif\ifotex@loadgraphics  % tikz, graphicx 等绘图工具
-\newif\ifotex@loadlistings  % listings 代码高亮
-\newif\ifotex@loadminted    % minted 代码高亮 (需 -shell-escape)
-\newif\ifotex@loadtables    % booktabs 等表格增强
+% ==============================================================================
+% 模块变量声明 (Variable Declarations)
+% ------------------------------------------------------------------------------
+% 语法讲解:
+% \bool_new:N <variable>
+%   创建一个新的布尔(boolean)变量，初始值为 false。
+%   :N 表示参数是一个单一的控制序列 (Command/Control Sequence)。
+%
+% 命名规范 (Naming Convention):
+%   \g_otex_..._bool
+%   ^ ^    ^       ^
+%   | |    |       |__ 类型后缀 (Type): 表示这是一个布尔变量
+%   | |    |__________ 变量名 (Name): 描述变量用途
+%   | |_______________ 模块名 (Module): 属于 'otex' 包
+%   |_________________ 作用域 (Scope): Global (全局变量)
+% ==============================================================================
 
-% 第二步: 粒度化覆盖选项 (Granular Override Options)
-% 布局
-\DeclareOption{layout}{\otex@loadlayouttrue}
-\DeclareOption{nolayout}{\otex@loadlayoutfalse}
-\DeclareOption{geometry}{\otex@loadlayouttrue}
-\DeclareOption{nogeometry}{\otex@loadlayoutfalse}
+\bool_new:N \g_otex_load_layout_bool    % 是否加载页面布局模块 (geometry 等)
+\bool_new:N \g_otex_load_fonts_bool     % 是否加载字体配置模块
+\bool_new:N \g_otex_load_ctex_bool      % 是否加载中文支持 (ctex)
+\bool_new:N \g_otex_load_theorems_bool  % 是否加载定理环境 (amsthm 等)
+\bool_new:N \g_otex_load_hyperref_bool  % 是否加载超链接支持 (hyperref)
+\bool_new:N \g_otex_load_cleveref_bool  % 是否加载智能引用支持 (cleveref)
+\bool_new:N \g_otex_load_caption_bool   % 是否加载图表标题支持 (caption)
+\bool_new:N \g_otex_load_algo_bool      % 是否加载算法模块 (algorithm2e/algorithmicx)
+\bool_new:N \g_otex_load_math_bool      % 是否加载数学模块 (amsmath, mathtools 等)
+\bool_new:N \g_otex_load_graphics_bool  % 是否加载图形模块 (graphicx, tikz 等)
+\bool_new:N \g_otex_load_listings_bool  % 是否加载 listings 代码高亮
+\bool_new:N \g_otex_load_minted_bool    % 是否加载 minted 代码高亮
+\bool_new:N \g_otex_load_tables_bool    % 是否加载表格模块 (booktabs 等)
+\bool_new:N \g_otex_english_bool        % 是否开启英文模式 (影响日期格式、ctex 选项等)
+\bool_new:N \g_otex_is_std_class_bool   % 是否检测到标准文档类 (article, book, report 等)
 
-% 字体
-\DeclareOption{fonts}{\otex@loadfontstrue}
-\DeclareOption{nofonts}{\otex@loadfontsfalse}
+% ==============================================================================
+% 智能默认值设置 (Smart Defaults)
+% ------------------------------------------------------------------------------
+% 根据文档类自动启用/禁用某些功能
+% ==============================================================================
 
-% CTeX
-\DeclareOption{ctex}{\otex@loadctextrue}
-\DeclareOption{noctex}{\otex@loadctexfalse}
+% \@ifclassloaded 是 LaTeX2e 的命令，但在 expl3 中也可以使用。
+% 作用：检查某个文档类是否已被加载。
+% 语法：\@ifclassloaded{class-name}{true-code}{false-code}
 
-% 定理环境
-\DeclareOption{theorems}{\otex@loadtheoremstrue}
-\DeclareOption{notheorems}{\otex@loadtheoremsfalse}
+% 检查当前是否在使用标准文档类或其 CTEX 变体
+\@ifclassloaded{article}  { \bool_gset_true:N \g_otex_is_std_class_bool } {}
+\@ifclassloaded{report}   { \bool_gset_true:N \g_otex_is_std_class_bool } {}
+\@ifclassloaded{book}     { \bool_gset_true:N \g_otex_is_std_class_bool } {}
+\@ifclassloaded{ctexart}  { \bool_gset_true:N \g_otex_is_std_class_bool } {}
+\@ifclassloaded{ctexrep}  { \bool_gset_true:N \g_otex_is_std_class_bool } {}
+\@ifclassloaded{ctexbook} { \bool_gset_true:N \g_otex_is_std_class_bool } {}
 
-% 超链接
-\DeclareOption{hyperref}{\otex@loadhyperreftrue}
-\DeclareOption{nohyperref}{\otex@loadhyperreffalse}
+% 语法讲解:
+% \bool_gset_true:N <variable>
+%   将全局布尔变量设置为真 (true)。
+%   g = global (全局)
+%   set = 设置值
+%
+% \bool_if:NTF <bool_var> { <true_code> } { <false_code> }
+%   条件判断语句。
+%   :N  = 参数是一个控制序列 (即变量名)
+%   :TF = 需要提供 True分支 和 False分支 的代码块
 
-% 智能引用 (默认随 hyperref 联动)
-\DeclareOption{cleveref}{\otex@loadclevereftrue}
-\DeclareOption{nocleveref}{\otex@loadclevereffalse}
-
-% 图表标题
-\DeclareOption{caption}{\otex@loadcaptiontrue}
-\DeclareOption{nocaption}{\otex@loadcaptionfalse}
-
-% 算法
-\DeclareOption{algo}{\otex@loadalgotrue}
-\DeclareOption{noalgo}{\otex@loadalgofalse}
-\DeclareOption{algorithms}{\otex@loadalgotrue}
-\DeclareOption{noalgorithms}{\otex@loadalgofalse}
-
-% 无害模块 (通常开启，但允许关闭)
-\DeclareOption{math}{\otex@loadmathtrue}
-\DeclareOption{nomath}{\otex@loadmathfalse}
-\DeclareOption{graphics}{\otex@loadgraphicstrue}
-\DeclareOption{nographics}{\otex@loadgraphicsfalse}
-\DeclareOption{listings}{\otex@loadlistingstrue}
-\DeclareOption{nolistings}{\otex@loadlistingsfalse}
-\DeclareOption{minted}{\otex@loadmintedtrue}
-\DeclareOption{nominted}{\otex@loadmintedfalse}
-\DeclareOption{tables}{\otex@loadtablestrue}
-\DeclareOption{notables}{\otex@loadtablesfalse}
-
-% 第三步: 基于文档类白名单的智能默认值设置
-\newif\ifotex@isstandardclass \otex@isstandardclassfalse
-\@ifclassloaded{article}{\otex@isstandardclasstrue}{}
-\@ifclassloaded{report}{\otex@isstandardclasstrue}{}
-\@ifclassloaded{book}{\otex@isstandardclasstrue}{}
-\@ifclassloaded{ctexart}{\otex@isstandardclasstrue}{}
-\@ifclassloaded{ctexrep}{\otex@isstandardclasstrue}{}
-\@ifclassloaded{ctexbook}{\otex@isstandardclasstrue}{}
-
-\ifotex@isstandardclass
-    % 白名单内的标准类: 默认开启所有功能
-    \otex@loadlayouttrue
-    \otex@loadfontstrue
-    \otex@loadctextrue
-    \otex@loadtheoremstrue
-    \otex@loadhyperreftrue
-    \otex@loadclevereftrue
-    \otex@loadcaptiontrue
-    \otex@loadalgotrue
-    \otex@loadmathtrue
-    \otex@loadgraphicstrue
-    \otex@loadgraphicstrue
-    \otex@loadlistingstrue
-    \otex@loadmintedtrue
-    \otex@loadtablestrue
-\else
-    % 未知类 (可能是期刊模板): 仅开启无害功能，关闭风险功能
-    \PackageWarning{otex}{Non-standard class detected! Defaulting to Safe Mode (Risky features disabled).}
-    \otex@loadlayoutfalse       % 风险: 页面布局
-    \otex@loadfontsfalse        % 风险: 字体配置
-    \otex@loadctexfalse         % 风险: CTeX
-    \otex@loadtheoremsfalse     % 风险: 定理环境
-    \otex@loadhyperreffalse     % 风险: 超链接
-    \otex@loadclevereffalse     % 风险: 智能引用 (依赖 hyperref)
-    \otex@loadcaptionfalse      % 风险: 图表标题
-    \otex@loadalgofalse         % 风险: 算法环境
+% 如果是标准文档类，默认开启所有功能
+\bool_if:NTF \g_otex_is_std_class_bool
+  {
+    % --- 标准模式：默认开启一切 ---
+    \bool_gset_true:N \g_otex_load_layout_bool
+    \bool_gset_true:N \g_otex_load_fonts_bool
+    \bool_gset_true:N \g_otex_load_ctex_bool
+    \bool_gset_true:N \g_otex_load_theorems_bool
+    \bool_gset_true:N \g_otex_load_hyperref_bool
+    \bool_gset_true:N \g_otex_load_cleveref_bool
+    \bool_gset_true:N \g_otex_load_caption_bool
+    \bool_gset_true:N \g_otex_load_algo_bool
+    \bool_gset_true:N \g_otex_load_math_bool
+    \bool_gset_true:N \g_otex_load_graphics_bool
+    \bool_gset_true:N \g_otex_load_listings_bool
+    \bool_gset_true:N \g_otex_load_minted_bool
+    \bool_gset_true:N \g_otex_load_tables_bool
+  }
+  {
+    % --- 安全模式 (Safe Mode) ---
+    % 非标准类 (如 beamer, standalone) 检测到时进入此分支。
     
-    % 无害: 数学、绘图、代码、表格增强
-    \otex@loadmathtrue
-    \otex@loadgraphicstrue
-    \otex@loadlistingstrue
-    \otex@loadmintedfalse       % 风险: Shell-escape 依赖
-    \otex@loadtablestrue
-\fi
+    % 语法讲解:
+    % \msg_new:nnn { <module> } { <msg_name> } { <text> }
+    %   定义一条新消息。
+    % \msg_warning:nn { <module> } { <msg_name> }
+    %   发出一条警告消息。
+    
+    \msg_new:nnn { otex } { safe-mode } { Non-standard~class~detected!~Defaulting~to~Safe~Mode. }
+    \msg_warning:nn { otex } { safe-mode }
+    
+    % 关闭可能引起冲突的模块
+    \bool_gset_false:N \g_otex_load_layout_bool
+    \bool_gset_false:N \g_otex_load_fonts_bool
+    \bool_gset_false:N \g_otex_load_ctex_bool
+    \bool_gset_false:N \g_otex_load_theorems_bool
+    \bool_gset_false:N \g_otex_load_hyperref_bool
+    \bool_gset_false:N \g_otex_load_cleveref_bool
+    \bool_gset_false:N \g_otex_load_caption_bool
+    \bool_gset_false:N \g_otex_load_algo_bool
+    
+    % 开启通常无害的功能
+    \bool_gset_true:N \g_otex_load_math_bool
+    \bool_gset_true:N \g_otex_load_graphics_bool
+    \bool_gset_true:N \g_otex_load_listings_bool
+    \bool_gset_false:N \g_otex_load_minted_bool % safe mode下也默认关闭minted以防万一
+    \bool_gset_true:N \g_otex_load_tables_bool
+  }
 
-% ==========================================
-%  3. 本地化与名称配置 (Localization & Names)
-% ==========================================
-%  功能: 集中管理所有中英文关键词
-%  语法: 这里的名称变量将在后续环境定义中使用
+% ==============================================================================
+% 选项定义 (Option Definitions)
+% ------------------------------------------------------------------------------
+% 使用 l3keys 定义 key-value 选项接口
+% ==============================================================================
+\RequirePackage { l3keys2e } % 允许 LaTeX2e 宏包 (\usepackage[...]{...}) 使用 expl3 的 key-value 处理功能
 
-% --- 默认名称 (Default Names - Chinese) ---
-% 定理类
-\newcommand{\theoremname}{定理}
-\newcommand{\lemmaname}{引理}
-\newcommand{\propositionname}{命题}
-\newcommand{\corollaryname}{推论}
-\newcommand{\definitionname}{定义}
-\newcommand{\examplename}{例}
-\newcommand{\remarkname}{注}
-\newcommand{\assumptionname}{假设}
-\newcommand{\conjecturename}{猜想}
-\newcommand{\axiomname}{公理}
-\newcommand{\problemname}{问题}
-\newcommand{\solutionname}{解答}
-\newcommand{\exercisename}{练习}
-\newcommand{\casename}{情形}
-% \proofname 已经在 amsthm 中定义，这里均需重定义以确保一致性
+% 语法讲解:
+% \keys_define:nn { <module> } { <key_defs> }
+%   定义一组键值对选项。
+%   :nn 表示两个参数都是普通的大括号包围的文本。
 
-% 文档元素类 (覆盖 LaTeX/CTeX 默认值)
-% 注意: CTeX 会在 \begin{document} 时应用其中文配置, 
-% 所以我们需要在 \AtBeginDocument 中强制应用我们的修改, 
-% 或者修改 CTeX 内部的宏. 但最简单的是使用 \renewcommand 在 English 选项中覆盖,
-% 而默认中文使用 CTeX 的默认值(如果合适)或这里覆盖.
-% 为了统一管理，我们在这里明确定义中文名，确保一致性.
-% (注: \contentsname 等通常由 babel 或 ctex 管理, 直接重定义即可)
+\keys_define:nn { otex }
+  {
+    % 语法讲解:
+    % key_name .bool_set:N = \variable
+    %   定义一个名为 key_name 的选项，当用户使用 key=true/false 时，
+    %   自动将结果存储到 \variable 中。
+    %
+    % key_name .default:n = true
+    %   定义当用户只写 'key_name' 而不写 '=value' 时，默认视作 '=true'。
+    
+    layout      .bool_set:N = \g_otex_load_layout_bool,
+    layout      .default:n  = true,
+    
+    fonts       .bool_set:N = \g_otex_load_fonts_bool,
+    fonts       .default:n  = true,
+    
+    ctex        .bool_set:N = \g_otex_load_ctex_bool,
+    ctex        .default:n  = true,
+    
+    theorems    .bool_set:N = \g_otex_load_theorems_bool,
+    theorems    .default:n  = true,
+    
+    hyperref    .bool_set:N = \g_otex_load_hyperref_bool,
+    hyperref    .default:n  = true,
+    
+    cleveref    .bool_set:N = \g_otex_load_cleveref_bool,
+    cleveref    .default:n  = true,
+    
+    caption     .bool_set:N = \g_otex_load_caption_bool,
+    caption     .default:n  = true,
+    
+    algo        .bool_set:N = \g_otex_load_algo_bool,
+    algo        .default:n  = true,
+    
+    % 语法讲解:
+    % key_name .meta:n = { <other_keys> }
+    %   定义一个"元选项" (Meta Key)。当用户使用此 key 时，
+    %   实际效果等同于设置了大括号内的那些 keys。
+    %   这里 #1 代表用户传递给 alias 的值。
+    algorithms  .meta:n     = { algo = #1 },
+    algorithms  .default:n  = true,
+    
+    math        .bool_set:N = \g_otex_load_math_bool,
+    math        .default:n  = true,
+    
+    graphics    .bool_set:N = \g_otex_load_graphics_bool,
+    graphics    .default:n  = true,
+    
+    listings    .bool_set:N = \g_otex_load_listings_bool,
+    listings    .default:n  = true,
+    
+    minted      .bool_set:N = \g_otex_load_minted_bool,
+    minted      .default:n  = true,
+    
+    tables      .bool_set:N = \g_otex_load_tables_bool,
+    tables      .default:n  = true,
+    
+    english     .bool_set:N = \g_otex_english_bool,
+    english     .default:n  = true,
+    
+    % 反向别名 (Negative Aliases)
+    % 方便用户使用 \usepackage[no-math]{otex} 这种形式
+    nolayout    .meta:n = { layout = false },
+    nofonts     .meta:n = { fonts = false },
+    noctex      .meta:n = { ctex = false },
+    notheorems  .meta:n = { theorems = false },
+    nohyperref  .meta:n = { hyperref = false },
+    nocleveref  .meta:n = { cleveref = false },
+    nocaption   .meta:n = { caption = false },
+    noalgo      .meta:n = { algo = false },
+    noalgorithms.meta:n = { algo = false },
+    nomath      .meta:n = { math = false },
+    nographics  .meta:n = { graphics = false },
+    nolistings  .meta:n = { listings = false },
+    nominted    .meta:n = { minted = false },
+    notables    .meta:n = { tables = false },
+  }
 
-% --- 选项配置 (Options) ---
-\newif\ifotex@english % 如果使用 english 选项导入 otex 包
-\DeclareOption{english}{
-    \otex@englishtrue
-    % Theorem-like
-    \renewcommand{\theoremname}{Theorem}
-    \renewcommand{\lemmaname}{Lemma}
-    \renewcommand{\propositionname}{Proposition}
-    \renewcommand{\corollaryname}{Corollary}
-    \renewcommand{\definitionname}{Definition}
-    \renewcommand{\examplename}{Example}
-    \renewcommand{\remarkname}{Remark}
-    \renewcommand{\assumptionname}{Assumption}
-    \renewcommand{\conjecturename}{Conjecture}
-    \renewcommand{\axiomname}{Axiom}
-    \renewcommand{\problemname}{Problem}
-    \renewcommand{\solutionname}{Solution}
-    \renewcommand{\exercisename}{Exercise}
-    \renewcommand{\casename}{Case}
+% 语法讲解:
+% \ProcessKeysOptions { <module> }
+%   处理当前包接收到的选项。它会查看 \usepackage[...]{otex} 中的内容，
+%   并匹配上面定义的 keys。这一步会将用户选项应用到变量中。
+\ProcessKeysOptions { otex }
+
+% ==============================================================================
+% 冲突熔断 (Conflict Resolution)
+% ------------------------------------------------------------------------------
+% 检查是否已加载冲突包，如果已加载则自动关闭对应模块，防止报错。
+% ==============================================================================
+
+% 定义冲突提示消息模板
+% #1 是占位符，会被具体包名替换
+\msg_new:nnn { otex } { package-clash } { Package~'#1'~detected.~Disabling~otex~#1. }
+
+% 检测 geometry
+% 如果用户在加载 otex 之前已经 \usepackage{geometry}，
+% 则不应再让 otex 加载 geometry，否则会报错 "Option clash"。
+\@ifpackageloaded { geometry } {
+  \bool_gset_false:N \g_otex_load_layout_bool
+  % \msg_info:nnn 发送一条 Info 级别的消息
+  \msg_info:nnn { otex } { package-clash } { layout }
+} {}
+
+% 检测 hyperref
+\@ifpackageloaded { hyperref } {
+  \bool_gset_false:N \g_otex_load_hyperref_bool
+  \msg_info:nnn { otex } { package-clash } { hyperref }
+} {}
+
+% 检测 cleveref
+\@ifpackageloaded { cleveref } {
+  \bool_gset_false:N \g_otex_load_cleveref_bool
+  \msg_info:nnn { otex } { package-clash } { cleveref }
+} {}
+
+% 检测 caption
+\@ifpackageloaded { caption } {
+  \bool_gset_false:N \g_otex_load_caption_bool
+  \msg_info:nnn { otex } { package-clash } { caption }
+} {}
+
+% 检测 algorithm
+\@ifpackageloaded { algorithm } {
+  \bool_gset_false:N \g_otex_load_algo_bool
+  \msg_info:nnn { otex } { package-clash } { algorithm2e }
+} {}
+
+% 检测 minted
+\@ifpackageloaded { minted } {
+  \bool_gset_false:N \g_otex_load_minted_bool
+  \msg_info:nnn { otex } { package-clash } { minted }
+} {}
+
+% 检查定理环境
+% \@ifundefined{command}{true}{false} 检查命令是否未定义
+% 如果 \theorem 命令已存在，说明可能加载了 amsthm 或 ntheorem
+\@ifundefined { theorem } {} {
+  \bool_gset_false:N \g_otex_load_theorems_bool
+  \msg_info:nnn { otex } { package-clash } { theorems }
 }
 
-\ProcessOptions\relax
+% ==============================================================================
+% 模块加载 (Module Loading)
+% ------------------------------------------------------------------------------
+% 根据布尔变量的最终状态 (用户选项 + 自动检测 + 冲突熔断)，加载对应模块。
+% ==============================================================================
 
-% ==========================================
-%  1. 基础宏包与颜色配置
-% ==========================================
-\RequirePackage{pdftexcmds} % Portable shell escape detection
-\RequirePackage[table]{xcolor} % 颜色支持
-% 预定义颜色方案
-\definecolor{code_background}{rgb}{0.95, 0.95, 0.95} % 代码块背景: 浅灰
-\definecolor{code_keyword}{rgb}{0.16, 0.32, 0.75}    % 关键字: 蓝色
-\definecolor{code_comment}{rgb}{0.12, 0.38, 0.17}    % 注释: 深绿
-\definecolor{code_string}{rgb}{0.63, 0.12, 0.94}     % 字符串: 紫色
-\definecolor{code_identifier}{rgb}{0.0, 0.0, 0.0}    % 标识符: 黑色
-\definecolor{code_number}{rgb}{0.5, 0.5, 0.5}        % 行号: 灰色
+% 1. 基础模块 (Always loaded) - 包含一些通用宏
+\RequirePackage { otex/otex-base }
 
-% 第四步: 冲突熔断检查 (Post-Process Conflict Prevention)
-% 如果相关包已被加载，强制关闭对应模块以避免选项冲突
-\@ifpackageloaded{geometry}{\otex@loadlayoutfalse \PackageInfo{otex}{Package 'geometry' detected. Disabling otex layout.}}{}
-\@ifpackageloaded{hyperref}{\otex@loadhyperreffalse \PackageInfo{otex}{Package 'hyperref' detected. Disabling otex hyperref.}}{}
-\@ifpackageloaded{cleveref}{\otex@loadclevereffalse \PackageInfo{otex}{Package 'cleveref' detected. Disabling otex cleveref.}}{}
-\@ifpackageloaded{caption}{\otex@loadcaptionfalse \PackageInfo{otex}{Package 'caption' detected. Disabling otex caption.}}{}
-\@ifpackageloaded{algorithm}{\otex@loadalgofalse \PackageInfo{otex}{Package 'algorithm' detected. Disabling otex algorithm2e.}}{}
-\@ifpackageloaded{minted}{\otex@loadmintedfalse \PackageInfo{otex}{Package 'minted' detected. Disabling otex minted.}}{}
-% 检查定理环境是否已定义
-\@ifundefined{theorem}{}{\otex@loadtheoremsfalse \PackageInfo{otex}{Theorem environment detected. Disabling otex theorems.}}
+% 语法讲解:
+% \bool_if:NT <bool_var> { <code_if_true> }
+%   如果变量为真，则执行代码。这是 \bool_if:NTF 的简化版，省略了 False 分支。
 
-% ==========================================
-%  2. 数学公式增强 (Math Enhancements)
-% ==========================================
-%  功能: 提供更强大的数学公式排版支持
-\ifotex@loadmath
-    \RequirePackage{amsmath}     % 基础数学宏包 (AMS)
-    \RequirePackage{amssymb}     % 数学符号库 (如 \mathbb)
-    \RequirePackage{mathtools}   % amsmath 的扩展修复和增强
-    \RequirePackage{amsthm}      % 定理环境支持
-\fi
-
-% 常用数学配置说明:
-% \begin{align} ... \end{align} 用于多行对齐公式
-% \begin{gather} ... \end{gather} 用于多行居中公式
-% \mathbb{R} 实数集 R, \mathcal{L} 损失函数 L
-% \DeclarePairedDelimiter 可用于定义自适应括号
-
-% 修复 CTeX 可能覆盖中文名的问题 (如果需要强制覆盖)
-\ifotex@english
-    \AtBeginDocument{
-        \renewcommand{\contentsname}{Contents}
-        \renewcommand{\listfigurename}{List of Figures}
-        \renewcommand{\listtablename}{List of Tables}
-        \renewcommand{\figurename}{Figure}
-        \renewcommand{\tablename}{Table}
-        % Handle both article (refname) and book/report (bibname) classes
-        \@ifundefined{refname}{}{\renewcommand{\refname}{References}}
-        \@ifundefined{bibname}{}{\renewcommand{\bibname}{References}}
-        \renewcommand{\appendixname}{Appendix}
-        \renewcommand{\indexname}{Index}
-        \renewcommand{\abstractname}{Abstract}
-    }
-\fi
-
-% ==========================================
-%  4. 定理环境注册 (Theorem Environments)
-% ==========================================
-\ifotex@loadtheorems
-    \newtheoremstyle{mystyle}     % 定义样式名称
-        {3pt}                     % 上间距
-        {3pt}                     % 下间距
-        {\normalfont}             % 正文字体
-        {}                        % 缩进量
-        {\bfseries}               % 定理头字体 (粗体)
-        {:}                       % 标点
-        {.5em}                    % 标点后间距
-        {}                        % 头部说明 (默认)
-    \theoremstyle{mystyle}        % 使用定义好的样式
-    
-    % 核心环境 (共享 section 编号)
-    \newtheorem{theorem}{\theoremname}[section]
-    \newtheorem{lemma}[theorem]{\lemmaname}
-    \newtheorem{proposition}[theorem]{\propositionname}
-    \newtheorem{corollary}[theorem]{\corollaryname}
-    \newtheorem{definition}[theorem]{\definitionname}
-    \newtheorem{example}[theorem]{\examplename}
-    \newtheorem{remark}[theorem]{\remarkname}
-    \newtheorem{assumption}[theorem]{\assumptionname}
-    \newtheorem{conjecture}[theorem]{\conjecturename}
-    \newtheorem{axiom}[theorem]{\axiomname}
-    \newtheorem{problem}[theorem]{\problemname}
-    \newtheorem{exercise}[theorem]{\exercisename}
-    \newtheorem{case}[theorem]{\casename}
-    
-    % 特殊环境
-    % Solution 通常不编号或独立编号，这里设置为无编号环境
-    \newtheorem*{solution}{\solutionname}
-\fi
-
-% ==========================================
-%  4. 算法与伪代码 (Algorithms)
-% ==========================================
-%  功能: 排版算法伪代码
-%  文档: http://mirrors.ctan.org/macros/latex/contrib/algorithm2e/doc/algorithm2e.pdf
-\ifotex@loadalgo
-    \RequirePackage[ruled,linesnumbered,vlined]{algorithm2e}
-\fi
-% 配置:
-% ruled: 标题在上方, 有双横线
-% linesnumbered: 显示行号
-% vlined: 代码块垂直连接线
-%
-% 用法示例:
-% \begin{algorithm}[H]
-%     \SetAlgoLined
-%     \KwIn{输入}
-%     \KwOut{输出}
-%     \While{条件}{
-%         操作\;
-%     }
-%     \caption{算法标题}
-% \end{algorithm}
-
-% ==========================================
-%  5. 代码高亮 (Code Highlighting)
-% ==========================================
-% 提供 listings (纯LaTeX) 和 minted (Python/Pygments) 两种方案
-% 建议: 能用 -shell-escape 编译时优先使用 minted
-
-\ifotex@loadlistings
-    \RequirePackage{listings}
-    \lstset{
-        backgroundcolor=\color{code_background}, % 背景色
-        basicstyle=\ttfamily\small,              % 字体: 等宽 + 小号
-        keywordstyle=\color{code_keyword}\bfseries, % 关键字: 颜色 + 粗体
-        commentstyle=\color{code_comment}\itshape,  % 注释: 颜色 + 斜体
-        stringstyle=\color{code_string},         % 字符串
-        identifierstyle=\color{code_identifier}, % 标识符
-        numberstyle=\tiny\color{code_number},    % 行号样式
-        numbers=left,                            % 行号位置: 左侧
-        stepnumber=1,                            % 行号步长: 每一行都显示
-        frame=single,                            % 边框: 单线框
-        rulecolor=\color{gray!30},               % 边框颜色
-        frameround=tttt,                         % 圆角边框
-        breaklines=true,                         % 自动代码换行
-        tabsize=4,                               % 制表符宽度
-        showspaces=false,                        % 不显示空格符号
-        showstringspaces=false,                  % 字符串中不显示空格
-        extendedchars=true,                      % 扩展字符支持
-        captionpos=b,                            % 标题位置: 底部
-        escapeinside={(*@}{@*)},                 % 逃逸字符
-        inputencoding=utf8
-    }
-\fi
-
-\ifotex@loadminted
-    % 检查 shell-escape 是否开启 (使用 pdftexcmds 提供的兼容性宏)
-    \ifnum\pdf@shellescape=1
-        \RequirePackage{minted}
-        \usemintedstyle{friendly} % 风格类似: friendly, pastie, vs
-        \setminted{
-            bgcolor=code_background, % 背景色
-            fontsize=\small,
-            linenos,                 % 行号
-            breaklines,              % 自动换行
-            tabsize=4,
-            frame=lines,             % 上下边框
-            framesep=2mm,
-            autogobble               % 自动去除缩进
-        }
-    \else
-        \PackageWarning{otex}{Shell-escape not enabled! Minted disabled. Falling back to listings if enabled.}
-        \otex@loadmintedfalse
-    \fi
-\fi
-
-% ==========================================
-%  6. 图表与浮动体 (Figures & Tables)
-% ==========================================
-\ifotex@loadgraphics
-    \RequirePackage{graphicx}    % 图片支持
-\fi
-
-\ifotex@loadcaption
-    \RequirePackage{caption}     % 标题样式控制
-    \RequirePackage{subcaption}  % 子图支持
-    % 标题设置
-    \captionsetup{
-        font=small,              % 标题字体小一号
-        labelfont=bf,            % 标签(如Figure 1)加粗
-        labelsep=colon,          % 分隔符用冒号
-        textfont=it              % 标题文本用斜体
-    }
-\fi
-
-\ifotex@loadtables
-    \RequirePackage{booktabs}    % 三线表 (\toprule, \midrule, \bottomrule)
-    \RequirePackage{multirow}    % 表格行合并
-    \RequirePackage{array}       % 增强的列格式
-    \RequirePackage{float}       % 强力浮动体控制 (使用 [H] 禁止浮动)
-    \RequirePackage{longtable}   % 长表格
-    \RequirePackage{wrapfig}     % 图文环绕
-\fi
-
-% ==========================================
-%  7. 列表与枚举 (Lists)
-% ==========================================
-% 注: enumitem 是通用功能，总是加载
-\RequirePackage[inline]{enumitem}    % 列表定制
-% 配置: \setlist[itemize]{...} 全局配置
-% 用法: \begin{enumerate}[label=(\arabic*)] ... \end{enumerate}
-
-% ==========================================
-%  8. 单位与物理量 (SI Units)
-% ==========================================
-% 注: siunitx 是通用功能，总是加载
-\RequirePackage{siunitx}
-% 用法: \SI{10}{\meter\per\second} -> 10 m/s
-
-% ==========================================
-%  9. TikZ 绘图系统 (TikZ & PGF) - 核心新增
-% ==========================================
-\ifotex@loadgraphics
-    \RequirePackage{tcolorbox}   % 彩色盒子
-
-    % 功能: 极其强大的绘图工具
-    \RequirePackage{tikz}
-    \usetikzlibrary{
-        shapes,         % 形状库: ellipse, node styles
-        arrows.meta,    % 箭头库: 提供更多箭头样式 (Stepper, Latex, etc.)
-        positioning,    % 定位库: below = of node1
-        calc,           % 计算库: ($ (a) + (b) $)
-        patterns,       % 填充纹理: north east lines
-        decorations.pathreplacing, % 路径装饰: brace (大括号)
-        decorations.markings,      % 标记装饰: 在线上加箭头
-        quotes,         % 引用语法: "label"
-        fit,            % 自适应节点: fit=(a)(b)
-        backgrounds,    % 背景层: on background layer
-        shadows,        % 阴影: drop shadow
-        trees,          % 树形图
-        mindmap         % 思维导图
-    }
-
-    % --- PGFPlots 高级绘图库 ---
-    % 功能: 专业级函数绘图与数据可视化
-    \RequirePackage{pgfplots}
-    \pgfplotsset{compat=1.18}   % 使用最新兼容模式
-    \usepgfplotslibrary{
-        fillbetween,            % 区域填充
-        polar                   % 极坐标图
-    }
-
-    % --- TikZ 常用样式预定义 ---
-    % 1. 基础节点样式
-    \tikzset{
-        base/.style = {draw, align=center, minimum height=2em, minimum width=2em},
-        % 矩形框 (例如: 流程图处理块)
-        process/.style = {base, rectangle, rounded corners, fill=orange!10},
-        % 判断框 (例如: 流程图判断)
-        decision/.style = {base, diamond, aspect=2, fill=blue!10, inner sep=0pt},
-        % 输入输出 (平行四边形)
-        io/.style = {base, trapezium, trapezium left angle=70, trapezium right angle=110, fill=green!10},
-        % 开始/结束 (胶囊形)
-        startstop/.style = {base, rounded rectangle, fill=red!10},
-        % 箭头样式
-        arrow/.style = {thick, ->, >=Stealth},
-        % 连接线样式
-        line/.style = {thick}
-    }
-\fi
-
-% ==========================================
-%  10. 中文支持与排版优化 (Chinese Support)
-% ==========================================
-% CTeX 宏包配置
-\ifotex@loadctex
-    \RequirePackage[UTF8, heading=true, scheme=chinese]{ctex}
-\fi
-
-\ifotex@loadfonts
-    \RequirePackage{fontspec}
-    % 字体设置 (建议根据系统安装字体调整)
-    % Win/Linux通用常用配置:
-    \setmainfont{Times New Roman}
-    \setsansfont{Arial}
-    % \setmonofont{Maple Mono NF}
-
-    \ifotex@loadctex
-        % % 中文字体 - 优先匹配系统常见字体
-        % % 注意: 如果编译报错"Font not found", 请修改为系统实际存在的字体名
-        \setCJKmainfont{SimSun}      % 宋体
-        \setCJKsansfont{Source Han Sans CN}      % 黑体
-        % \setCJKmonofont{Source Han Sans CN}    % 黑体
-    \fi
-\fi
-
-% 微排版优化
-\RequirePackage{microtype}
-% 首行缩进 (即使是章节后的第一段)
-\RequirePackage{indentfirst}
-
-% ==========================================
-%  11. 页面布局与页眉页脚 (Layout)
-% ==========================================
-% 仅在 article 类生效，避免冲突
-\ifotex@loadlayout
-    \@ifclassloaded{article}{
-        \RequirePackage{geometry}
-        \geometry{
-            a4paper,
-            left=2.5cm,
-            right=2.5cm,
-            top=2.5cm,
-            bottom=2.5cm
-        }
-
-        \RequirePackage{fancyhdr}
-        \pagestyle{fancy}
-        \fancyhf{}
-        \lhead{\leftmark}       % 左页眉: 章节名
-        \chead{}                % 中页眉: 空
-        \rhead{\thepage}        % 右页眉: 页码
-        \lfoot{}                % 左页脚
-        \cfoot{}                % 中页脚
-        \rfoot{}                % 右页脚
-    }{}
-\fi
-
-% ==========================================
-%  12. 引用与PDF元数据 (Hyperref)
-% ==========================================
-\ifotex@loadhyperref
-    \RequirePackage{cite} % [1-3] 样式引用
-    \RequirePackage[pdfborder={0 0 0}]{hyperref} % 超链接
-    \hypersetup{
-        colorlinks=true,        % 激活彩色链接
-        linkcolor=blue,         % 内部链接(目录, 公式引用)颜色
-        filecolor=magenta,      % 文件链接颜色
-        urlcolor=cyan,          % URL链接颜色
-        citecolor=green!50!black, % 引用颜色([1])
-        pdftitle={Generated Document},
-        pdfauthor={Orion},
-    }
-\fi
-
-% ==========================================
-%  13. 智能交叉引用 (Cleveref)
-% ==========================================
-%  功能: 自动识别引用类型, 生成智能引用格式
-%  警告: 必须在 hyperref 之后加载!
-%  文档: http://mirrors.ctan.org/macros/latex/contrib/cleveref/cleveref.pdf
-\ifotex@loadcleveref
-    % 如果 hyperref 未开启, 强制关闭 cleveref 并发出警告
-    \ifotex@loadhyperref\else
-        \PackageWarning{otex}{cleveref requires hyperref! Auto-disabling cleveref.}
-        \otex@loadclevereffalse
-    \fi
-\fi
-
-\ifotex@loadcleveref
-    \RequirePackage[capitalise,nameinlink]{cleveref}
-    % 选项说明:
-    % - capitalise: 引用文本首字母大写 (Figure 1, not figure 1)
-    % - nameinlink: 将类型名也包含在超链接中 (整个 "Figure 1" 可点击)
-    % - noabbrev: 使用完整名称而非缩写 (可选, 默认使用缩写如 fig.)
-    
-    % --- 中英文本地化配置 ---
-    \ifotex@english
-        % 英文环境: 使用默认英文格式 (如 Figure, Table, Equation)
-        % cleveref 的默认英文配置已经足够好, 无需额外设置
-    \else
-        % 中文环境: 自定义中文引用格式
-        % 格式: \crefname{环境名}{单数形式}{复数形式}
-        \crefname{figure}{图}{图}
-        \crefname{table}{表}{表}
-        \crefname{equation}{式}{式}
-        \crefname{section}{节}{节}
-        \crefname{chapter}{章}{章}
-        \crefname{appendix}{附录}{附录}
-        
-        % 定理环境 (如果开启了 theorems 模块)
-        \ifotex@loadtheorems
-            \crefname{theorem}{定理}{定理}
-            \crefname{lemma}{引理}{引理}
-            \crefname{proposition}{命题}{命题}
-            \crefname{corollary}{推论}{推论}
-            \crefname{definition}{定义}{定义}
-            \crefname{example}{例}{例}
-            \crefname{remark}{注}{注}
-            \crefname{assumption}{假设}{假设}
-            \crefname{conjecture}{猜想}{猜想}
-            \crefname{axiom}{公理}{公理}
-            \crefname{problem}{问题}{问题}
-            \crefname{exercise}{练习}{练习}
-        \fi
-        
-        % 算法环境 (如果开启了 algo 模块)
-        \ifotex@loadalgo
-            \crefname{algocf}{算法}{算法}  % algorithm2e 使用 algocf 环境名
-        \fi
-    \fi
-\fi
-
-% 用法示例:
-% \cref{fig:example}      -> "Figure 1" or "图 1"
-% \Cref{fig:example}      -> "Figure 1" (句首大写, 英文环境)
-% \cref{eq:1,eq:2,eq:3}   -> "Equations 1 to 3" or "式 1 至 3"
-% \crefrange{sec:1}{sec:3} -> "Sections 1 to 3" or "节 1 至 3"
-% \cpageref{fig:1}        -> "page 5" or "第 5 页"
-% \labelcref{thm:main}    -> 仅显示编号 "1.2", 不显示类型名
-
-% ==========================================
-%  14. 自定义命令 (Custom Commands)
-% ==========================================
-% 语义化字体切换
-\providecommand{\zh}{}\renewcommand{\zh}[1]{{\CJKfamily{zhsong}#1}} % 强制宋体
-\newcommand{\en}[1]{{\fontfamily{lmr}\selectfont#1}} % 强制英文字体
-
-% 强调关键字: 红色加粗
-\newcommand{\keyword}[1]{\textbf{\textcolor{red!80!black}{#1}}}
-
-% 行内代码简化: 灰色背景+等宽
-% --- 行内代码: \code ---
-% 功能: 统一的行内代码高亮/格式化
-% 用法: \code{print("Hello")}
-%
-% 行为差异:
-% - minted 模式: 使用 \mintinline{text}{...}, 支持自动换行, 稍微更慢
-% - listings 模式: 使用 \colorbox + \texttt, 简单快速, 不支持复杂高亮
-%
-% [高级用法] 如果你需要特定语言的行内高亮 (仅 minted 模式有效):
-% 请直接使用: \mintinline{python}{def foo()}
-%
-\newcommand{\code}[1]{%
-    \ifotex@loadminted
-        % 使用 text 词法分析器作为通用默认值, 避免特定语法报错
-        \mintinline[bgcolor=code_background,breaklines,fontsize=\small]{text}{#1}%
-    \else
-        \colorbox{code_background}{\texttt{\small #1}}%
-    \fi
+% 2. 数学模块
+\bool_if:NT \g_otex_load_math_bool {
+  \RequirePackage { otex/otex-math }
 }
 
-% --- 统一接口: \inputcode ---
-% 功能: 从外部文件导入代码，自动适配 listings 或 minted 后端
-% 用法: \inputcode{语言}{文件路径}
-% 示例: \inputcode{python}{scripts/demo.py}
-%
-% 行为差异:
-% - listings: 使用 \lstinputlisting, 样式受 \lstset 控制
-% - minted: 使用 \inputminted, 样式受 \setminted 控制
-%
-\newcommand{\inputcode}[2]{%
-    \ifotex@loadminted
-        \inputminted{#1}{#2}%
-    \else
-        \ifotex@loadlistings
-            \lstinputlisting[language=#1]{#2}%
-        \else
-            \PackageError{otex}{No code highlighting package loaded!}{Enable 'listings' or 'minted'.}
-        \fi
-    \fi
+% 3. 定理模块
+\bool_if:NT \g_otex_load_theorems_bool {
+  \RequirePackage { otex/otex-theorems }
 }
 
-% 待办事项: 醒目黄底红字
-\newcommand{\todo}[1]{\par\noindent\colorbox{yellow}{\textbf{TODO: } #1}\par}
+% 4. 算法模块
+\bool_if:NT \g_otex_load_algo_bool {
+  \RequirePackage { otex/otex-algo }
+}
 
-% 预定义常用 alert box 样式
-\newtcolorbox{alertbox}[1][]{colback=red!5, colframe=red!75!black, title=Warning, #1}
-\newtcolorbox{infobox}[1][]{colback=blue!5, colframe=blue!75!black, title=Note, #1}
-\newtcolorbox{tipbox}[1][]{colback=green!5, colframe=green!75!black, title=Tip, #1}
+% 5. 代码高亮模块
+% 逻辑: 如果 listings 或 minted 任意一个被启用，就加载 code 模块。
+% 具体使用哪个包，由 otex-code 内部再次判断。
+% 语法讲解:
+% \bool_if:nTF { <expression> } { <code_if_true> } { <code_if_false> }
+%   支持逻辑表达式，如 || (或), && (与), ! (非)。
+%   :n 表示参数是普通文本(表达式)。
+\bool_if:nTF { \g_otex_load_listings_bool || \g_otex_load_minted_bool }
+  { \RequirePackage { otex/otex-code } }
+  {}
+
+% 6. 图形模块
+\bool_if:NT \g_otex_load_graphics_bool {
+  \RequirePackage { otex/otex-graphics }
+}
+
+% 7. 标题模块
+\bool_if:NT \g_otex_load_caption_bool {
+  \RequirePackage { otex/otex-caption }
+}
+
+% 8. 表格模块
+\bool_if:NT \g_otex_load_tables_bool {
+  \RequirePackage { otex/otex-tables }
+}
+
+% 9. 中文/字体模块
+% 将 fonts 和 ctex 参数的逻辑交给该模块内部或通过开关处理
+% 这里我们总是加载它，它内部会检查 \g_otex_load_ctex_bool 等变量
+\RequirePackage { otex/otex-chinese } 
+
+% 10. 字体配置 (Fonts)
+% 放在中文模块之后加载，以确保 ctex 已就绪（如果开启的话）
+\RequirePackage { otex/otex-fonts } 
+
+% 11. 页面布局
+\bool_if:NT \g_otex_load_layout_bool {
+  \RequirePackage { otex/otex-layout }
+}
+
+% 12. 引用模块 (包含 hyperref 和 cleveref)
+% 具体的加载逻辑在子模块内部实现, 这里总是引入
+\RequirePackage { otex/otex-refs }
+
+% 13. 自定义命令
+\RequirePackage { otex/otex-commands }
 
 \endinput

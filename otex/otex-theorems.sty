@@ -1,0 +1,115 @@
+\ProvidesExplPackage {otex/otex-theorems} {2025-01-16} {1.0} {Orion's Theorem Environments}
+
+% ==============================================================================
+% 变量定义 (Variables)
+% ==============================================================================
+\tl_new:N \l_otex_theorem_name_tl
+\tl_new:N \l_otex_lemma_name_tl
+\tl_new:N \l_otex_proposition_name_tl
+\tl_new:N \l_otex_corollary_name_tl
+\tl_new:N \l_otex_definition_name_tl
+\tl_new:N \l_otex_example_name_tl
+\tl_new:N \l_otex_remark_name_tl
+\tl_new:N \l_otex_assumption_name_tl
+\tl_new:N \l_otex_conjecture_name_tl
+\tl_new:N \l_otex_axiom_name_tl
+\tl_new:N \l_otex_problem_name_tl
+\tl_new:N \l_otex_solution_name_tl
+\tl_new:N \l_otex_exercise_name_tl
+\tl_new:N \l_otex_case_name_tl
+
+% ==============================================================================
+% 名称设置 (Localization)
+% ==============================================================================
+
+\bool_if:NTF \g_otex_english_bool
+  {
+    % 英文默认值
+    \tl_set:Nn \l_otex_theorem_name_tl { Theorem }
+    \tl_set:Nn \l_otex_lemma_name_tl { Lemma }
+    \tl_set:Nn \l_otex_proposition_name_tl { Proposition }
+    \tl_set:Nn \l_otex_corollary_name_tl { Corollary }
+    \tl_set:Nn \l_otex_definition_name_tl { Definition }
+    \tl_set:Nn \l_otex_example_name_tl { Example }
+    \tl_set:Nn \l_otex_remark_name_tl { Remark }
+    \tl_set:Nn \l_otex_assumption_name_tl { Assumption }
+    \tl_set:Nn \l_otex_conjecture_name_tl { Conjecture }
+    \tl_set:Nn \l_otex_axiom_name_tl { Axiom }
+    \tl_set:Nn \l_otex_problem_name_tl { Problem }
+    \tl_set:Nn \l_otex_solution_name_tl { Solution }
+    \tl_set:Nn \l_otex_exercise_name_tl { Exercise }
+    \tl_set:Nn \l_otex_case_name_tl { Case }
+  }
+  {
+    % 中文默认值
+    \tl_set:Nn \l_otex_theorem_name_tl { 定理 }
+    \tl_set:Nn \l_otex_lemma_name_tl { 引理 }
+    \tl_set:Nn \l_otex_proposition_name_tl { 命题 }
+    \tl_set:Nn \l_otex_corollary_name_tl { 推论 }
+    \tl_set:Nn \l_otex_definition_name_tl { 定义 }
+    \tl_set:Nn \l_otex_example_name_tl { 例 }
+    \tl_set:Nn \l_otex_remark_name_tl { 注 }
+    \tl_set:Nn \l_otex_assumption_name_tl { 假设 }
+    \tl_set:Nn \l_otex_conjecture_name_tl { 猜想 }
+    \tl_set:Nn \l_otex_axiom_name_tl { 公理 }
+    \tl_set:Nn \l_otex_problem_name_tl { 问题 }
+    \tl_set:Nn \l_otex_solution_name_tl { 解答 }
+    \tl_set:Nn \l_otex_exercise_name_tl { 练习 }
+    \tl_set:Nn \l_otex_case_name_tl { 情形 }
+  }
+
+% 暴露变量给用户(兼容旧接口)
+\newcommand{\theoremname}{\l_otex_theorem_name_tl}
+\newcommand{\lemmaname}{\l_otex_lemma_name_tl}
+\newcommand{\propositionname}{\l_otex_proposition_name_tl}
+\newcommand{\corollaryname}{\l_otex_corollary_name_tl}
+\newcommand{\definitionname}{\l_otex_definition_name_tl}
+\newcommand{\examplename}{\l_otex_example_name_tl}
+\newcommand{\remarkname}{\l_otex_remark_name_tl}
+\newcommand{\assumptionname}{\l_otex_assumption_name_tl}
+\newcommand{\conjecturename}{\l_otex_conjecture_name_tl}
+\newcommand{\axiomname}{\l_otex_axiom_name_tl}
+\newcommand{\problemname}{\l_otex_problem_name_tl}
+\newcommand{\solutionname}{\l_otex_solution_name_tl}
+\newcommand{\exercisename}{\l_otex_exercise_name_tl}
+\newcommand{\casename}{\l_otex_case_name_tl}
+
+% ==============================================================================
+% 定理环境注册 (Environment Definitions)
+% ==============================================================================
+
+\newtheoremstyle{mystyle}     % 定义样式名称
+    {3pt}                     % 上间距
+    {3pt}                     % 下间距
+    {\normalfont}             % 正文字体
+    {}                        % 缩进量
+    {\bfseries}               % 定理头字体 (粗体)
+    {:}                       % 标点
+    {.5em}                    % 标点后间距
+    {}                        % 头部说明 (默认)
+\theoremstyle{mystyle}        % 使用定义好的样式
+
+% 核心环境 (共享 section 编号)
+\newtheorem{theorem}{\l_otex_theorem_name_tl}[section]
+
+% 使用 seq 数据结构和 map 循环批量定义共享编号的环境
+\seq_new:N \l_otex_theorems_seq
+\seq_set_from_clist:Nn \l_otex_theorems_seq
+  {
+    lemma, proposition, corollary, definition, example, 
+    remark, assumption, conjecture, axiom, problem, 
+    exercise, case
+  }
+
+\seq_map_inline:Nn \l_otex_theorems_seq
+  {
+    % #1 是环境名 (如 lemma)
+    % \use:c { l_otex_#1_name_tl } 动态获取对应变量名 (如 \l_otex_lemma_name_tl)
+    \newtheorem { #1 } [ theorem ] { \use:c { l_otex_#1_name_tl } }
+  }
+
+% 特殊环境
+% Solution 通常不编号或独立编号，这里设置为无编号环境
+\newtheorem*{solution}{\l_otex_solution_name_tl}
+
+\endinput

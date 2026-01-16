@@ -1,0 +1,17 @@
+\ProvidesExplPackage {otex/otex-caption} {2025-01-16} {1.0} {Orion's Captions}
+
+% ==============================================================================
+% 标题设置 (Captions)
+% ==============================================================================
+
+\RequirePackage { caption }      % 标题样式控制
+\RequirePackage { subcaption }   % 子图支持
+
+\captionsetup{
+    font      = small,           % 标题字体小一号
+    labelfont = bf,              % 标签(如Figure 1)加粗
+    labelsep  = colon,           % 分隔符用冒号
+    textfont  = it               % 标题文本用斜体
+}
+
+\endinput

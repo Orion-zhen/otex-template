@@ -1,0 +1,60 @@
+\ProvidesExplPackage {otex/otex-graphics} {2025-01-16} {1.0} {Orion's Graphics}
+
+% ==============================================================================
+% 基础绘图包
+% ==============================================================================
+\ExplSyntaxOff
+\RequirePackage{graphicx}    % 图片支持
+\RequirePackage{tcolorbox}   % 彩色盒子 (不仅仅用于代码框)
+
+% ==============================================================================
+% TikZ 绘图系统
+% ==============================================================================
+\RequirePackage{tikz}
+\usetikzlibrary{
+    shapes,         % 形状库: ellipse, node styles
+    arrows.meta,    % 箭头库: 提供更多箭头样式
+    positioning,    % 定位库: below = of node1
+    calc,           % 计算库: ($ (a) + (b) $)
+    patterns,       % 填充纹理: north east lines
+    decorations.pathreplacing, % 路径装饰: brace (大括号)
+    decorations.markings,      % 标记装饰: 在线上加箭头
+    quotes,         % 引用语法: "label"
+    fit,            % 自适应节点: fit=(a)(b)
+    backgrounds,    % 背景层: on background layer
+    shadows,        % 阴影: drop shadow
+    trees,          % 树形图
+    mindmap         % 思维导图
+}
+
+% ==============================================================================
+% PGFPlots 高级绘图库
+% ==============================================================================
+\RequirePackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepgfplotslibrary{
+    fillbetween,            % 区域填充
+    polar                   % 极坐标图
+}
+
+% ==============================================================================
+% TikZ 常用样式预定义
+% ==============================================================================
+\tikzset{
+    base/.style = {draw, align=center, minimum height=2em, minimum width=2em},
+    % 矩形框 (例如: 流程图处理块)
+    process/.style = {base, rectangle, rounded corners, fill=orange!10},
+    % 判断框 (例如: 流程图判断)
+    decision/.style = {base, diamond, aspect=2, fill=blue!10, inner sep=0pt},
+    % 输入输出 (平行四边形)
+    io/.style = {base, trapezium, trapezium left angle=70, trapezium right angle=110, fill=green!10},
+    % 开始/结束 (胶囊形)
+    startstop/.style = {base, rounded rectangle, fill=red!10},
+    % 箭头样式
+    arrow/.style = {thick, ->, >=Stealth},
+    % 连接线样式
+    line/.style = {thick}
+}
+\ExplSyntaxOn
+
+\endinput

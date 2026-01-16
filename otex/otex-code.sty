@@ -1,0 +1,113 @@
+\ProvidesExplPackage {otex/otex-code} {2025-01-16} {1.0} {Orion's Code Highlighting}
+
+% ==============================================================================
+% 预定义颜色方案 (Predefined Style Colors)
+% ==============================================================================
+% 使用 LaTeX2e 标准语法定义颜色 (xcolor 暂无官方 expl3 接口)
+\definecolor{code_background}{rgb}{0.95, 0.95, 0.95} % 代码块背景: 浅灰
+\definecolor{code_keyword}{rgb}{0.16, 0.32, 0.75}    % 关键字: 蓝色
+\definecolor{code_comment}{rgb}{0.12, 0.38, 0.17}    % 注释: 深绿
+\definecolor{code_string}{rgb}{0.63, 0.12, 0.94}     % 字符串: 紫色
+\definecolor{code_identifier}{rgb}{0.0, 0.0, 0.0}    % 标识符: 黑色
+\definecolor{code_number}{rgb}{0.5, 0.5, 0.5}        % 行号: 灰色
+
+% ==============================================================================
+% 1. Listings 配置
+% ==============================================================================
+
+\bool_if:NT \g_otex_load_listings_bool
+  {
+    \RequirePackage { listings }
+    \lstset{
+        backgroundcolor  = \color{code_background}, % 背景色
+        basicstyle       = \ttfamily\small,         % 字体: 等宽 + 小号
+        keywordstyle     = \color{code_keyword}\bfseries, % 关键字
+        commentstyle     = \color{code_comment}\itshape,  % 注释
+        stringstyle      = \color{code_string},           % 字符串
+        identifierstyle  = \color{code_identifier},       % 标识符
+        numberstyle      = \tiny\color{code_number},      % 行号样式
+        numbers          = left,                          % 行号位置: 左侧
+        stepnumber       = 1,                             % 行号步长
+        frame            = single,                        % 边框: 单线框
+        rulecolor        = \color{gray!30},               % 边框颜色
+        frameround       = tttt,                          % 圆角边框
+        breaklines       = true,                          % 自动代码换行
+        tabsize          = 4,                             % 制表符宽度
+        showspaces       = false,                         % 不显示空格符号
+        showstringspaces = false,                         % 字符串中不显示空格
+        extendedchars    = true,                          % 扩展字符支持
+        captionpos       = b,                             % 标题位置: 底部
+        escapeinside     = {(*@}{@*)},                    % 逃逸字符
+        inputencoding    = utf8
+    }
+  }
+
+% ==============================================================================
+% 2. Minted 配置 (需 -shell-escape)
+% ==============================================================================
+
+\bool_if:NT \g_otex_load_minted_bool
+  {
+    % 检查 shell-escape 是否开启
+    % \pdf@shellescape 1=enabled, 0=disabled/restricted
+    \int_compare:nNnTF { \pdf@shellescape } = { 1 }
+      {
+        \RequirePackage { minted }
+        \usemintedstyle { friendly }
+        \setminted{
+            bgcolor    = code_background,
+            fontsize   = \small,
+            linenos,
+            breaklines,
+            tabsize    = 4,
+            frame      = lines,
+            framesep   = 2mm,
+            autogobble
+        }
+      }
+      {
+        \msg_warning:nn { otex } { shell-escape-disabled }
+        \bool_gset_false:N \g_otex_load_minted_bool
+      }
+  }
+
+\msg_new:nnn { otex } { shell-escape-disabled }
+  { Shell-escape~not~enabled!~Minted~disabled.~Falling~back~to~listings~if~enabled. }
+
+% ==============================================================================
+% 3. 统一接口 (Unified Interface)
+% ==============================================================================
+
+% --- 行内代码: \code{...} ---
+\DeclareDocumentCommand \code { m }
+  {
+    \bool_if:NTF \g_otex_load_minted_bool
+      {
+        \mintinline [bgcolor=code_background,breaklines,fontsize=\small] { text } { #1 }
+      }
+      {
+        \colorbox { code_background } { \texttt { \small #1 } }
+      }
+  }
+
+% --- 文件导入: \inputcode{lang}{file} ---
+\DeclareDocumentCommand \inputcode { m m }
+  {
+    \bool_if:NTF \g_otex_load_minted_bool
+      {
+        \inputminted { #1 } { #2 }
+      }
+      {
+        \bool_if:NTF \g_otex_load_listings_bool
+          {
+            \lstinputlisting [ language = #1 ] { #2 }
+          }
+          {
+            \msg_error:nn { otex } { no-highlighting-pkg }
+          }
+      }
+  }
+
+\msg_new:nnn { otex } { no-highlighting-pkg } { No~code~highlighting~package~loaded!~Enable~'listings'~or~'minted'. }
+
+\endinput

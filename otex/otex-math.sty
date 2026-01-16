@@ -1,0 +1,18 @@
+\ProvidesExplPackage {otex/otex-math} {2025-01-16} {1.0} {Orion's Math Enhancements}
+
+% ==============================================================================
+% 数学宏包 loading
+% ==============================================================================
+
+\RequirePackage { amsmath }     % 基础数学宏包 (AMS)
+\RequirePackage { amssymb }     % 数学符号库 (如 \mathbb)
+\RequirePackage { mathtools }   % amsmath 的扩展修复和增强
+\RequirePackage { amsthm }      % 定理环境支持
+
+% 常用数学配置说明:
+% \begin{align} ... \end{align} 用于多行对齐公式
+% \begin{gather} ... \end{gather} 用于多行居中公式
+% \mathbb{R} 实数集 R, \mathcal{L} 损失函数 L
+% \DeclarePairedDelimiter 可用于定义自适应括号
+
+\endinput
