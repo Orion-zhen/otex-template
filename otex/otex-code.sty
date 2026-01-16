@@ -32,6 +32,33 @@
       }
   }
 
+% Fallback for minted environment if not loaded
+\bool_if:NF \g_otex_load_minted_bool
+{
+  % Map minted environment to listings
+  % Usage: \begin{minted}[options]{language}
+  \lstnewenvironment{minted}[2][]
+  {
+      \lstset{#1}
+      \lstset{language=#2}
+  }
+  {}
+  
+  % Map \mintinline to \lstinline
+  % Usage: \mintinline[options]{language}{code}
+  \ProvideDocumentCommand{\mintinline}{O{}m}{%
+     \lstinline[#1,language=#2]%
+  }
+
+  % Map listing float environment if not defined
+  \cs_if_exist:NF \c@listing
+  {
+    \RequirePackage{float}
+    \newfloat{listing}{htbp}{lol}
+    \floatname{listing}{Listing}
+  }
+}
+
 \otex_provide_command:Nnn \code { m }
   {
     \bool_if:NTF \g_otex_load_minted_bool
