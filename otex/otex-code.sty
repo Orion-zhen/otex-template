@@ -12,6 +12,8 @@
     \setminted{bgcolor=code_bg, fontsize=\small, linenos, breaklines, frame=lines}
   }
   {
+    \msg_new:nnn { otex } { minted-skip } { Shell~escape~disabled.~Skipping~minted~(using~listings~fallback). }
+    \msg_warning:nn { otex } { minted-skip }
     \bool_gset_false:N \g_otex_load_minted_bool
   }
 }

@@ -93,6 +93,8 @@
 
 \bool_if:NT \g_otex_load_cleveref_bool
 {
+  \msg_new:nnn { otex } { cleveref-skip } { Hyperref~not~loaded.~Skipping~cleveref. }
+  
   \AtBeginDocument
   {
     \@ifpackageloaded{cleveref}
@@ -115,7 +117,9 @@
           \crefname{lemma}{引理}{引理}
         }
       }
-      {}
+      {
+        \msg_warning:nn { otex } { cleveref-skip }
+      }
     }
   }
 }

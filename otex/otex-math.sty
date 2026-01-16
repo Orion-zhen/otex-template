@@ -24,6 +24,12 @@
 
 \bool_lazy_or:nnTF { \sys_if_engine_pdftex_p: } { \l_otex_math_conflict_bool }
 {
+  % pdfTeX 或检测到传统数学包 -> 使用 amssymb
+  \sys_if_engine_pdftex:T
+  {
+    \msg_new:nnn { otex } { math-pdftex } { pdfTeX~detected.~Using~amssymb~instead~of~unicode-math. }
+    \msg_warning:nn { otex } { math-pdftex }
+  }
   \otex_require:nnnn { amsmath } {} {} {}
   % Load amssymb only if its symbols are not already provided
   % (newtxmath, stix, etc. already define these symbols)
