@@ -1,0 +1,20 @@
+\documentclass[lang=cn]{elegantpaper} 
+% Intentionally load elegantpaper in CN mode (if default) but override with otex english
+
+\usepackage[english]{otex}
+
+\title{English Mode Test (Elegant)}
+\author{Test}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+Testing if \texttt{otex} english option correctly localizes environments even if template might have defaults.
+
+\begin{theorem}
+    Should be "Theorem".
+\end{theorem}
+
+\end{document}

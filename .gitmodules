@@ -1,0 +1,12 @@
+[submodule "tests/templates/cjc"]
+	path = tests/templates/cjc
+	url = https://github.com/DaozeTang/CHINESE-JOURNAL-OF-COMPUTERS--Overleaf-Latex-Template
+[submodule "tests/templates/elegantpaper"]
+	path = tests/templates/elegantpaper
+	url = https://github.com/ElegantLaTeX/ElegantPaper
+[submodule "tests/templates/hithesis"]
+	path = tests/templates/hithesis
+	url = https://github.com/hithesis/hithesis
+[submodule "tests/templates/ustcthesis"]
+	path = tests/templates/ustcthesis
+	url = https://github.com/ustctug/ustcthesis

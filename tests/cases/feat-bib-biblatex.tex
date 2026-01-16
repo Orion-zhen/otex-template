@@ -1,0 +1,21 @@
+\documentclass{article}
+\usepackage{otex} % Default import (defaults to biblatex usually)
+
+\addbibresource{../ref.bib}
+
+\begin{document}
+
+\section{Bib Test}
+Testing bibliography with default \texttt{otex}.
+Citation: \cite{texbook}.
+
+\section{Math}
+$E=mc^2$
+
+\section{Code}
+\begin{minted}{python}
+print("BibTest")
+\end{minted}
+
+\printbibliography
+\end{document}

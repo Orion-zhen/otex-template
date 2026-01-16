@@ -1,0 +1,58 @@
+\documentclass{ctexart}
+\usepackage{otex} % Default import without options
+
+\title{中文测试文档 (Enhanced)}
+\author{Test User}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+This tests \texttt{otex} compatibility with \texttt{ctexart} using default options.
+
+\section{Mathematics (otex-math)}
+\begin{equation}
+    E = mc^2, \quad e^{i\pi} + 1 = 0
+\end{equation}
+
+\section{Theorems (otex-theorems)}
+\begin{theorem}
+    This is a test theorem.
+\end{theorem}
+\begin{proof}
+    This is a proof.
+\end{proof}
+
+\section{Colors (xcolor)}
+Text in \textcolor{red}{Red} and \textcolor{blue}{Blue}.
+
+\section{Code (minted)}
+\begin{minted}{python}
+def hello():
+    print("Hello Feature Test")
+\end{minted}
+
+\section{Tables (otex-tables)}
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{cc}
+        \toprule
+        Head A & Head B \\
+        \midrule
+        Val 1 & Val 2 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Booktabs Table}
+\end{table}
+
+\section{Algorithms (otex-algo)}
+\begin{algorithm}
+    \caption{Test Algorithm}
+    \KwIn{Input $x$}
+    \KwOut{Output $y$}
+    $y \leftarrow x^2$\;
+    \Return $y$\;
+\end{algorithm}
+
+\end{document}

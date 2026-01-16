@@ -1,0 +1,22 @@
+\documentclass{article}
+\usepackage{otex} % Default import (defaults to minted=true)
+
+\begin{document}
+
+\section{Code Test}
+Testing minted with default \texttt{otex}.
+
+\begin{minted}[linenos]{python}
+def test():
+    return "Minted is working"
+\end{minted}
+
+\section{Math}
+$E=mc^2$
+
+\section{Theorems}
+\begin{theorem}
+Theorem in code test.
+\end{theorem}
+
+\end{document}

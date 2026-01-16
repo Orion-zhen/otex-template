@@ -1,0 +1,63 @@
+\documentclass{article}
+\usepackage{otex} % Default import without options
+
+\title{Standard Article Test (Enhanced)}
+\author{Test User}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+This tests \texttt{otex} compatibility with standard \texttt{article} class using default options.
+
+\section{Mathematics}
+\begin{equation}
+    \int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}
+\end{equation}
+
+\section{Theorems}
+\begin{theorem}
+    Standard theorem env.
+\end{theorem}
+\begin{proof}
+    Proof env.
+\end{proof}
+
+\section{Colors}
+\textcolor{red}{Red text}.
+
+\section{Code}
+\begin{minted}{c}
+int main() {
+    return 0;
+}
+\end{minted}
+
+\section{Tables}
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{ll}
+        \toprule
+        Item & Value \\
+        \midrule
+        A & 1 \\
+        B & 2 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Standard Table}
+\end{table}
+
+\section{Algorithms}
+\begin{algorithm}
+    \caption{Euclid}
+    \KwIn{a, b}
+    \While{b $\neq$ 0}{
+        t = b\;
+        b = a mod b\;
+        a = t\;
+    }
+    \Return a\;
+\end{algorithm}
+
+\end{document}

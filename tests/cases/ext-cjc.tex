@@ -1,0 +1,84 @@
+\documentclass[10.5pt,compsoc,UTF8]{CjC}
+
+% Inject otex to test compatibility with legacy packages loaded by CjC.cls (cite, subfigure, etc.)
+\usepackage{otex} 
+
+% CJC requires these for title
+\pagestyle{CjCheadings}
+\setmainfont{Times New Roman} % CJC template hardcodes this
+
+\begin{document}
+\makeatletter
+\newcommand\mysmall{\@setfontsize\mysmall{7}{9.5}}
+\newenvironment{tablehere}{\def\@captype{table}}{}
+\let\temp\footnote
+\renewcommand \footnote[1]{\temp{\zihao{-5}#1}}
+\makeatother
+
+\begin{table*}[!t] 
+\onecolumn
+\noindent\begin{tabular}{p{168mm}}
+\zihao{5-}
+第??卷\quad 第?期 \hfill 计\quad 算\quad 机\quad 学\quad 报\hfill Vol. ??  No. ?\\
+\hline\end{tabular}\end{table*}
+
+{
+\centering
+\vspace {11mm}
+{\zihao{2} \heiti CJC Legacy Test with Otex}
+\vskip 5mm
+{\zihao{3}\fangsong Author$^1$}
+}
+
+\begin{center}
+\zihao{5}{\heiti Title in English}\\
+\zihao{5}{ NAME Name$^1$}
+\end{center}
+
+\zihao{5}
+\begin{multicols}{1}
+
+\section{\heiti Introduction}
+This tests compatibility between the legacy CJC template and \texttt{otex}.
+CJC loads: \texttt{cite}, \texttt{subfigure}, \texttt{gbt7714}.
+Otex loads: \texttt{biblatex} (default), \texttt{subcaption} (maybe), etc.
+
+\section{Math (Otex Feature)}
+Testing \texttt{otex-math}:
+\begin{equation}
+    E = mc^2
+\end{equation}
+
+\section{Theorems (Otex Feature)}
+\begin{theorem}
+    Otex Theorem.
+\end{theorem}
+\begin{proof}
+    Otex Proof.
+\end{proof}
+
+\section{Code (Otex Feature)}
+Testing \texttt{minted} from \texttt{otex}:
+\begin{minted}{python}
+def cjc_test():
+    return "Legacy Compatibility"
+\end{minted}
+
+\section{Legacy Features}
+Using \texttt{zihao} and fonts: {\heiti Black}, {\kaishu Kai}.
+
+% CJC uses subfigure (obsolete)
+% otex might load subcaption. This is a conflict point.
+\begin{figure}[h]
+\centering
+% CJC doesn't actually provide an example of subfigure in the template text, 
+% but loads the package. We'll skip explicit subfigure usage to avoid 
+% immediate crash if otex doesn't handle it, but the loading itself is the test.
+\caption{Test Figure}
+\end{figure}
+
+\section{Citations}
+Citing: \cite{texbook} (This usually fails if otex forces biblatex while cite is loaded).
+
+\end{multicols}
+\end{document}
