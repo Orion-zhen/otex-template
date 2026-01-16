@@ -11,7 +11,7 @@
 - `amsthm`: 定理基础支持。
 - **智能选择**：
   - **XeLaTeX/LuaLaTeX (推荐)**：加载 `unicode-math`，设置数学字体风格为 ISO。
-  - **pdfTeX 或 冲突类**：加载传统的 `amssymb`。
+  - **pdfTeX 或 冲突类**：使用**符号存在性检测**（检测 `\Bbbk`）决定是否加载 `amssymb`。如果模板已提供等效符号则跳过。
 
 ## 2. 提供的命令
 

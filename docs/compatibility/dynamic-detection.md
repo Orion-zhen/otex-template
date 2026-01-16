@@ -28,13 +28,14 @@ otex 引入了全新的**动态智能兼容性**机制。不再依赖硬编码�
 
 **效果**：`ctex` 不会重置或干扰模板精心设计的标题样式。
 
-#### 3. 数学字体自动退避
+#### 3. 数学符号包自动退避
 
 **检测逻辑**：otex 默认倾向于使用现代的 `unicode-math`。但在加载前，它会扫描当前的包列表。
 
 - 如果检测到传统的数学字体包（如 `mathpazo`, `newtxmath`, `fourier`, `stix` 等），otex 会自动禁用 `unicode-math` 模块。
+- 对于 `amssymb` 包，otex 使用**符号存在性检测**：检查 `\Bbbk` 符号是否已定义。如果已定义（说明其他包已提供等效符号），则跳过加载。
 
-**效果**：避免了 `unicode-math` 与传统数学包并存时的致命冲突。
+**效果**：避免了 `unicode-math` 与传统数学包并存时的致命冲突，以及 `amssymb` 与 `newtxmath` 等包的 `Command already defined` 错误。
 
 #### 4. Hyperref 加载自动退避 (Hyperref Backoff)
 
@@ -44,6 +45,32 @@ otex 引入了全新的**动态智能兼容性**机制。不再依赖硬编码�
 - **主动模式 (Active Mode)**：对于其他标准或未知文档类，otex 默认采用主动加载策略，以确保最佳兼容性。
 
 **效果**：解决了 MDPI 等模板因 `hyperref` 加载时机过晚导致的 `LaTeX hooks Error` 或 `Missing \begin{document}` 错误。
+
+### 符号存在性检测 (Symbol Existence Detection)
+
+otex 采用**符号存在性检测**作为核心兼容策略。相比包名检测或文档类检测，这种方式更加通用和健壮。
+
+**原理**：在加载某个包之前，检测该包提供的代表性符号是否已存在。如果存在，则跳过加载。
+
+| 模块 | 包 | 代表性符号 |
+| ---- | --- | --------- |
+| `math` | `amssymb` | `\Bbbk` |
+| `tables` | `booktabs` | `\toprule` |
+| `tables` | `multirow` | `\multirow` |
+| `tables` | `longtable` | `longtable` 环境 |
+| `graphics` | `graphicx` | `\includegraphics` |
+| `graphics` | `tikz` | `\tikz` |
+| `floats` | `float` | `\newfloat` |
+| `algo` | `algorithm2e` | `\SetKwInput` |
+| `caption` | `caption` | `\captionsetup` |
+| `toc` | `tocloft` | `\cftbeforetoctitleskip` |
+| `base` | `siunitx` | `\SI` |
+
+**优势**：
+
+- 无需枚举所有可能冲突的包
+- 直接检测本质条件（符号是否已存在）
+- 适用于任何提供等效功能的第三方包
 
 ## 🕵️ 如何确认功能状态 (Verification)
 

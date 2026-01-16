@@ -1,15 +1,17 @@
 # 🖼️ 图形处理模块 (`graphics`)
 
-`graphics` 模块集成了强大的 TikZ 绘图系统和标准的图片加载功能。
+`graphics` 模块集成了强大的 TikZ 绘图系统和标准的图片加载功能。采用**符号存在性检测**避免与模板冲突。
 
 ---
 
 ## 1. 加载的宏包
 
-- `graphicx`: 标准图片加载包。
-- `tcolorbox`: 用于创建美观的彩色文本框。
-- `tikz`: 强大的矢量绘图宏包。
-- `pgfplots`: 基于 TikZ 的函数图与数据可视化宏包。
+以下包仅在其代表性符号不存在时加载：
+
+- `graphicx` (检测 `\includegraphics`): 标准图片加载包。
+- `tcolorbox` (检测 `\tcbox`): 用于创建美观的彩色文本框。
+- `tikz` (检测 `\tikz`): 强大的矢量绘图宏包。
+- `pgfplots` (检测 `axis` 环境): 基于 TikZ 的函数图与数据可视化宏包。
 
 ## 2. 提供的样式 (TikZ Style)
 
