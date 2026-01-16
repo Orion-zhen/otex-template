@@ -14,36 +14,47 @@
 % 1. Listings 配置
 % ==============================================================================
 
+% ==============================================================================
+% 1. Listings 配置
+% ==============================================================================
+
 \bool_if:NT \g_otex_load_listings_bool
   {
-    % --- Smart Load listings ---
-    \otex_smart_require:nnnn { listings }
-      { } % No specific load options
-      { } % No validation
+    \@ifpackageloaded { listings }
       {
-        % Post-setup
-        \lstset{
-            backgroundcolor  = \color{code_background},
-            basicstyle       = \ttfamily\small,
-            keywordstyle     = \color{code_keyword}\bfseries,
-            commentstyle     = \color{code_comment}\itshape,
-            stringstyle      = \color{code_string},
-            identifierstyle  = \color{code_identifier},
-            numberstyle      = \tiny\color{code_number},
-            numbers          = left,
-            stepnumber       = 1,
-            frame            = single,
-            rulecolor        = \color{gray!30},
-            frameround       = tttt,
-            breaklines       = true,
-            tabsize          = 4,
-            showspaces       = false,
-            showstringspaces = false,
-            extendedchars    = true,
-            captionpos       = b,
-            escapeinside     = {(*@}{@*)},
-            inputencoding    = utf8
-        }
+         \otex_smart_require:nnnn { listings } { } { } { }
+         \msg_info:nnn { otex } { config-backoff } { listings }
+      }
+      {
+        % --- Smart Load listings ---
+        \otex_smart_require:nnnn { listings }
+          { } % No specific load options
+          { } % No validation
+          {
+            % Post-setup
+            \lstset{
+                backgroundcolor  = \color{code_background},
+                basicstyle       = \ttfamily\small,
+                keywordstyle     = \color{code_keyword}\bfseries,
+                commentstyle     = \color{code_comment}\itshape,
+                stringstyle      = \color{code_string},
+                identifierstyle  = \color{code_identifier},
+                numberstyle      = \tiny\color{code_number},
+                numbers          = left,
+                stepnumber       = 1,
+                frame            = single,
+                rulecolor        = \color{gray!30},
+                frameround       = tttt,
+                breaklines       = true,
+                tabsize          = 4,
+                showspaces       = false,
+                showstringspaces = false,
+                extendedchars    = true,
+                captionpos       = b,
+                escapeinside     = {(*@}{@*)},
+                inputencoding    = utf8
+            }
+          }
       }
   }
 
@@ -55,23 +66,30 @@
   {
     \int_compare:nNnTF { \pdf@shellescape } = { 1 }
       {
-        % --- Smart Load minted ---
-        \otex_smart_require:nnnn { minted }
-          { }
-          { }
+        \@ifpackageloaded { minted }
           {
-            % Post-setup
-            \usemintedstyle { friendly }
-            \setminted{
-                bgcolor    = code_background,
-                fontsize   = \small,
-                linenos,
-                breaklines,
-                tabsize    = 4,
-                frame      = lines,
-                framesep   = 2mm,
-                autogobble
-            }
+             \otex_smart_require:nnnn { minted } { } { } { }
+             \msg_info:nnn { otex } { config-backoff } { minted }
+          }
+          {
+            % --- Smart Load minted ---
+            \otex_smart_require:nnnn { minted }
+              { }
+              { }
+              {
+                % Post-setup
+                \usemintedstyle { friendly }
+                \setminted{
+                    bgcolor    = code_background,
+                    fontsize   = \small,
+                    linenos,
+                    breaklines,
+                    tabsize    = 4,
+                    frame      = lines,
+                    framesep   = 2mm,
+                    autogobble
+                }
+              }
           }
       }
       {
@@ -88,14 +106,14 @@
 % ==============================================================================
 % (保持不变)
 
-\DeclareDocumentCommand \code { m }
+\otex_provide_command:Nnn \code { m }
   {
     \bool_if:NTF \g_otex_load_minted_bool
       { \mintinline [bgcolor=code_background,breaklines,fontsize=\small] { text } { #1 } }
       { \colorbox { code_background } { \texttt { \small #1 } } }
   }
 
-\DeclareDocumentCommand \inputcode { m m }
+\otex_provide_command:Nnn \inputcode { m m }
   {
     \bool_if:NTF \g_otex_load_minted_bool
       { \inputminted { #1 } { #2 } }

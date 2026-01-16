@@ -3,6 +3,9 @@
 % ==============================================================================
 % 变量定义 (Variables)
 % ==============================================================================
+\msg_new:nnn { otex } { theorems-defined } { Environment~'#1'~already~defined.~Skipping~definition. }
+\msg_new:nnn { otex } { amsthm-conflict } { Package~'ntheorem'~detected.~Skipping~'amsthm'~and~definitions. }
+
 \tl_new:N \l_otex_theorem_name_tl
 \tl_new:N \l_otex_lemma_name_tl
 \tl_new:N \l_otex_proposition_name_tl
@@ -70,16 +73,38 @@
 \newcommand{\exercisename}{\l_otex_exercise_name_tl}
 \newcommand{\casename}{\l_otex_case_name_tl}
 
+
 % ==============================================================================
 % 定理环境注册 (Environment Definitions)
 % ==============================================================================
 
+% Helper function (defined at top level to avoid nesting issues)
+\cs_new_protected:Npn \__otex_define_single_theorem:n #1
+  {
+    \cs_if_exist:cTF { #1 }
+      { \msg_info:nnn { otex } { theorems-defined } { #1 } }
+      {
+        \newtheorem { #1 } [ theorem ] { \use:c { l_otex_#1_name_tl } }
+      }
+  }
+
+% 检查 'theorem' 环境是否存在
 \cs_if_exist:cTF { theorem }
   {
-    \msg_info:nnn { otex } { theorems-defined } { Environment~'theorem'~already~defined.~Skipping~otex~theorems. }
+    \msg_info:nnn { otex } { theorems-defined } { theorem }
+    % 可能还需要检查其他环境，这里简化处理：如果 theorem 存在，假设这套体系已建立
   }
   {
     % --- Smart Load amsthm ---
+    
+    % Compatibility Fix for CjC / Legacy IEEEtran
+    % These classes sometimes define \proof -> \@IEEElegacywarn{proof}{...}...
+    % but fail to define \@IEEElegacywarn, causing a crash.
+    % We define a dummy handler to swallow it.
+    \cs_if_exist:NTF \@IEEElegacywarn
+      {}
+      { \providecommand{\@IEEElegacywarn}[2]{} }
+
     % 检查 ntheorem 冲突
     \@ifpackageloaded{ntheorem}
     {
@@ -89,10 +114,16 @@
     {
        \otex_smart_require:nnnn { amsthm } { } { } { }
 
-        \newtheoremstyle{mystyle}
-            {3pt} {3pt} {\normalfont} {} {\bfseries} {:} {.5em} {}
-        \theoremstyle{mystyle}
+       % 设置样式 (仅当 mystyle 未定义时)
+       \cs_if_exist:cTF { th@mystyle } 
+         {}
+         {
+            \newtheoremstyle{mystyle}
+                {3pt} {3pt} {\normalfont} {} {\bfseries} {:} {.5em} {}
+            \theoremstyle{mystyle}
+         }
     
+        % Define theorem if not exists (checked above, but safe to be explicit)
         \newtheorem{theorem}{\l_otex_theorem_name_tl}[section]
     
         \seq_new:N \l_otex_theorems_seq
@@ -102,17 +133,14 @@
             remark, assumption, conjecture, axiom, problem, 
             exercise, case
           }
+        
+        \seq_map_function:NN \l_otex_theorems_seq \__otex_define_single_theorem:n
     
-        \seq_map_inline:Nn \l_otex_theorems_seq
-          {
-            \newtheorem { #1 } [ theorem ] { \use:c { l_otex_#1_name_tl } }
-          }
-    
-        \newtheorem*{solution}{\l_otex_solution_name_tl}
+        % Solution environment
+        \cs_if_exist:cTF { solution }
+          {}
+          { \newtheorem*{solution}{\l_otex_solution_name_tl} }
     }
   }
-
-\msg_new:nnn { otex } { theorems-defined } { #1 }
-\msg_new:nnn { otex } { amsthm-conflict } { Package~'ntheorem'~detected.~Skipping~'amsthm'~and~definitions. }
 
 \endinput

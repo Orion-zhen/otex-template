@@ -7,7 +7,16 @@
 
 % 引入 smart require 别名 (已在 otex.sty 加载)
 
-\@ifclassloaded { article }
+% 引入 smart require 别名 (已在 otex.sty 加载)
+
+% ------------------------------------------------------------------------------
+% 布局管理 (Geometry)
+% ------------------------------------------------------------------------------
+\@ifpackageloaded { geometry }
+  {
+    \otex_smart_require:nnnn { geometry } { } { } { }
+    \msg_info:nnn { otex } { config-backoff } { geometry }
+  }
   {
     % --- Smart Load Geometry ---
     % 如果用户已加载 geometry，则不覆盖其设置。
@@ -22,12 +31,24 @@
       }
       { } % No validation rules
       { } % No post-setup
+  }
 
-    % --- Smart Load Fancyhdr ---
+% ------------------------------------------------------------------------------
+% 页眉页脚 (Fancyhdr)
+% ------------------------------------------------------------------------------
+\@ifpackageloaded { fancyhdr }
+  {
+     \otex_smart_require:nnnn { fancyhdr } { } { } { }
+     \msg_info:nnn { otex } { config-backoff } { fancyhdr }
+  }
+  {
+    % Only apply fancyhdr style if not already set manually?
+    % Hard to know if pagestyle was set. But if fancyhdr not loaded, it wasn't set using fancyhdr.
     \otex_smart_require:nnnn { fancyhdr }
       { }
       { }
       {
+        % Apply default style
         \pagestyle { fancy }
         \fancyhf{}
         \lhead { \leftmark }       % 左页眉: 章节名
@@ -38,7 +59,6 @@
         \rfoot {}                  % 右页脚
       }
   }
-  {}
 
 % ==============================================================================
 % 浮动体控制 (Move to otex-floats)

@@ -4,17 +4,36 @@
 % 数学宏包 loading
 % ==============================================================================
 
+\msg_new:nnn { otex } { amssymb-conflict }
+  { Package~'amssymb'~detected.~It~is~often~redundant~or~conflicting~with~'unicode-math'. }
+
 \otex_smart_require:nnnn { amsmath } {} {} {}
 \otex_smart_require:nnnn { mathtools } {} {} {}
 \otex_smart_require:nnnn { amsthm } {} {} {}
 
 % 引擎检测与 Unicode Math 支持
-\sys_if_engine_pdftex:TF
+% 引擎检测与 Unicode Math 支持
+\bool_new:N \l_otex_math_conflict_class_bool
+\bool_set_false:N \l_otex_math_conflict_class_bool
+
+\@ifclassloaded{acmart}{\bool_set_true:N \l_otex_math_conflict_class_bool}{}
+\@ifclassloaded{IEEEtran}{\bool_set_true:N \l_otex_math_conflict_class_bool}{}
+\@ifclassloaded{elsarticle}{\bool_set_true:N \l_otex_math_conflict_class_bool}{}
+\@ifclassloaded{CjC}{\bool_set_true:N \l_otex_math_conflict_class_bool}{}
+
+% If pdfTeX OR Bad Class -> Standard Math (amsmath)
+\bool_lazy_or:nnTF { \sys_if_engine_pdftex_p: } { \l_otex_math_conflict_class_bool }
   {
-    \otex_smart_require:nnnn { amssymb } {} {} {}
+    % pdfLaTeX or Conflict Class -> Use standard amsmath
+    \otex_smart_require:nnnn { amsmath } {} {} {}
+    
+    % acmart already loads math fonts/symbols, loading amssymb causes clash (\eth, etc.)
+    \@ifclassloaded{acmart}
+      { }
+      { \otex_smart_require:nnnn { amssymb } {} {} {} }
   }
   {
-    % XeLaTeX / LuaLaTeX 模式: Unicode Math
+    % XeLaTeX / LuaLaTeX 模式 (且非冲突类): Unicode Math
     % 注意: unicode-math 通常不应与 amssymb 同时加载
     \@ifpackageloaded { amssymb }
       {
@@ -25,8 +44,8 @@
             { }
             {
                \AtBeginDocument{
-                 \providecommand{\square}{\mdlgwhtsquare}
-                 \providecommand{\boxtimes}{\boxtimes}
+                 \otex_provide_command:Nnn \square { } { \mdlgwhtsquare }
+                 \otex_provide_command:Nnn \boxtimes { } { \boxtimes }
                }
             }
       }
@@ -36,15 +55,14 @@
             { }
             {
                \AtBeginDocument{
-                 \providecommand{\square}{\mdlgwhtsquare}
-                 \providecommand{\boxtimes}{\boxtimes}
+                 \otex_provide_command:Nnn \square { } { \mdlgwhtsquare }
+                 \otex_provide_command:Nnn \boxtimes { } { \boxtimes }
                }
             }
       }
   }
 
-\msg_new:nnn { otex } { amssymb-conflict }
-  { Package~'amssymb'~detected.~It~is~often~redundant~or~conflicting~with~'unicode-math'. }
+
 
 
 \endinput

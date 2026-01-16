@@ -4,14 +4,29 @@
 % 目录定制 (TOC Customization)
 % ==============================================================================
 
-\otex_smart_require:nnnn { tocloft } {} {}
+\bool_if:NT \g_otex_load_toc_bool
   {
-      % Post-setup
-      \setcounter{tocdepth}{3}
-      \setcounter{secnumdepth}{3}
-      % Dot leaders (need check if defined by tocloft, usually yes)
-      \renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
-      \setlength{\cftbeforesecskip}{0.5em}
+    \bool_new:N \l_otex_can_load_tocloft_bool
+    \bool_set_true:N \l_otex_can_load_tocloft_bool
+    
+    % Conflict detection
+    \@ifclassloaded{acmart}{ \bool_set_false:N \l_otex_can_load_tocloft_bool } {}
+    \@ifclassloaded{IEEEtran}{ \bool_set_false:N \l_otex_can_load_tocloft_bool } {}
+    \@ifclassloaded{elsarticle}{ \bool_set_false:N \l_otex_can_load_tocloft_bool } {}
+    \@ifclassloaded{CjC}{ \bool_set_false:N \l_otex_can_load_tocloft_bool } {}
+
+    \bool_if:NT \l_otex_can_load_tocloft_bool
+      {
+        \otex_smart_require:nnnn { tocloft } {} {}
+          {
+              % Post-setup
+              \setcounter{tocdepth}{3}
+              \setcounter{secnumdepth}{3}
+              % Dot leaders (need check if defined by tocloft, usually yes)
+              \renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+              \setlength{\cftbeforesecskip}{0.5em}
+          }
+      }
   }
 
 % ==============================================================================

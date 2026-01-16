@@ -35,7 +35,7 @@
 \bool_new:N \g_otex_load_tables_bool    
 \bool_new:N \g_otex_load_floats_bool    % 浮动体高级控制
 \bool_new:N \g_otex_english_bool        
-\bool_new:N \g_otex_is_std_class_bool   
+
 
 % 新增开关
 \bool_new:N \g_otex_load_bib_bool       % 参考文献
@@ -44,7 +44,15 @@
 \bool_new:N \g_otex_load_appendix_bool  % 附录
 \bool_new:N \g_otex_float_section_bool  % 浮动体限制在章节内
 
+% ------------------------------------------------------------------------------
+% 自动检测标准文档类 (Class Detection) - DEPRECATED
+% ------------------------------------------------------------------------------
+% We no longer detect standard classes explicitly.
+% We assume "Best Effort" mode: try to load everything, but back off if conflicts detected.
+
+% ------------------------------------------------------------------------------
 % 文本变量 (配置选项)
+% ------------------------------------------------------------------------------
 \tl_new:N \g_otex_bib_backend_tl        % bibtex 或 biblatex
 \tl_new:N \g_otex_bib_style_tl          % 参考文献样式
 \tl_new:N \g_otex_algo_backend_tl       % algorithm2e 或 algorithmicx
@@ -57,97 +65,40 @@
 \tl_new:N \g_otex_pdf_author_tl         % PDF作者
 
 % ==============================================================================
-% 智能默认值设置 (Smart Defaults)
+% 智能默认值设置 (Best Effort Defaults)
 % ------------------------------------------------------------------------------
-% 根据文档类自动启用/禁用某些功能
+% 默认开启大部分功能，依靠 otex-pkgcheck 和子模块进行冲突避让
 % ==============================================================================
 
-% \@ifclassloaded 是 LaTeX2e 的命令，但在 expl3 中也可以使用。
-% 作用：检查某个文档类是否已被加载。
-% 语法：\@ifclassloaded{class-name}{true-code}{false-code}
+% 默认开启所有主要模块
+\bool_gset_true:N \g_otex_load_layout_bool
+\bool_gset_true:N \g_otex_load_fonts_bool
+\bool_gset_true:N \g_otex_load_ctex_bool
+\bool_gset_true:N \g_otex_load_theorems_bool
+\bool_gset_true:N \g_otex_load_hyperref_bool
+\bool_gset_true:N \g_otex_load_cleveref_bool
+\bool_gset_true:N \g_otex_load_caption_bool
+\bool_gset_true:N \g_otex_load_algo_bool
+\bool_gset_true:N \g_otex_load_math_bool
+\bool_gset_true:N \g_otex_load_graphics_bool
+\bool_gset_true:N \g_otex_load_listings_bool
+\bool_gset_true:N \g_otex_load_minted_bool
+\bool_gset_true:N \g_otex_load_tables_bool
+\bool_gset_true:N \g_otex_load_floats_bool
+\bool_gset_true:N \g_otex_load_bib_bool
+\bool_gset_true:N \g_otex_load_toc_bool
 
-% 检查当前是否在使用标准文档类或其 CTEX 变体
-\@ifclassloaded{article}  { \bool_gset_true:N \g_otex_is_std_class_bool } {}
-\@ifclassloaded{report}   { \bool_gset_true:N \g_otex_is_std_class_bool } {}
-\@ifclassloaded{book}     { \bool_gset_true:N \g_otex_is_std_class_bool } {}
-\@ifclassloaded{ctexart}  { \bool_gset_true:N \g_otex_is_std_class_bool } {}
-\@ifclassloaded{ctexrep}  { \bool_gset_true:N \g_otex_is_std_class_bool } {}
-\@ifclassloaded{ctexbook} { \bool_gset_true:N \g_otex_is_std_class_bool } {}
+% 默认启用英文模式 (可通过选项更改)
+\bool_gset_true:N \g_otex_english_bool
 
-% 语法讲解:
-% \bool_gset_true:N <variable>
-%   将全局布尔变量设置为真 (true)。
-%   g = global (全局)
-%   set = 设置值
-%
-% \bool_if:NTF <bool_var> { <true_code> } { <false_code> }
-%   条件判断语句。
-%   :N  = 参数是一个控制序列 (即变量名)
-%   :TF = 需要提供 True分支 和 False分支 的代码块
+% 其他可选模块默认关闭 (需要显式开启或用户明确需要)
+\bool_gset_false:N \g_otex_load_index_bool
+\bool_gset_false:N \g_otex_load_appendix_bool
+\bool_gset_false:N \g_otex_float_section_bool
 
-% 如果是标准文档类，默认开启所有功能
-\bool_if:NTF \g_otex_is_std_class_bool
-  {
-    % --- 标准模式：默认开启一切 ---
-    \bool_gset_true:N \g_otex_load_layout_bool
-    \bool_gset_true:N \g_otex_load_fonts_bool
-    \bool_gset_true:N \g_otex_load_ctex_bool
-    \bool_gset_true:N \g_otex_load_theorems_bool
-    \bool_gset_true:N \g_otex_load_hyperref_bool
-    \bool_gset_true:N \g_otex_load_cleveref_bool
-    \bool_gset_true:N \g_otex_load_caption_bool
-    \bool_gset_true:N \g_otex_load_algo_bool
-    \bool_gset_true:N \g_otex_load_math_bool
-    \bool_gset_true:N \g_otex_load_graphics_bool
-    \bool_gset_true:N \g_otex_load_listings_bool
-    \bool_gset_true:N \g_otex_load_minted_bool
-    \bool_gset_true:N \g_otex_load_tables_bool
-    \bool_gset_true:N \g_otex_load_floats_bool
-    
-    % 新增默认开启
-    \bool_gset_true:N \g_otex_load_bib_bool
-    \bool_gset_true:N \g_otex_load_toc_bool
-    \bool_gset_true:N \g_otex_english_bool % 默认英文模式
-    % 索引和附录默认关闭，按需开启
-    \bool_gset_false:N \g_otex_load_index_bool
-    \bool_gset_false:N \g_otex_load_appendix_bool
-    \bool_gset_false:N \g_otex_float_section_bool
-  }
-  {
-    % --- 安全模式 (Safe Mode) ---
-    % 非标准类 (如 beamer, standalone) 检测到时进入此分支。
-    
-    % 语法讲解:
-    % \msg_new:nnn { <module> } { <msg_name> } { <text> }
-    %   定义一条新消息。
-    % \msg_warning:nn { <module> } { <msg_name> }
-    %   发出一条警告消息。
-    
-    \msg_new:nnn { otex } { safe-mode } { Non-standard~class~detected!~Defaulting~to~Safe~Mode. }
-    \msg_warning:nn { otex } { safe-mode }
-    
-    % 关闭可能引起冲突的模块
-    \bool_gset_false:N \g_otex_load_layout_bool
-    \bool_gset_false:N \g_otex_load_fonts_bool
-    \bool_gset_false:N \g_otex_load_ctex_bool
-    \bool_gset_false:N \g_otex_load_theorems_bool
-    \bool_gset_false:N \g_otex_load_hyperref_bool
-    \bool_gset_false:N \g_otex_load_cleveref_bool
-    \bool_gset_false:N \g_otex_load_caption_bool
-    \bool_gset_false:N \g_otex_load_algo_bool
-    \bool_gset_false:N \g_otex_load_bib_bool
-    \bool_gset_false:N \g_otex_load_toc_bool
-    \bool_gset_false:N \g_otex_load_index_bool
-    \bool_gset_false:N \g_otex_load_appendix_bool
-    
-    % 开启通常无害的功能
-    \bool_gset_true:N \g_otex_load_math_bool
-    \bool_gset_true:N \g_otex_load_graphics_bool
-    \bool_gset_true:N \g_otex_load_listings_bool
-    \bool_gset_false:N \g_otex_load_minted_bool 
-    \bool_gset_true:N \g_otex_load_tables_bool
-    \bool_gset_true:N \g_otex_load_floats_bool
-  }
+% 通知用户
+\msg_new:nnn { otex } { best-effort } { otex~loaded~in~Best~Effort~mode.~Merging~configurations... }
+\msg_info:nn { otex } { best-effort }
 
 % ==============================================================================
 % 选项定义 (Option Definitions)
@@ -233,7 +184,7 @@
 
     % 字体配置
     font-set    .tl_set:N   = \g_otex_font_set_tl,
-    font-set    .initial:n  = windows,
+    font-set    .initial:n  = auto,
 
     main-font   .tl_set:N   = \g_otex_font_main_tl,
     sans-font   .tl_set:N   = \g_otex_font_sans_tl,

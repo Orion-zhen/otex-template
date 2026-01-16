@@ -4,30 +4,43 @@
 % 标题设置 (Captions)
 % ==============================================================================
 
-\otex_smart_require:nnnn { caption }
-  { } 
-  { } 
-  {
-    \captionsetup{
-        font      = small,
-        labelfont = bf,
-        labelsep  = colon,
-        textfont  = it
-    }
-  }
+\msg_new:nnn { otex } { subcaption-clash }
+  { Incompatible~package~'subfig'~or~'subfigure'~or~class~'CjC'~detected.~Skipping~'subcaption'. }
 
-% --- Smart Load Subcaption (Conflict Check) ---
-\@ifpackageloaded { subfig }
-  { \msg_warning:nn { otex } { subcaption-clash } }
+\@ifpackageloaded { caption }
   {
-    \@ifpackageloaded { subfigure }
-      { \msg_warning:nn { otex } { subcaption-clash } }
+    \otex_smart_require:nnnn { caption } { } { } { }
+    \msg_info:nnn { otex } { config-backoff } { caption }
+  }
+  {
+    \otex_smart_require:nnnn { caption }
+      { } 
+      { } 
       {
-        \otex_smart_require:nnnn { subcaption } { } { } { }
+        \captionsetup{
+            font      = small,
+            labelfont = bf,
+            labelsep  = colon,
+            textfont  = it
+        }
       }
   }
 
-\msg_new:nnn { otex } { subcaption-clash }
-  { Incompatible~package~'subfig'~or~'subfigure'~detected.~Skipping~'subcaption'. }
+% --- Smart Load Subcaption (Conflict Check) ---
+\@ifclassloaded{CjC}
+  { \msg_warning:nn { otex } { subcaption-clash } }
+  {
+    \@ifpackageloaded { subfig }
+      { \msg_warning:nn { otex } { subcaption-clash } }
+      {
+        \@ifpackageloaded { subfigure }
+          { \msg_warning:nn { otex } { subcaption-clash } }
+          {
+            \otex_smart_require:nnnn { subcaption } { } { } { }
+          }
+      }
+  }
+
+
 
 \endinput
