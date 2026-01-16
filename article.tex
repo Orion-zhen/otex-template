@@ -1,5 +1,6 @@
 \documentclass{article}
 \usepackage[english]{otex}
+\addbibresource{ref.bib}
 
 \ctexset{
     % otex宏包的[english]选项已自动处理了以下名称的英文本地化 (如 Contents, References 等)
@@ -50,7 +51,6 @@
 \input{contents/08-pgfplots}
 
 \newpage
-\bibliographystyle{plain}
-\bibliography{ref}
+\printbibliography[heading=bibintoc]
 
 \end{document}
