@@ -114,8 +114,8 @@
 \bool_if:NT \g_otex_load_index_bool    { \RequirePackage { otex/otex-index } }
 \bool_if:NT \g_otex_load_appendix_bool { \RequirePackage { otex/otex-appendix } }
 
-\RequirePackage { otex/otex-chinese }
-\RequirePackage { otex/otex-fonts }
+\bool_if:NT \g_otex_load_ctex_bool   { \RequirePackage { otex/otex-chinese } }
+\bool_if:NT \g_otex_load_fonts_bool  { \RequirePackage { otex/otex-fonts } }
 
 \bool_if:NT \g_otex_load_layout_bool   { \RequirePackage { otex/otex-layout } }
 \RequirePackage { otex/otex-refs }
