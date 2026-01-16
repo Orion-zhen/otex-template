@@ -42,6 +42,8 @@
   latexmk -xelatex -shell-escape main.tex
   ```
 
+- **LaTeX Workshop**：仓库中附带了 VS Code 的 LaTeX Workshop 插件的相关配置，在 `latex-worksop.jsonc` 中。可以复制到自己的 VS Code 中使用。
+
 ## 📚 详细文档
 
 为了保持简洁，完整的技术手册和方案详解请参阅 `docs/` 目录：
