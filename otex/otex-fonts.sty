@@ -1,6 +1,14 @@
-\ProvidesExplPackage {otex/otex-fonts} {2026-01-16} {1.1} {Orion's Font Configuration}
+\ProvidesExplPackage {otex/otex-fonts} {2026-01-17} {1.2} {Orion's Font Configuration}
 
 \bool_if:NF \g_otex_load_fonts_bool { \endinput }
+
+% pdfTeX 引擎检测：fontspec 仅支持 XeTeX/LuaTeX
+\sys_if_engine_pdftex:T
+{
+  \msg_new:nnn { otex } { fonts-pdftex-skip } { pdfTeX~detected.~Skipping~fontspec~(requires~XeTeX/LuaTeX). }
+  \msg_warning:nn { otex } { fonts-pdftex-skip }
+  \endinput
+}
 
 % Dynamic Font Preservation Check (MUST be done before loading fontspec)
 % Check if \rmdefault is standard (cmr) or if fontspec has already normalized it.

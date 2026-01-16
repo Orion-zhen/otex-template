@@ -1,6 +1,18 @@
-\ProvidesExplPackage {otex/otex-chinese} {2026-01-16} {1.1} {Orion's Chinese Support}
+\ProvidesExplPackage {otex/otex-chinese} {2026-01-17} {1.2} {Orion's Chinese Support}
 
 \bool_if:NF \g_otex_load_ctex_bool { \endinput }
+
+% pdfTeX 引擎检测：xeCJK 仅支持 XeTeX，但 ctex + CJK 可以在 pdfLaTeX 下工作
+\sys_if_engine_pdftex:T
+{
+  \msg_new:nnn { otex } { ctex-pdftex } { pdfTeX~detected.~Loading~ctex~with~CJK~backend~(limited~CJK~support). }
+  \msg_warning:nn { otex } { ctex-pdftex }
+  % pdfLaTeX 下使用 ctex 的 CJK 后端（非 xeCJK）
+  \bool_if:NTF \g_otex_english_bool
+  { \otex_require:nnnn { ctex } { UTF8, scheme=plain, heading=false, fontset=none } {} {} }
+  { \otex_require:nnnn { ctex } { UTF8, scheme=chinese, heading=false, fontset=none } {} {} }
+  \endinput
+}
 
 \bool_new:N \l_otex_safe_header_bool
 % Dynamic check: If titlesec is loaded, it implies the class controls headings.
