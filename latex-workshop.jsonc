@@ -30,6 +30,7 @@
                 "-synctex=1", // 开启正反向搜索
                 "-interaction=batchmode", // 屏蔽输出, 只在错误时写入 log
                 "-file-line-error", // 错误日志格式
+                "-silent", // 屏蔽 warning 以下的输出
                 "-latexoption=-halt-on-error", // 遇到错误立刻停止
                 "-bibtex-cond1", // 智能检测 .bib 文件
                 "-latexoption=-shell-escape", // 注入执行参数: 允许执行 shell
@@ -46,9 +47,11 @@
             "args": [
                 "-xelatex", // 使用 xelatex 以支持中文
                 "-pdfxe", // 关键! 使用 xelatex 生成 pdf
+                "-gg", // 每次编译前强制清理所有旧的文件
                 "-synctex=1", // 开启正反向搜索
                 "-interaction=nonstopmode", // 不因错误而暂停
                 "-file-line-error", // 错误日志格式
+                "-silent", // 屏蔽 warning 以下的输出
                 "-bibtex-cond1", // 智能检测 .bib 文件
                 "-latexoption=-shell-escape", // 注入执行参数: 允许执行 shell
                 "-output-directory=%OUTDIR%",
