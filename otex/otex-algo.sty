@@ -7,6 +7,17 @@
   }
   {
      \otex_require:nnnn { algorithm2e } { ruled, linesnumbered, vlined } { required={ruled} } {}
+     
+     % Define Input and Output commands
+     \bool_if:NTF \g_otex_english_bool
+     {
+        \SetKwInput{Input}{Input}
+        \SetKwInput{Output}{Output}
+     }
+     {
+        \SetKwInput{Input}{输入}
+        \SetKwInput{Output}{输出}
+     }
   }
 
 \endinput
