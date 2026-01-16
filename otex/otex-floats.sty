@@ -1,0 +1,91 @@
+\ProvidesExplPackage {otex/otex-floats} {2025-01-16} {1.0} {Orion's Floats}
+
+% ==============================================================================
+% 浮动体控制宏包 (Floats Control)
+% ==============================================================================
+% 本模块提供高级浮动体控制功能,包括:
+%   - float: 强力浮动体控制 (使用 [H] 禁止浮动)
+%   - placeins: 限制浮动体在章节内
+%   - flafter: 确保浮动体在引用之后
+%
+% 配置目标:
+%   - 提供更宽松的浮动规则，减少 "Too many unprocessed floats" 错误
+%   - 可选地将浮动体限制在章节边界内
+% ==============================================================================
+
+% ------------------------------------------------------------------------------
+% 基础浮动控制
+% ------------------------------------------------------------------------------
+\RequirePackage { float }       % 强力浮动体控制 (使用 [H] 禁止浮动)
+
+% ------------------------------------------------------------------------------
+% 高级浮动配置
+% ------------------------------------------------------------------------------
+
+% placeins: 限制浮动体不超出章节边界
+% 选项说明:
+%   section - 在 \section 处插入 \FloatBarrier
+%   below   - 只阻止浮动体向前飘，允许向后飘
+\bool_if:NT \g_otex_float_section_bool
+  {
+    \RequirePackage [ section ] { placeins }
+  }
+
+% flafter: 确保浮动体只在引用之后出现，而非之前
+% 这可以避免浮动体"倒流"到前面章节的问题
+\RequirePackage { flafter }
+
+% ------------------------------------------------------------------------------
+% 放宽浮动体默认参数
+% ------------------------------------------------------------------------------
+% LaTeX 默认的浮动参数较为严格，经常导致 "Too many unprocessed floats" 警告。
+% 以下配置放宽这些限制，使浮动体更容易被放置。
+
+% \topfraction: 页面顶部可用于浮动体的最大比例 (默认 0.7)
+\cs_set:Npn \topfraction { 0.85 }
+
+% \bottomfraction: 页面底部可用于浮动体的最大比例 (默认 0.3)
+\cs_set:Npn \bottomfraction { 0.70 }
+
+% \textfraction: 页面上必须保留给文本的最小比例 (默认 0.2)
+\cs_set:Npn \textfraction { 0.10 }
+
+% \floatpagefraction: 浮动页面上浮动体必须占据的最小比例 (默认 0.5)
+\cs_set:Npn \floatpagefraction { 0.60 }
+
+% \dblfloatpagefraction: 双栏文档中浮动页面的最小比例 (默认 0.5)
+\cs_set:Npn \dblfloatpagefraction { 0.60 }
+
+% \topnumber: 页面顶部允许的最大浮动体数量 (默认 2)
+\setcounter { topnumber } { 4 }
+
+% \bottomnumber: 页面底部允许的最大浮动体数量 (默认 1)
+\setcounter { bottomnumber } { 3 }
+
+% \totalnumber: 单页上允许的最大浮动体总数 (默认 3)
+\setcounter { totalnumber } { 8 }
+
+% \dbltopnumber: 双栏文档顶部允许的最大浮动体数量 (默认 2)
+\setcounter { dbltopnumber } { 4 }
+
+% ------------------------------------------------------------------------------
+% 浮动体与文本的间距配置
+% ------------------------------------------------------------------------------
+% 这些参数控制浮动体与周围文本之间的垂直间距
+
+% \textfloatsep: 浮动体与页面顶部/底部文本之间的间距
+\skip_set:Nn \textfloatsep { 12pt plus 4pt minus 3pt }
+
+% \floatsep: 同一区域内多个浮动体之间的间距
+\skip_set:Nn \floatsep { 10pt plus 3pt minus 2pt }
+
+% \intextsep: 页内浮动体 (使用 h 选项) 与周围文本的间距
+\skip_set:Nn \intextsep { 12pt plus 4pt minus 3pt }
+
+% \dbltextfloatsep: 双栏文档中的 \textfloatsep
+\skip_set:Nn \dbltextfloatsep { 12pt plus 4pt minus 3pt }
+
+% \dblfloatsep: 双栏文档中的 \floatsep
+\skip_set:Nn \dblfloatsep { 10pt plus 3pt minus 2pt }
+
+\endinput

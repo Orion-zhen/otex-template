@@ -33,6 +33,7 @@
 \bool_new:N \g_otex_load_listings_bool  
 \bool_new:N \g_otex_load_minted_bool    
 \bool_new:N \g_otex_load_tables_bool    
+\bool_new:N \g_otex_load_floats_bool    % 浮动体高级控制
 \bool_new:N \g_otex_english_bool        
 \bool_new:N \g_otex_is_std_class_bool   
 
@@ -101,6 +102,7 @@
     \bool_gset_true:N \g_otex_load_listings_bool
     \bool_gset_true:N \g_otex_load_minted_bool
     \bool_gset_true:N \g_otex_load_tables_bool
+    \bool_gset_true:N \g_otex_load_floats_bool
     
     % 新增默认开启
     \bool_gset_true:N \g_otex_load_bib_bool
@@ -144,6 +146,7 @@
     \bool_gset_true:N \g_otex_load_listings_bool
     \bool_gset_false:N \g_otex_load_minted_bool 
     \bool_gset_true:N \g_otex_load_tables_bool
+    \bool_gset_true:N \g_otex_load_floats_bool
   }
 
 % ==============================================================================
@@ -197,6 +200,9 @@
 
     tables      .bool_set:N = \g_otex_load_tables_bool,
     tables      .default:n  = true,
+
+    floats      .bool_set:N = \g_otex_load_floats_bool,
+    floats      .default:n  = true,
 
     english     .bool_set:N = \g_otex_english_bool,
     english     .default:n  = true,
@@ -255,6 +261,7 @@
     nolistings  .meta:n = { listings = false },
     nominted    .meta:n = { minted = false },
     notables    .meta:n = { tables = false },
+    nofloats    .meta:n = { floats = false },
     nobib       .meta:n = { bib = false },
     notoc       .meta:n = { toc = false },
     noindex     .meta:n = { index = false },
@@ -310,6 +317,7 @@
 \bool_if:NT \g_otex_load_graphics_bool { \RequirePackage { otex/otex-graphics } }
 \bool_if:NT \g_otex_load_caption_bool  { \RequirePackage { otex/otex-caption } }
 \bool_if:NT \g_otex_load_tables_bool   { \RequirePackage { otex/otex-tables } }
+\bool_if:NT \g_otex_load_floats_bool   { \RequirePackage { otex/otex-floats } }
 
 % 新增模块
 \bool_if:NT \g_otex_load_bib_bool      { \RequirePackage { otex/otex-bib } }
