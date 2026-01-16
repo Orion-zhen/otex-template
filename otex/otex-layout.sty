@@ -5,40 +5,45 @@
 % ==============================================================================
 % 仅在 article 类生效，避免冲突
 
+% 引入 smart require 别名 (已在 otex.sty 加载)
+
 \@ifclassloaded { article }
   {
-    \RequirePackage { geometry }
-    \geometry{
+    % --- Smart Load Geometry ---
+    % 如果用户已加载 geometry，则不覆盖其设置。
+    % 如果未加载，则应用默认页边距。
+    \otex_smart_require:nnnn { geometry }
+      {
         a4paper,
         left   = 2.5cm,
         right  = 2.5cm,
         top    = 2.5cm,
         bottom = 2.5cm
-    }
+      }
+      { } % No validation rules
+      { } % No post-setup
 
-    \RequirePackage { fancyhdr }
-    \pagestyle { fancy }
-    \fancyhf{}
-    \lhead { \leftmark }       % 左页眉: 章节名
-    \chead {}                  % 中页眉: 空
-    \rhead { \thepage }        % 右页眉: 页码
-    \lfoot {}                  % 左页脚
-    \cfoot {}                  % 中页脚
-    \rfoot {}                  % 右页脚
+    % --- Smart Load Fancyhdr ---
+    \otex_smart_require:nnnn { fancyhdr }
+      { }
+      { }
+      {
+        \pagestyle { fancy }
+        \fancyhf{}
+        \lhead { \leftmark }       % 左页眉: 章节名
+        \chead {}                  % 中页眉: 空
+        \rhead { \thepage }        % 右页眉: 页码
+        \lfoot {}                  % 左页脚
+        \cfoot {}                  % 中页脚
+        \rfoot {}                  % 右页脚
+      }
   }
   {}
 
 % ==============================================================================
-% 浮动体控制 (Floats)
+% 浮动体控制 (Move to otex-floats)
 % ==============================================================================
-
-\RequirePackage { placeins } % 提供 \FloatBarrier
-\RequirePackage { flafter }  % 确保浮动体不会出现在定义之前
-
-% 如果开启了 floats-in-section，则修改 section 命令自动添加 Barrier
-\bool_if:NT \g_otex_float_section_bool
-  {
-    \AddToHook{cmd/section/before}{\FloatBarrier}
-  }
+% 此处原有 placeins 和 flafter，现已移交 otex-floats 管理。
+% 保留此处为空或移除。
 
 \endinput

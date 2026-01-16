@@ -1,0 +1,95 @@
+\ProvidesExplPackage {otex/otex-pkgcheck} {2025-01-16} {1.0} {Orion's Smart Package Checker}
+
+% ==============================================================================
+% 智能包加载与冲突检测 (Smart Package Loading & Conflict Detection)
+% ==============================================================================
+
+\msg_new:nnn { otex } { pkg-loaded-ok }
+  { Package~'#1'~already~loaded.~Skipping~load.~(Mode:~Smart~Merge) }
+
+\msg_new:nnn { otex } { pkg-missing-req }
+  {
+    Package~'#1'~is~loaded~missing~REQUIRED~option~'#2'. \\
+    This~may~break~otex~functionality. \\
+    Please~load~it~as~:~\usepackage[#2,...]{#1}
+  }
+
+\msg_new:nnn { otex } { pkg-conflict-found }
+  {
+    Package~'#1'~is~loaded~with~CONFLICTING~option~'#2'. \\
+    This~will~clash~with~otex~style. \\
+    Please~remove~'#2'~from~your~\usepackage~call.
+  }
+
+% ------------------------------------------------------------------------------
+% 内部变量
+% ------------------------------------------------------------------------------
+\clist_new:N \l__otex_pkg_required_clist
+\clist_new:N \l__otex_pkg_conflict_clist
+\bool_new:N \l__otex_check_result_bool
+
+% 定义规则键值解析
+\keys_define:nn { otex / pkgcheck }
+  {
+    required .clist_set:N = \l__otex_pkg_required_clist,
+    conflict .clist_set:N = \l__otex_pkg_conflict_clist,
+  }
+
+% ------------------------------------------------------------------------------
+% 核心命令: \otex_smart_require:nnnn
+% ------------------------------------------------------------------------------
+\cs_new_protected:Npn \otex_smart_require:nnnn #1#2#3#4
+  {
+    \clist_clear:N \l__otex_pkg_required_clist
+    \clist_clear:N \l__otex_pkg_conflict_clist
+    
+    % 解析验证规则
+    \keys_set:nn { otex / pkgcheck } { #3 }
+
+    % 检查包是否已加载
+    \@ifpackageloaded { #1 }
+      {
+        % --- 已加载：执行检查 ---
+        \msg_info:nnn { otex } { pkg-loaded-ok } { #1 }
+
+        % 1. 检查必需选项 (Required)
+        \clist_map_inline:Nn \l__otex_pkg_required_clist
+          {
+            \bool_set_true:N \l__otex_check_result_bool
+            \@ifpackagewith { #1 } { ##1 }
+              { } % OK
+              { \bool_set_false:N \l__otex_check_result_bool }
+            
+            \bool_if:NF \l__otex_check_result_bool
+              { \msg_warning:nnnn { otex } { pkg-missing-req } { #1 } { ##1 } }
+          }
+
+        % 2. 检查冲突选项 (Conflict)
+        \clist_map_inline:Nn \l__otex_pkg_conflict_clist
+          {
+            \bool_set_false:N \l__otex_check_result_bool
+            \@ifpackagewith { #1 } { ##1 }
+              { \bool_set_true:N \l__otex_check_result_bool }
+              { } % OK
+            
+            \bool_if:NT \l__otex_check_result_bool
+              { \msg_warning:nnnn { otex } { pkg-conflict-found } { #1 } { ##1 } }
+          }
+
+        % 3. 执行后续配置
+        #4
+      }
+      {
+        % --- 未加载：正常加载 ---
+        \tl_if_empty:nTF { #2 }
+          { \RequirePackage { #1 } }
+          { \RequirePackage [ #2 ] { #1 } }
+        
+        % 执行后续配置
+        #4
+      }
+  }
+
+\cs_new_eq:NN \otex_require:nnnn \otex_smart_require:nnnn
+
+\endinput

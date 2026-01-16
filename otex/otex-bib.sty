@@ -1,39 +1,43 @@
-\ProvidesExplPackage {otex/otex-bib} {2025-01-16} {1.0} {Orion's Bibliography}
+\ProvidesExplPackage {otex/otex-bib} {2025-01-16} {1.1} {Orion's Bibliography}
 
 % ==============================================================================
 % 参考文献管理 (Bibliography)
 % ==============================================================================
-% 支持后端: biblatex (默认, 现代强推) 或 natbib (传统兼容)
 
 \str_case:VnF \g_otex_bib_backend_tl
   {
     {biblatex}
     {
-      % --- BibLaTeX ---
-      \RequirePackage [
-        backend = bibtex,
-        style   = \g_otex_bib_style_tl, % ieee, apa, nature, etc.
-        sorting = none,  % 默认按引用顺序排序
-        doi     = true,
-        isbn    = false,
-        url     = false,
-        eprint  = false
-      ] { biblatex }
-      
-      % 连接资源文件 (需要在导言区 addbibresource)
-      % 提供一个辅助命令，但主要由用户在主tex中调用
+      % --- Smart Load BibLaTeX ---
+      \otex_smart_require:nnnn { biblatex }
+        {
+          backend = bibtex,
+          style   = \g_otex_bib_style_tl,
+          sorting = none,
+          doi     = true,
+          isbn    = false,
+          url     = false,
+          eprint  = false
+        }
+        { } % No strict validation
+        { } % Post-setup
     }
     {natbib}
     {
-      % --- Natbib ---
-      \RequirePackage [numbers, sort&compress] { natbib }
-      % 样式通常在 document body 设定 \bibliographystyle{...}
+      % --- Smart Load Natbib ---
+      \otex_smart_require:nnnn { natbib }
+        { numbers, sort&compress }
+        { }
+        { }
     }
   }
   {
-    % 默认 fallback
+    % Default Fallback -> BibLaTeX
     \msg_warning:nnn { otex } { invalid-bib-backend } { \g_otex_bib_backend_tl }
-    \RequirePackage [backend=biber,style=ieee] { biblatex }
+    \otex_smart_require:nnnn { biblatex }
+      { backend=biber, style=ieee }
+      { }
+      { }
   }
 
 \msg_new:nnn { otex } { invalid-bib-backend } { Invalid~bib-backend~'#1'.~Defaulting~to~biblatex. }

@@ -1,14 +1,9 @@
-\ProvidesExplPackage {otex/otex-appendix} {2025-01-16} {1.0} {Orion's Appendix}
+\ProvidesExplPackage {otex/otex-appendix} {2025-01-16} {1.1} {Orion's Appendix}
 
 % ==============================================================================
 % 附录支持 (Appendix)
 % ==============================================================================
 
-\RequirePackage { appendix }
-
-% 配置附录环境
-% \begin{appendices} ... \end{appendices}
-% 自动处理: 章节编号改为 A, B, C...
-% 自动处理: 页码格式可选 (需手动配置)
+\otex_smart_require:nnnn { appendix } {} {} {}
 
 \endinput

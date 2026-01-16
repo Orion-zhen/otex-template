@@ -6,22 +6,31 @@
 
 \bool_if:NT \g_otex_load_hyperref_bool
   {
-    \bool_if:NF \g_otex_load_bib_bool { \RequirePackage { cite } } % 仅在未开启参考文献模块时加载 cite
-    \RequirePackage [ pdfborder = {0~0~0} ] { hyperref } % 超链接
-    
-    % \AtEndPreamble 确保所有配置都已生效
-    \AddToHook{begindocument/before}{
-        \hypersetup{
-            colorlinks = true,             % 激活彩色链接
-            linkcolor  = blue!70!black,    % 内部链接(目录, 公式引用)
-            filecolor  = magenta,          % 文件链接颜色
-            urlcolor   = cyan!70!black,    % URL链接颜色
-            citecolor  = green!40!black,   % 引用颜色([1])
-            pdftitle   = { \g_otex_pdf_title_tl },
-            pdfauthor  = { \g_otex_pdf_author_tl },
-            pdfcreator = { LaTeX~with~otex },
+    % 仅在未开启参考文献模块时加载 cite (避免与 natbib/biblatex 冲突)
+    \bool_if:NF \g_otex_load_bib_bool 
+      { 
+        \otex_smart_require:nnnn { cite } {} {} {}
+      }
+
+    % --- Smart Load Hyperref ---
+    \otex_smart_require:nnnn { hyperref }
+      { pdfborder = {0~0~0} } % Default options
+      { } % Validation
+      {
+        % Post-load setup
+        \AddToHook{begindocument/before}{
+            \hypersetup{
+                colorlinks = true,             
+                linkcolor  = blue!70!black,    
+                filecolor  = magenta,          
+                urlcolor   = cyan!70!black,    
+                citecolor  = green!40!black,   
+                pdftitle   = { \g_otex_pdf_title_tl },
+                pdfauthor  = { \g_otex_pdf_author_tl },
+                pdfcreator = { LaTeX~with~otex },
+            }
         }
-    }
+      }
   }
 
 % ==============================================================================
@@ -30,50 +39,51 @@
 % 功能: 自动识别引用类型, 生成智能引用格式
 % 警告: 必须在 hyperref 之后加载!
 
-% 如果 hyperref 未开启, 强制关闭 cleveref 并发出警告
 \bool_if:NT \g_otex_load_cleveref_bool
   {
     \bool_if:NTF \g_otex_load_hyperref_bool
       {
-        \RequirePackage [capitalise,nameinlink] { cleveref }
-        
-        % --- 中英文本地化配置 ---
-        \bool_if:NTF \g_otex_english_bool
+        % --- Smart Load Cleveref ---
+        \otex_smart_require:nnnn { cleveref }
+          { capitalise,nameinlink }
+          { }
           {
-            % 英文环境: 使用默认英文格式 (如 Figure, Table, Equation)
-            % cleveref 的默认英文配置已经足够好, 无需额外设置
-          }
-          {
-            % 中文环境: 自定义中文引用格式
-            \crefname{figure}{图}{图}
-            \crefname{table}{表}{表}
-            \crefname{equation}{式}{式}
-            \crefname{section}{节}{节}
-            \crefname{chapter}{章}{章}
-            \crefname{appendix}{附录}{附录}
-            
-            % 定理环境 (如果开启了 theorems 模块)
-            \bool_if:NT \g_otex_load_theorems_bool
+            % --- 中英文本地化配置 ---
+            \bool_if:NTF \g_otex_english_bool
               {
-                % 定理环境已经在 otex-theorems 中定义
-                \crefname{theorem}{定理}{定理}
-                \crefname{lemma}{引理}{引理}
-                \crefname{proposition}{命题}{命题}
-                \crefname{corollary}{推论}{推论}
-                \crefname{definition}{定义}{定义}
-                \crefname{example}{例}{例}
-                \crefname{remark}{注}{注}
-                \crefname{assumption}{假设}{假设}
-                \crefname{conjecture}{猜想}{猜想}
-                \crefname{axiom}{公理}{公理}
-                \crefname{problem}{问题}{问题}
-                \crefname{exercise}{练习}{练习}
+                % 英文环境: 使用默认
               }
-              
-            % 算法环境 (如果开启了 algo 模块)
-            \bool_if:NT \g_otex_load_algo_bool
               {
-                \crefname{algocf}{算法}{算法}  % algorithm2e 使用 algocf 环境名
+                % 中文环境: 自定义中文引用格式
+                \crefname{figure}{图}{图}
+                \crefname{table}{表}{表}
+                \crefname{equation}{式}{式}
+                \crefname{section}{节}{节}
+                \crefname{chapter}{章}{章}
+                \crefname{appendix}{附录}{附录}
+                
+                % 定理环境
+                \bool_if:NT \g_otex_load_theorems_bool
+                  {
+                    \crefname{theorem}{定理}{定理}
+                    \crefname{lemma}{引理}{引理}
+                    \crefname{proposition}{命题}{命题}
+                    \crefname{corollary}{推论}{推论}
+                    \crefname{definition}{定义}{定义}
+                    \crefname{example}{例}{例}
+                    \crefname{remark}{注}{注}
+                    \crefname{assumption}{假设}{假设}
+                    \crefname{conjecture}{猜想}{猜想}
+                    \crefname{axiom}{公理}{公理}
+                    \crefname{problem}{问题}{问题}
+                    \crefname{exercise}{练习}{练习}
+                  }
+                  
+                % 算法环境
+                \bool_if:NT \g_otex_load_algo_bool
+                  {
+                    \crefname{algocf}{算法}{算法}
+                  }
               }
           }
       }

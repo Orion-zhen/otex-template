@@ -1,13 +1,13 @@
-\ProvidesExplPackage {otex/otex-tables} {2025-01-16} {1.0} {Orion's Tables}
+\ProvidesExplPackage {otex/otex-tables} {2025-01-16} {1.1} {Orion's Tables}
 
 % ==============================================================================
 % 表格宏包 (Tables)
 % ==============================================================================
 
-\RequirePackage { booktabs }    % 三线表 (\toprule, \midrule, \bottomrule)
-\RequirePackage { multirow }    % 表格行合并
-\RequirePackage { array }       % 增强的列格式
-\RequirePackage { longtable }   % 长表格
-\RequirePackage { wrapfig }     % 图文环绕
+\otex_smart_require:nnnn { booktabs } {} {} {}
+\otex_smart_require:nnnn { multirow } {} {} {}
+\otex_smart_require:nnnn { array } {} {} {}
+\otex_smart_require:nnnn { longtable } {} {} {}
+\otex_smart_require:nnnn { wrapfig } {} {} {}
 
 \endinput

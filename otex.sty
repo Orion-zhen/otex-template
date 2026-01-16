@@ -275,30 +275,11 @@
 \ProcessKeysOptions { otex }
 
 % ==============================================================================
-% 冲突熔断 (Conflict Resolution)
+% 智能包检测 (Smart Package Check)
 % ------------------------------------------------------------------------------
-% 检查是否已加载冲突包，如果已加载则自动关闭对应模块，防止报错。
+% 加载智能检测模块，供子模块使用，不再粗暴禁用模块。
 % ==============================================================================
-
-% 定义冲突提示消息模板
-% #1 是占位符，会被具体包名替换
-\msg_new:nnn { otex } { package-clash } { Package~'#1'~detected.~Disabling~otex~#1. }
-
-% 检测现有冲突
-\@ifpackageloaded { geometry }  { \bool_gset_false:N \g_otex_load_layout_bool \msg_info:nnn { otex } { package-clash } { layout } } {}
-\@ifpackageloaded { hyperref }  { \bool_gset_false:N \g_otex_load_hyperref_bool \msg_info:nnn { otex } { package-clash } { hyperref } } {}
-\@ifpackageloaded { cleveref }  { \bool_gset_false:N \g_otex_load_cleveref_bool \msg_info:nnn { otex } { package-clash } { cleveref } } {}
-\@ifpackageloaded { caption }   { \bool_gset_false:N \g_otex_load_caption_bool \msg_info:nnn { otex } { package-clash } { caption } } {}
-\@ifpackageloaded { algorithm } { \bool_gset_false:N \g_otex_load_algo_bool \msg_info:nnn { otex } { package-clash } { algorithm2e } } {}
-\@ifpackageloaded { minted }    { \bool_gset_false:N \g_otex_load_minted_bool \msg_info:nnn { otex } { package-clash } { minted } } {}
-\@ifundefined { theorem } {}    { \bool_gset_false:N \g_otex_load_theorems_bool \msg_info:nnn { otex } { package-clash } { theorems } }
-
-% 新增冲突检测
-\@ifpackageloaded { biblatex }  { \bool_gset_false:N \g_otex_load_bib_bool \msg_info:nnn { otex } { package-clash } { bib } } {}
-\@ifpackageloaded { natbib }    { \bool_gset_false:N \g_otex_load_bib_bool \msg_info:nnn { otex } { package-clash } { bib } } {}
-\@ifpackageloaded { tocloft }   { \bool_gset_false:N \g_otex_load_toc_bool \msg_info:nnn { otex } { package-clash } { toc } } {}
-\@ifpackageloaded { imakeidx }  { \bool_gset_false:N \g_otex_load_index_bool \msg_info:nnn { otex } { package-clash } { index } } {}
-\@ifpackageloaded { appendix }  { \bool_gset_false:N \g_otex_load_appendix_bool \msg_info:nnn { otex } { package-clash } { appendix } } {}
+\RequirePackage { otex/otex-pkgcheck }
 
 % ==============================================================================
 % 模块加载 (Module Loading)

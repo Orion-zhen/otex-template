@@ -3,25 +3,30 @@
 % ==============================================================================
 % 算法与伪代码 (Algorithms)
 % ==============================================================================
-% 文档: http://mirrors.ctan.org/macros/latex/contrib/algorithm2e/doc/algorithm2e.pdf
 
 \str_case:VnF \g_otex_algo_backend_tl
   {
     {algorithm2e}
     {
-      % 原始配置
-      \RequirePackage[ruled,linesnumbered,vlined]{algorithm2e}
+      % --- Smart Load algorithm2e ---
+      \otex_smart_require:nnnn { algorithm2e }
+        { ruled, linesnumbered, vlined } % Defaults
+        { required = { ruled } }         % Validation: Warn if not ruled
+        { }                              % Post-setup
     }
     {algorithmicx}
     {
-      % 新增配置
-      \RequirePackage{algorithm}
-      \RequirePackage{algpseudocode}
+      % --- Smart Load algorithmicx ---
+      \otex_smart_require:nnnn { algorithm } {} {} {}
+      \otex_smart_require:nnnn { algpseudocode } {} {} {}
     }
   }
   {
     % Default
-    \RequirePackage[ruled,linesnumbered,vlined]{algorithm2e}
+    \otex_smart_require:nnnn { algorithm2e }
+      { ruled, linesnumbered, vlined }
+      { required = { ruled } }
+      { }
   }
 
 \endinput

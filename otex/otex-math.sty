@@ -4,38 +4,47 @@
 % 数学宏包 loading
 % ==============================================================================
 
-\RequirePackage { amsmath }     % 基础数学宏包 (AMS)
-\RequirePackage { mathtools }   % amsmath 的扩展修复和增强
-\RequirePackage { amsthm }      % 定理环境支持
+\otex_smart_require:nnnn { amsmath } {} {} {}
+\otex_smart_require:nnnn { mathtools } {} {} {}
+\otex_smart_require:nnnn { amsthm } {} {} {}
 
 % 引擎检测与 Unicode Math 支持
 \sys_if_engine_pdftex:TF
   {
-    % pdfLaTeX 模式: 传统数学字体
-    \RequirePackage { amssymb }     % 数学符号库 (如 \mathbb)
+    \otex_smart_require:nnnn { amssymb } {} {} {}
   }
   {
     % XeLaTeX / LuaLaTeX 模式: Unicode Math
-    % 注意: unicode-math 应该在所有其他数学包之后加载
-    \RequirePackage [
-      math-style=ISO,
-      bold-style=ISO
-    ] { unicode-math }
-    
-    % 这里可以设置默认数学字体，如果 font 模块没有覆盖的话
-    % \setmathfont{Latin Modern Math} 
-    
-    % 兼容 amssymb 符号
-    \AtBeginDocument{
-      \providecommand{\square}{\mdlgwhtsquare}
-      \providecommand{\boxtimes}{\boxtimes} % unicode-math 通常已有，防万一
-    } 
+    % 注意: unicode-math 通常不应与 amssymb 同时加载
+    \@ifpackageloaded { amssymb }
+      {
+         \msg_warning:nn { otex } { amssymb-conflict }
+         % 仍然尝试加载 unicode-math，因为它可能修补? 或者用户可能知道自己在做什么
+         \otex_smart_require:nnnn { unicode-math }
+            { math-style=ISO, bold-style=ISO }
+            { }
+            {
+               \AtBeginDocument{
+                 \providecommand{\square}{\mdlgwhtsquare}
+                 \providecommand{\boxtimes}{\boxtimes}
+               }
+            }
+      }
+      {
+         \otex_smart_require:nnnn { unicode-math }
+            { math-style=ISO, bold-style=ISO }
+            { }
+            {
+               \AtBeginDocument{
+                 \providecommand{\square}{\mdlgwhtsquare}
+                 \providecommand{\boxtimes}{\boxtimes}
+               }
+            }
+      }
   }
 
-% 常用数学配置说明:
-% \begin{align} ... \end{align} 用于多行对齐公式
-% \begin{gather} ... \end{gather} 用于多行居中公式
-% \mathbb{R} 实数集 R, \mathcal{L} 损失函数 L
-% \DeclarePairedDelimiter 可用于定义自适应括号
+\msg_new:nnn { otex } { amssymb-conflict }
+  { Package~'amssymb'~detected.~It~is~often~redundant~or~conflicting~with~'unicode-math'. }
+
 
 \endinput
