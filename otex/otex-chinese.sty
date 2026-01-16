@@ -5,12 +5,18 @@
 % pdfTeX 引擎检测：xeCJK 仅支持 XeTeX，但 ctex + CJK 可以在 pdfLaTeX 下工作
 \sys_if_engine_pdftex:T
 {
-  \msg_new:nnn { otex } { ctex-pdftex } { pdfTeX~detected.~Loading~ctex~with~CJK~backend~(limited~CJK~support). }
-  \msg_warning:nn { otex } { ctex-pdftex }
-  % pdfLaTeX 下使用 ctex 的 CJK 后端（非 xeCJK）
   \bool_if:NTF \g_otex_english_bool
-  { \otex_require:nnnn { ctex } { UTF8, scheme=plain, heading=false, fontset=none } {} {} }
-  { \otex_require:nnnn { ctex } { UTF8, scheme=chinese, heading=false, fontset=none } {} {} }
+  {
+    % In English mode on pdfTeX, avoid loading ctex to prevent font conflicts (e.g. unisong20)
+    % This is a "best effort" safe default.
+    \msg_new:nnn { otex } { ctex-pdftex-skipped } { pdfTeX~detected~in~English~mode.~Skipping~ctex~loading. }
+    \msg_info:nn { otex } { ctex-pdftex-skipped }
+  }
+  {
+    \msg_new:nnn { otex } { ctex-pdftex } { pdfTeX~detected.~Loading~ctex~with~CJK~backend~(limited~CJK~support). }
+    \msg_warning:nn { otex } { ctex-pdftex }
+    \otex_require:nnnn { ctex } { UTF8, scheme=chinese, heading=false, fontset=none } {} {}
+  }
   \endinput
 }
 
