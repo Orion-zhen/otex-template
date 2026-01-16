@@ -1,0 +1,102 @@
+{
+    "latex-workshop.bibtex-format.tab": "4 spaces",
+    "latex-workshop.latex.autoClean.run": "onBuilt",
+    "latex-workshop.latex.autoBuild.run": "onSave",
+    "latex-workshop.showContextMenu": true,
+    "latex-workshop.intellisense.package.enabled": true,
+    "latex-workshop.message.error.show": true,
+    "latex-workshop.message.warning.show": true,
+    "latex-workshop.view.pdf.internal.synctex.keybinding": "double-click",
+    "latex-workshop.hover.preview.mathjax.extensions": [
+        "boldsymbol",
+        "colortbl",
+        "unicode",
+        "mathtools",
+        "html"
+    ],
+    "latex-workshop.mathpreviewpanel.cursor.enabled": true,
+    "latex-workshop.intellisense.citation.backend": "biblatex",
+    "latex-workshop.synctex.afterBuild.enabled": true,
+    "latex-workshop.latex.outDir": "%DIR%/build", // 规定输出目录
+    "latex-workshop.latex.tools": [
+        {
+            "name": "latexmk-lualatex",
+            "command": "latexmk",
+            "args": [
+                "-lualatex", // 使用 lualatex 以支持高阶功能
+                "-pdflua", // 关键! 使用 lualatex 生成 pdf
+                "-gg", // 每次编译前强制清理所有旧的文件
+                "-latexoption=-pretex=\\pdfcompresslevel=9\\pdfobjcompresslevel=2", // 启用压缩功能, 最小化输出文件
+                "-synctex=1", // 开启正反向搜索
+                "-interaction=batchmode", // 屏蔽输出, 只在错误时写入 log
+                "-file-line-error", // 错误日志格式
+                "-latexoption=-halt-on-error", // 遇到错误立刻停止
+                "-bibtex-cond1", // 智能检测 .bib 文件
+                "-latexoption=-shell-escape", // 注入执行参数: 允许执行 shell
+                "-output-directory=%OUTDIR%",
+                "%DOCFILE%"
+            ],
+            "env": {
+                "TERM": "xterm-256color" // 指定终端类型
+            }
+        },
+        {
+            "name": "latexmk-xelatex",
+            "command": "latexmk",
+            "args": [
+                "-xelatex", // 使用 xelatex 以支持中文
+                "-pdfxe", // 关键! 使用 xelatex 生成 pdf
+                "-synctex=1", // 开启正反向搜索
+                "-interaction=nonstopmode", // 不因错误而暂停
+                "-file-line-error", // 错误日志格式
+                "-bibtex-cond1", // 智能检测 .bib 文件
+                "-latexoption=-shell-escape", // 注入执行参数: 允许执行 shell
+                "-output-directory=%OUTDIR%",
+                "%DOCFILE%"
+            ],
+            "env": {
+                "TERM": "xterm-256color" // 指定终端类型
+            }
+        }
+    ],
+    "latex-workshop.latex.recipes": [
+        // 第一个构建方案, 使用 XeLaTeX
+        // 速度快, 可以随写随编
+        {
+            "name": "Dev Build (w/XeLaTeX)",
+            "tools": [
+                "latexmk-xelatex"
+            ]
+        },
+        // LuaLaTeX 构建方案
+        // 速度慢, 功能强大, 适合终稿审定
+        {
+            "name": "Release Build (w/LuaLaTeX)",
+            "tools": [
+                "latexmk-lualatex"
+            ]
+        }
+    ],
+    "latex-workshop.latex.recipe.default": "first", // 使用第一个构建方案
+    "latex-workshop.latex.clean.fileTypes": [
+        "*.aux",
+        "*.bbl",
+        "*.blg",
+        "*.idx",
+        "*.ind",
+        "*.lof",
+        "*.lot",
+        "*.out",
+        "*.toc",
+        "*.acn",
+        "*.acr",
+        "*.alg",
+        "*.glg",
+        "*.glo",
+        "*.gls",
+        "*.ist",
+        "*.fls",
+        "*.log",
+        "*.fdb_latexmk"
+    ]
+}
