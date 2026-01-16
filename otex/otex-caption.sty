@@ -10,7 +10,7 @@
 
 % Subcaption check
 \bool_new:N \l_otex_subcap_conflict_bool
-\@ifclassloaded{CjC}{ \bool_set_true:N \l_otex_subcap_conflict_bool } {}
+% Removed hardcoded CjC check. Rely on package detection.
 \@ifpackageloaded{subfig}{ \bool_set_true:N \l_otex_subcap_conflict_bool } {}
 \@ifpackageloaded{subfigure}{ \bool_set_true:N \l_otex_subcap_conflict_bool } {}
 

@@ -11,7 +11,10 @@
 \RequirePackage [table] { xcolor } 
 
 % 列表定制 (Lists)
-\RequirePackage [inline] { enumitem }
+% If loaded by class (e.g. mdpi), respect it. Else load with [inline].
+\@ifpackageloaded{enumitem}
+{}
+{ \RequirePackage [inline] { enumitem } }
 
 % 单位支持 (SI Units)
 \RequirePackage { siunitx }

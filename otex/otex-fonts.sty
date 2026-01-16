@@ -2,6 +2,33 @@
 
 \bool_if:NF \g_otex_load_fonts_bool { \endinput }
 
+% Dynamic Font Preservation Check (MUST be done before loading fontspec)
+% Check if \rmdefault is standard (cmr) or if fontspec has already normalized it.
+% If the user hasn't explicitly set a font set (auto), and we detect a custom font, back off.
+\str_if_eq:VnT \g_otex_font_set_tl { auto }
+{
+  \tl_set:Nx \l_tmpa_tl { \rmdefault }
+
+  
+  \bool_set_false:N \l_tmpa_bool
+  \tl_if_in:NnT \l_tmpa_tl { cmr } { \bool_set_true:N \l_tmpa_bool }
+  \tl_if_in:NnT \l_tmpa_tl { lmr } { \bool_set_true:N \l_tmpa_bool }
+  
+  \bool_if:NTF \l_tmpa_bool
+  {
+    % Standard fonts detected, likely safe to proceed.
+  }
+  {
+    % Non-standard font detected (e.g. ppl/mathpazo), back off completely.
+    \msg_new:nnn { otex } { font-backoff } { Non-standard~font~family~'\tl_use:N \l_tmpa_tl'~detected.~Preserving~external~font~settings. }
+    \msg_warning:nn { otex } { font-backoff }
+    \tl_gset:Nn \g_otex_font_set_tl { none }
+  }
+}
+
+% If font set is none, exit early to avoid loading fontspec and overwriting fonts
+\str_if_eq:VnT \g_otex_font_set_tl { none } { \endinput }
+
 \RequirePackage { fontspec }
 
 \tl_if_empty:NF \g_otex_fonts_dir_tl
@@ -9,27 +36,17 @@
   \defaultfontfeatures+ { Path = \g_otex_fonts_dir_tl / }
 }
 
-% Resolve auto preset
+% Resolve platform defaults (only if not backed off)
 \str_if_eq:VnT \g_otex_font_set_tl { auto }
 {
-  \tl_gset:Nn \g_otex_font_set_tl { none }
-  \clist_map_inline:nn { article, report, book, ctexart, ctexrep, ctexbook }
+  \str_if_eq:VnTF \c_sys_platform_str { windows }
+  { \tl_gset:Nn \g_otex_font_set_tl { windows } }
   {
-    \@ifclassloaded { #1 } 
-    { 
-      \str_if_eq:VnTF \c_sys_platform_str { windows }
-      { \tl_gset:Nn \g_otex_font_set_tl { windows } }
-      {
-        \str_if_eq:VnTF \c_sys_platform_str { macos }
-        { \tl_gset:Nn \g_otex_font_set_tl { adobe } }
-        { \tl_gset:Nn \g_otex_font_set_tl { linux } }
-      }
-    }
-    {}
+    \str_if_eq:VnTF \c_sys_platform_str { macos }
+    { \tl_gset:Nn \g_otex_font_set_tl { adobe } }
+    { \tl_gset:Nn \g_otex_font_set_tl { linux } }
   }
 }
-
-\str_if_eq:VnT \g_otex_font_set_tl { none } { \endinput }
 
 % Helper
 \cs_new:Nn \otex_set_font:nnn
