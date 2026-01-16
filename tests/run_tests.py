@@ -29,7 +29,9 @@ def clean_build_dir():
 
 def run_test_case(case_path, engine):
     case_name = os.path.basename(case_path).replace(".tex", "")
-    job_name = f"{case_name}_{engine}"
+    # Map engine flag to human-readable names for job naming
+    engine_display = {"pdfxe": "xelatex", "pdflua": "lualatex"}.get(engine, engine)
+    job_name = f"{case_name}@{engine_display}"
     output_subdir = os.path.join(OUTPUT_DIR, job_name)
     os.makedirs(output_subdir, exist_ok=True)
     
@@ -160,7 +162,7 @@ def run_test_case(case_path, engine):
 def main():
     clean_build_dir()
     test_cases = sorted(glob.glob(os.path.join(CASES_DIR, "*.tex")))
-    engines = ["xelatex", "lualatex"]
+    engines = ["pdfxe", "pdflua"]
     
     results = []
     
