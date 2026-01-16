@@ -26,7 +26,7 @@
 
 ```latex
 \begin{tipbox}[title=小技巧]
-    使用 \otexkeyword{\cref} 可以实现自动带前缀的交叉引用。
+    使用 \otexkeyword{\string\cref} 可以实现自动带前缀的交叉引用。
 \end{tipbox}
 
 \todo{记得补全这一段的推导过程}

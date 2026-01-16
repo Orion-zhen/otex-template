@@ -24,7 +24,7 @@ otex 的所有子模块都不会直接调用标准的 `\RequirePackage`，而是
 
 - `\otex_merge_setup:nn`: 智能合并包配置。
 - `\otex_provide_command:Nnn`: 防御性命令定义，只有在该命令不存在时才定义，防止 `Command already defined`。
-- `\otex_provide_env:nnn`: 同理，防御性定义环境。
+- `\otex_provide_env:nnnn`: 同理，防御性定义环境。
 
 ## 3. 它的意义
 
