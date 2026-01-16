@@ -1,146 +1,68 @@
-\ProvidesExplPackage {otex/otex-theorems} {2025-01-16} {1.1} {Orion's Theorem Environments}
+\ProvidesExplPackage {otex/otex-theorems} {2025-01-16} {1.1} {Orion's Theorems - Minimalist}
 
-% ==============================================================================
-% 变量定义 (Variables)
-% ==============================================================================
-\msg_new:nnn { otex } { theorems-defined } { Environment~'#1'~already~defined.~Skipping~definition. }
-\msg_new:nnn { otex } { amsthm-conflict } { Package~'ntheorem'~detected.~Skipping~'amsthm'~and~definitions. }
+\msg_new:nnn { otex } { amsthm-conflict } { Package~'ntheorem'~detected.~Skipping~'amsthm'. }
 
+% Determine Theorem Name
 \tl_new:N \l_otex_theorem_name_tl
-\tl_new:N \l_otex_lemma_name_tl
-\tl_new:N \l_otex_proposition_name_tl
-\tl_new:N \l_otex_corollary_name_tl
-\tl_new:N \l_otex_definition_name_tl
-\tl_new:N \l_otex_example_name_tl
-\tl_new:N \l_otex_remark_name_tl
-\tl_new:N \l_otex_assumption_name_tl
-\tl_new:N \l_otex_conjecture_name_tl
-\tl_new:N \l_otex_axiom_name_tl
-\tl_new:N \l_otex_problem_name_tl
-\tl_new:N \l_otex_solution_name_tl
-\tl_new:N \l_otex_exercise_name_tl
-\tl_new:N \l_otex_case_name_tl
+\bool_if:NTF \g_otex_english_bool { \tl_set:Nn \l_otex_theorem_name_tl { Theorem } } { \tl_set:Nn \l_otex_theorem_name_tl { 定理 } }
 
-% ==============================================================================
-% 名称设置 (Localization)
-% ==============================================================================
-\bool_if:NTF \g_otex_english_bool
+% Legacy proof fix
+\cs_if_exist:NF \@IEEElegacywarn { \providecommand{\@IEEElegacywarn}[2]{} }
+
+% Main logic
+\cs_if_exist:cTF { theorem } {}
   {
-    \tl_set:Nn \l_otex_theorem_name_tl { Theorem }
-    \tl_set:Nn \l_otex_lemma_name_tl { Lemma }
-    \tl_set:Nn \l_otex_proposition_name_tl { Proposition }
-    \tl_set:Nn \l_otex_corollary_name_tl { Corollary }
-    \tl_set:Nn \l_otex_definition_name_tl { Definition }
-    \tl_set:Nn \l_otex_example_name_tl { Example }
-    \tl_set:Nn \l_otex_remark_name_tl { Remark }
-    \tl_set:Nn \l_otex_assumption_name_tl { Assumption }
-    \tl_set:Nn \l_otex_conjecture_name_tl { Conjecture }
-    \tl_set:Nn \l_otex_axiom_name_tl { Axiom }
-    \tl_set:Nn \l_otex_problem_name_tl { Problem }
-    \tl_set:Nn \l_otex_solution_name_tl { Solution }
-    \tl_set:Nn \l_otex_exercise_name_tl { Exercise }
-    \tl_set:Nn \l_otex_case_name_tl { Case }
-  }
-  {
-    \tl_set:Nn \l_otex_theorem_name_tl { 定理 }
-    \tl_set:Nn \l_otex_lemma_name_tl { 引理 }
-    \tl_set:Nn \l_otex_proposition_name_tl { 命题 }
-    \tl_set:Nn \l_otex_corollary_name_tl { 推论 }
-    \tl_set:Nn \l_otex_definition_name_tl { 定义 }
-    \tl_set:Nn \l_otex_example_name_tl { 例 }
-    \tl_set:Nn \l_otex_remark_name_tl { 注 }
-    \tl_set:Nn \l_otex_assumption_name_tl { 假设 }
-    \tl_set:Nn \l_otex_conjecture_name_tl { 猜想 }
-    \tl_set:Nn \l_otex_axiom_name_tl { 公理 }
-    \tl_set:Nn \l_otex_problem_name_tl { 问题 }
-    \tl_set:Nn \l_otex_solution_name_tl { 解答 }
-    \tl_set:Nn \l_otex_exercise_name_tl { 练习 }
-    \tl_set:Nn \l_otex_case_name_tl { 情形 }
-  }
+     \@ifpackageloaded{ntheorem}
+       { \msg_warning:nn { otex } { amsthm-conflict } }
+       {
+          \otex_require:nnnn { amsthm } {} {} {}
+          
+          % Style
+          \cs_if_exist:cF { th@mystyle } 
+            {
+               \newtheoremstyle{mystyle}{3pt}{3pt}{\normalfont}{}{\bfseries}{:}{.5em}{}
+               \theoremstyle{mystyle}
+            }
+          
+          \newtheorem{theorem}{\l_otex_theorem_name_tl}[section]
+          
+          \cs_new:Nn \__otex_def_thm:nn 
+            { \cs_if_exist:cF { #1 } { \newtheorem{#1}[theorem]{#2} } }
 
-\newcommand{\theoremname}{\l_otex_theorem_name_tl}
-\newcommand{\lemmaname}{\l_otex_lemma_name_tl}
-\newcommand{\propositionname}{\l_otex_proposition_name_tl}
-\newcommand{\corollaryname}{\l_otex_corollary_name_tl}
-\newcommand{\definitionname}{\l_otex_definition_name_tl}
-\newcommand{\examplename}{\l_otex_example_name_tl}
-\newcommand{\remarkname}{\l_otex_remark_name_tl}
-\newcommand{\assumptionname}{\l_otex_assumption_name_tl}
-\newcommand{\conjecturename}{\l_otex_conjecture_name_tl}
-\newcommand{\axiomname}{\l_otex_axiom_name_tl}
-\newcommand{\problemname}{\l_otex_problem_name_tl}
-\newcommand{\solutionname}{\l_otex_solution_name_tl}
-\newcommand{\exercisename}{\l_otex_exercise_name_tl}
-\newcommand{\casename}{\l_otex_case_name_tl}
-
-
-% ==============================================================================
-% 定理环境注册 (Environment Definitions)
-% ==============================================================================
-
-% Helper function (defined at top level to avoid nesting issues)
-\cs_new_protected:Npn \__otex_define_single_theorem:n #1
-  {
-    \cs_if_exist:cTF { #1 }
-      { \msg_info:nnn { otex } { theorems-defined } { #1 } }
-      {
-        \newtheorem { #1 } [ theorem ] { \use:c { l_otex_#1_name_tl } }
-      }
-  }
-
-% 检查 'theorem' 环境是否存在
-\cs_if_exist:cTF { theorem }
-  {
-    \msg_info:nnn { otex } { theorems-defined } { theorem }
-    % 可能还需要检查其他环境，这里简化处理：如果 theorem 存在，假设这套体系已建立
-  }
-  {
-    % --- Smart Load amsthm ---
-    
-    % Compatibility Fix for CjC / Legacy IEEEtran
-    % These classes sometimes define \proof -> \@IEEElegacywarn{proof}{...}...
-    % but fail to define \@IEEElegacywarn, causing a crash.
-    % We define a dummy handler to swallow it.
-    \cs_if_exist:NTF \@IEEElegacywarn
-      {}
-      { \providecommand{\@IEEElegacywarn}[2]{} }
-
-    % 检查 ntheorem 冲突
-    \@ifpackageloaded{ntheorem}
-    {
-       \msg_warning:nn { otex } { amsthm-conflict }
-       % ntheorem incompatible with amsthm usually. Skip amsthm.
-    }
-    {
-       \otex_smart_require:nnnn { amsthm } { } { } { }
-
-       % 设置样式 (仅当 mystyle 未定义时)
-       \cs_if_exist:cTF { th@mystyle } 
-         {}
-         {
-            \newtheoremstyle{mystyle}
-                {3pt} {3pt} {\normalfont} {} {\bfseries} {:} {.5em} {}
-            \theoremstyle{mystyle}
-         }
-    
-        % Define theorem if not exists (checked above, but safe to be explicit)
-        \newtheorem{theorem}{\l_otex_theorem_name_tl}[section]
-    
-        \seq_new:N \l_otex_theorems_seq
-        \seq_set_from_clist:Nn \l_otex_theorems_seq
-          {
-            lemma, proposition, corollary, definition, example, 
-            remark, assumption, conjecture, axiom, problem, 
-            exercise, case
-          }
-        
-        \seq_map_function:NN \l_otex_theorems_seq \__otex_define_single_theorem:n
-    
-        % Solution environment
-        \cs_if_exist:cTF { solution }
-          {}
-          { \newtheorem*{solution}{\l_otex_solution_name_tl} }
-    }
+          \bool_if:NTF \g_otex_english_bool
+            {
+              \__otex_def_thm:nn { lemma } { Lemma }
+              \__otex_def_thm:nn { proposition } { Proposition }
+              \__otex_def_thm:nn { corollary } { Corollary }
+              \__otex_def_thm:nn { definition } { Definition }
+              \__otex_def_thm:nn { example } { Example }
+              \__otex_def_thm:nn { remark } { Remark }
+              \__otex_def_thm:nn { assumption } { Assumption }
+              \__otex_def_thm:nn { conjecture } { Conjecture }
+              \__otex_def_thm:nn { axiom } { Axiom }
+              \__otex_def_thm:nn { problem } { Problem }
+              \__otex_def_thm:nn { exercise } { Exercise }
+              \__otex_def_thm:nn { case } { Case }
+              
+              \cs_if_exist:cF { solution } { \newtheorem*{solution}{Solution} }
+            }
+            {
+               \__otex_def_thm:nn { lemma } { 引理 }
+               \__otex_def_thm:nn { proposition } { 命题 }
+               \__otex_def_thm:nn { corollary } { 推论 }
+               \__otex_def_thm:nn { definition } { 定义 }
+               \__otex_def_thm:nn { example } { 例 }
+               \__otex_def_thm:nn { remark } { 注 }
+               \__otex_def_thm:nn { assumption } { 假设 }
+               \__otex_def_thm:nn { conjecture } { 猜想 }
+               \__otex_def_thm:nn { axiom } { 公理 }
+               \__otex_def_thm:nn { problem } { 问题 }
+               \__otex_def_thm:nn { exercise } { 练习 }
+               \__otex_def_thm:nn { case } { 情形 }
+               
+               \cs_if_exist:cF { solution } { \newtheorem*{solution}{解答} }
+            }
+       }
   }
 
 \endinput

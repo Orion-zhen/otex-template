@@ -1,69 +1,15 @@
-\ProvidesExplPackage {otex/otex-layout} {2025-01-16} {1.1} {Orion's Layout}
+\ProvidesExplPackage {otex/otex-layout} {2025-01-16} {1.1} {Orion's Layout - Minimalist}
 
-% ==============================================================================
-% 页面布局与页眉页脚 (Layout)
-% ==============================================================================
-% 仅在 article 类生效，避免冲突
+\otex_require:nnnn { geometry } { a4paper, left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm } {} {}
 
-% 引入 smart require 别名 (已在 otex.sty 加载)
-
-% 引入 smart require 别名 (已在 otex.sty 加载)
-
-% ------------------------------------------------------------------------------
-% 布局管理 (Geometry)
-% ------------------------------------------------------------------------------
-\@ifpackageloaded { geometry }
+\otex_require:nnnn { fancyhdr } {} {} {}
+\@ifpackageloaded{fancyhdr}
   {
-    \otex_smart_require:nnnn { geometry } { } { } { }
-    \msg_info:nnn { otex } { config-backoff } { geometry }
+     \pagestyle{fancy}
+     \fancyhf{}
+     \lhead{\leftmark}
+     \rhead{\thepage}
   }
-  {
-    % --- Smart Load Geometry ---
-    % 如果用户已加载 geometry，则不覆盖其设置。
-    % 如果未加载，则应用默认页边距。
-    \otex_smart_require:nnnn { geometry }
-      {
-        a4paper,
-        left   = 2.5cm,
-        right  = 2.5cm,
-        top    = 2.5cm,
-        bottom = 2.5cm
-      }
-      { } % No validation rules
-      { } % No post-setup
-  }
-
-% ------------------------------------------------------------------------------
-% 页眉页脚 (Fancyhdr)
-% ------------------------------------------------------------------------------
-\@ifpackageloaded { fancyhdr }
-  {
-     \otex_smart_require:nnnn { fancyhdr } { } { } { }
-     \msg_info:nnn { otex } { config-backoff } { fancyhdr }
-  }
-  {
-    % Only apply fancyhdr style if not already set manually?
-    % Hard to know if pagestyle was set. But if fancyhdr not loaded, it wasn't set using fancyhdr.
-    \otex_smart_require:nnnn { fancyhdr }
-      { }
-      { }
-      {
-        % Apply default style
-        \pagestyle { fancy }
-        \fancyhf{}
-        \lhead { \leftmark }       % 左页眉: 章节名
-        \chead {}                  % 中页眉: 空
-        \rhead { \thepage }        % 右页眉: 页码
-        \lfoot {}                  % 左页脚
-        \cfoot {}                  % 中页脚
-        \rfoot {}                  % 右页脚
-      }
-  }
-
-% ==============================================================================
-% 浮动体控制 (Move to otex-floats)
-% ==============================================================================
-% 此处原有 placeins 和 flafter，现已移交 otex-floats 管理。
-% 保留此处为空或移除。
+  {}
 
 \endinput

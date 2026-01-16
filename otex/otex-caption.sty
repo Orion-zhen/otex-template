@@ -1,46 +1,20 @@
-\ProvidesExplPackage {otex/otex-caption} {2025-01-16} {1.1} {Orion's Captions}
+\ProvidesExplPackage {otex/otex-caption} {2025-01-16} {1.1} {Orion's Captions - Minimalist}
 
-% ==============================================================================
-% 标题设置 (Captions)
-% ==============================================================================
+\otex_require:nnnn { caption } {} {} {}
 
-\msg_new:nnn { otex } { subcaption-clash }
-  { Incompatible~package~'subfig'~or~'subfigure'~or~class~'CjC'~detected.~Skipping~'subcaption'. }
-
-\@ifpackageloaded { caption }
+\@ifpackageloaded{caption}
   {
-    \otex_smart_require:nnnn { caption } { } { } { }
-    \msg_info:nnn { otex } { config-backoff } { caption }
+     \captionsetup{ font=small, labelfont=bf, labelsep=colon, textfont=it }
   }
-  {
-    \otex_smart_require:nnnn { caption }
-      { } 
-      { } 
-      {
-        \captionsetup{
-            font      = small,
-            labelfont = bf,
-            labelsep  = colon,
-            textfont  = it
-        }
-      }
-  }
+  {}
 
-% --- Smart Load Subcaption (Conflict Check) ---
-\@ifclassloaded{CjC}
-  { \msg_warning:nn { otex } { subcaption-clash } }
-  {
-    \@ifpackageloaded { subfig }
-      { \msg_warning:nn { otex } { subcaption-clash } }
-      {
-        \@ifpackageloaded { subfigure }
-          { \msg_warning:nn { otex } { subcaption-clash } }
-          {
-            \otex_smart_require:nnnn { subcaption } { } { } { }
-          }
-      }
-  }
+% Subcaption check
+\bool_new:N \l_otex_subcap_conflict_bool
+\@ifclassloaded{CjC}{ \bool_set_true:N \l_otex_subcap_conflict_bool } {}
+\@ifpackageloaded{subfig}{ \bool_set_true:N \l_otex_subcap_conflict_bool } {}
+\@ifpackageloaded{subfigure}{ \bool_set_true:N \l_otex_subcap_conflict_bool } {}
 
-
+\bool_if:NF \l_otex_subcap_conflict_bool
+  { \otex_require:nnnn { subcaption } {} {} {} }
 
 \endinput

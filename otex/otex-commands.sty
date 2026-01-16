@@ -1,28 +1,16 @@
-\ProvidesExplPackage {otex/otex-commands} {2025-01-16} {1.0} {Orion's Custom Commands}
+\ProvidesExplPackage {otex/otex-commands} {2025-01-16} {1.1} {Orion's Objectively Good Commands}
 
-% ==============================================================================
-% 自定义命令 (Custom Commands)
-% ==============================================================================
+\otex_require:nnnn { etoolbox } {} {} {}
+\otex_require:nnnn { tcolorbox } {} {} {}
 
-% 语义化字体切换
-\RequirePackage { etoolbox } % 增强的命令修补工具
-\providecommand{\zh}{}\renewcommand{\zh}[1]{{\CJKfamily{zhsong}#1}} % 强制宋体
-\newcommand{\en}[1]{{\fontfamily{lmr}\selectfont#1}} % 强制英文字体
+\providecommand{\zh}{} \renewcommand{\zh}[1]{{\CJKfamily{zhsong}#1}}
+\otex_provide_command:Nnn \en { m } {{\fontfamily{lmr}\selectfont#1}}
 
-% 强调关键字: 红色加粗
-\newcommand{\otexkeyword}[1]{\textbf{\textcolor{red!80!black}{#1}}}
+\otex_provide_command:Nnn \otexkeyword { m } {\textbf{\textcolor{red!80!black}{#1}}}
+\otex_provide_command:Nnn \todo { m } {\par\noindent\colorbox{yellow}{\textbf{TODO: } #1}\par}
 
-% 待办事项: 醒目黄底红字
-\newcommand{\todo}[1]{\par\noindent\colorbox{yellow}{\textbf{TODO: } #1}\par}
-
-% ==============================================================================
-% 自定义盒子 (Custom Boxes)
-% ==============================================================================
-% 依赖 tcolorbox (已在 otex-graphics 或 otex-base 中间接依赖，这里显式加载确保安全)
-\RequirePackage { tcolorbox }
-
-\newtcolorbox{alertbox}[1][]{colback=red!5, colframe=red!75!black, title=Warning, #1}
-\newtcolorbox{infobox}[1][]{colback=blue!5, colframe=blue!75!black, title=Note, #1}
-\newtcolorbox{tipbox}[1][]{colback=green!5, colframe=green!75!black, title=Tip, #1}
+\otex_provide_env:nnn { alertbox } { O{} } { \begin{tcolorbox}[colback=red!5, colframe=red!75!black, title=Warning, #1] }
+\otex_provide_env:nnn { infobox }  { O{} } { \begin{tcolorbox}[colback=blue!5, colframe=blue!75!black, title=Note, #1] }
+\otex_provide_env:nnn { tipbox }   { O{} } { \begin{tcolorbox}[colback=green!5, colframe=green!75!black, title=Tip, #1] }
 
 \endinput

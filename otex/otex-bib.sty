@@ -1,67 +1,21 @@
-\ProvidesExplPackage {otex/otex-bib} {2025-01-16} {1.1} {Orion's Bibliography}
+\ProvidesExplPackage {otex/otex-bib} {2025-01-16} {1.1} {Orion's Bibliography - Minimalist}
 
-% ==============================================================================
-% 参考文献管理 (Bibliography)
-% ==============================================================================
+\bool_new:N \l_otex_bib_configured_bool
+\clist_map_inline:nn { IEEEtran, acmart, elsarticle, CjC }
+  { \@ifclassloaded{#1}{\bool_set_true:N \l_otex_bib_configured_bool}{} }
+\@ifpackageloaded{biblatex}{\bool_set_true:N \l_otex_bib_configured_bool}{}
+\@ifpackageloaded{natbib}{\bool_set_true:N \l_otex_bib_configured_bool}{}
 
-% 模块局部变量定义
-\bool_new:N \l_otex_bib_already_configured_bool  % 参考文献是否已被配置
-
-% 检查是否已经加载了参考文献相关的包
-\bool_set_false:N \l_otex_bib_already_configured_bool
-
-\@ifpackageloaded { biblatex } { \bool_set_true:N \l_otex_bib_already_configured_bool } { }
-\@ifpackageloaded { natbib }   { \bool_set_true:N \l_otex_bib_already_configured_bool } { }
-\@ifpackageloaded { cite }     { \bool_set_true:N \l_otex_bib_already_configured_bool } { }
-
-% 检测自带参考文献系统的文档类
-\@ifclassloaded{IEEEtran}   { \bool_set_true:N \l_otex_bib_already_configured_bool } { }
-\@ifclassloaded{acmart}     { \bool_set_true:N \l_otex_bib_already_configured_bool } { }
-\@ifclassloaded{elsarticle} { \bool_set_true:N \l_otex_bib_already_configured_bool } { }
-\@ifclassloaded{CjC}        { \bool_set_true:N \l_otex_bib_already_configured_bool } { }
-
-\bool_if:NTF \l_otex_bib_already_configured_bool
+\bool_if:NF \l_otex_bib_configured_bool
   {
-    \msg_info:nnn { otex } { config-backoff } { bibliography-setup }
+     \str_case:VnF \g_otex_bib_backend_tl
+       {
+          {biblatex} { \otex_require:nnnn { biblatex } { backend=bibtex, style=\g_otex_bib_style_tl, sorting=none, doi=true } {} {} }
+          {natbib}   { \otex_require:nnnn { natbib } { numbers, sort&compress } {} {} }
+       }
+       {
+          \otex_require:nnnn { biblatex } { backend=biber, style=ieee } {} {}
+       }
   }
-  {
-    \str_case:VnF \g_otex_bib_backend_tl
-      {
-        {biblatex}
-        {
-          % --- Smart Load BibLaTeX ---
-          \otex_smart_require:nnnn { biblatex }
-            {
-              backend = bibtex,
-              style   = \g_otex_bib_style_tl,
-              sorting = none,
-              doi     = true,
-              isbn    = false,
-              url     = false,
-              eprint  = false
-            }
-            { } % No strict validation
-            { } % Post-setup
-        }
-        {natbib}
-        {
-          % --- Smart Load Natbib ---
-          \otex_smart_require:nnnn { natbib }
-            { numbers, sort&compress }
-            { }
-            { }
-        }
-      }
-      {
-        % Default Fallback -> BibLaTeX
-        \msg_warning:nnn { otex } { invalid-bib-backend } { \g_otex_bib_backend_tl }
-        \otex_smart_require:nnnn { biblatex }
-          { backend=biber, style=ieee }
-          { }
-          { }
-      }
-  }
-
-\msg_new:nnn { otex } { invalid-bib-backend } { Invalid~bib-backend~'#1'.~Defaulting~to~biblatex. }
 
 \endinput

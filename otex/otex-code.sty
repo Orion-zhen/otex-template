@@ -1,129 +1,42 @@
-\ProvidesExplPackage {otex/otex-code} {2025-01-16} {1.1} {Orion's Code Highlighting}
+\ProvidesExplPackage {otex/otex-code} {2025-01-16} {1.1} {Orion's Code Highlighting - Minimalist}
 
-% ==============================================================================
-% 预定义颜色方案 (Predefined Style Colors)
-% ==============================================================================
-\definecolor{code_background}{rgb}{0.95, 0.95, 0.95}
-\definecolor{code_keyword}{rgb}{0.16, 0.32, 0.75}
-\definecolor{code_comment}{rgb}{0.12, 0.38, 0.17}
-\definecolor{code_string}{rgb}{0.63, 0.12, 0.94}
-\definecolor{code_identifier}{rgb}{0.0, 0.0, 0.0}
-\definecolor{code_number}{rgb}{0.5, 0.5, 0.5}
+\definecolor{code_bg}{rgb}{0.95, 0.95, 0.95}
 
-% ==============================================================================
-% 1. Listings 配置
-% ==============================================================================
-
-% ==============================================================================
-% 1. Listings 配置
-% ==============================================================================
-
-\bool_if:NT \g_otex_load_listings_bool
-  {
-    \@ifpackageloaded { listings }
-      {
-         \otex_smart_require:nnnn { listings } { } { } { }
-         \msg_info:nnn { otex } { config-backoff } { listings }
-      }
-      {
-        % --- Smart Load listings ---
-        \otex_smart_require:nnnn { listings }
-          { } % No specific load options
-          { } % No validation
-          {
-            % Post-setup
-            \lstset{
-                backgroundcolor  = \color{code_background},
-                basicstyle       = \ttfamily\small,
-                keywordstyle     = \color{code_keyword}\bfseries,
-                commentstyle     = \color{code_comment}\itshape,
-                stringstyle      = \color{code_string},
-                identifierstyle  = \color{code_identifier},
-                numberstyle      = \tiny\color{code_number},
-                numbers          = left,
-                stepnumber       = 1,
-                frame            = single,
-                rulecolor        = \color{gray!30},
-                frameround       = tttt,
-                breaklines       = true,
-                tabsize          = 4,
-                showspaces       = false,
-                showstringspaces = false,
-                extendedchars    = true,
-                captionpos       = b,
-                escapeinside     = {(*@}{@*)},
-                inputencoding    = utf8
-            }
-          }
-      }
-  }
-
-% ==============================================================================
-% 2. Minted 配置 (需 -shell-escape)
-% ==============================================================================
-
+% Minted
 \bool_if:NT \g_otex_load_minted_bool
   {
-    \int_compare:nNnTF { \pdf@shellescape } = { 1 }
-      {
-        \@ifpackageloaded { minted }
-          {
-             \otex_smart_require:nnnn { minted } { } { } { }
-             \msg_info:nnn { otex } { config-backoff } { minted }
-          }
-          {
-            % --- Smart Load minted ---
-            \otex_smart_require:nnnn { minted }
-              { }
-              { }
-              {
-                % Post-setup
-                \usemintedstyle { friendly }
-                \setminted{
-                    bgcolor    = code_background,
-                    fontsize   = \small,
-                    linenos,
-                    breaklines,
-                    tabsize    = 4,
-                    frame      = lines,
-                    framesep   = 2mm,
-                    autogobble
-                }
-              }
-          }
-      }
-      {
-        \msg_warning:nn { otex } { shell-escape-disabled }
-        \bool_gset_false:N \g_otex_load_minted_bool
-      }
+     \int_compare:nNnTF { \pdf@shellescape } = { 1 }
+       {
+           \otex_require:nnnn { minted } {} {} {}
+           \usemintedstyle{friendly}
+           \setminted{bgcolor=code_bg, fontsize=\small, linenos, breaklines, frame=lines}
+       }
+       {
+           \bool_gset_false:N \g_otex_load_minted_bool
+       }
   }
 
-\msg_new:nnn { otex } { shell-escape-disabled }
-  { Shell-escape~not~enabled!~Minted~disabled.~Falling~back~to~listings~if~enabled. }
-
-% ==============================================================================
-% 3. 统一接口 (Unified Interface)
-% ==============================================================================
-% (保持不变)
+% Listings (Fallback or primary if minted not loaded)
+\bool_if:NT \g_otex_load_listings_bool
+  {
+      \otex_require:nnnn { listings } {} {} {}
+      \lstset{
+          backgroundcolor=\color{code_bg},
+          basicstyle=\ttfamily\small,
+          keywordstyle=\bfseries\color{blue},
+          commentstyle=\itshape\color{green!40!black},
+          stringstyle=\color{purple},
+          frame=single,
+          breaklines=true,
+          numbers=left
+      }
+  }
 
 \otex_provide_command:Nnn \code { m }
   {
     \bool_if:NTF \g_otex_load_minted_bool
-      { \mintinline [bgcolor=code_background,breaklines,fontsize=\small] { text } { #1 } }
-      { \colorbox { code_background } { \texttt { \small #1 } } }
+      { \mintinline[bgcolor=code_bg,breaklines]{text}{#1} }
+      { \colorbox{code_bg}{\texttt{\small #1}} }
   }
-
-\otex_provide_command:Nnn \inputcode { m m }
-  {
-    \bool_if:NTF \g_otex_load_minted_bool
-      { \inputminted { #1 } { #2 } }
-      {
-        \bool_if:NTF \g_otex_load_listings_bool
-          { \lstinputlisting [ language = #1 ] { #2 } }
-          { \msg_error:nn { otex } { no-highlighting-pkg } }
-      }
-  }
-
-\msg_new:nnn { otex } { no-highlighting-pkg } { No~code~highlighting~package~loaded!~Enable~'listings'~or~'minted'. }
 
 \endinput

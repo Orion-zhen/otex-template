@@ -1,247 +1,105 @@
 \NeedsTeXFormat{LaTeX2e}
 \RequirePackage{expl3}
-\ProvidesExplPackage {otex} {2025-01-16} {1.1} {Orion's Custom Package - Enhanced}
+\ProvidesExplPackage {otex} {2025-01-16} {1.2} {Orion's Custom Package - Minimalist Refactor}
 
-% ==============================================================================
-% 模块变量声明 (Variable Declarations)
-% ------------------------------------------------------------------------------
-% 语法讲解:
-% \bool_new:N <variable>
-%   创建一个新的布尔(boolean)变量，初始值为 false。
-%   :N 表示参数是一个单一的控制序列 (Command/Control Sequence)。
-%
-% 命名规范 (Naming Convention):
-%   \g_otex_..._bool
-%   ^ ^    ^       ^
-%   | |    |       |__ 类型后缀 (Type): 表示这是一个布尔变量
-%   | |    |__________ 变量名 (Name): 描述变量用途
-%   | |_______________ 模块名 (Module): 属于 'otex' 包
-%   |_________________ 作用域 (Scope): Global (全局变量)
-% ==============================================================================
-
-% 布尔开关
-\bool_new:N \g_otex_load_layout_bool    
-\bool_new:N \g_otex_load_fonts_bool     
-\bool_new:N \g_otex_load_ctex_bool      
-\bool_new:N \g_otex_load_theorems_bool  
-\bool_new:N \g_otex_load_hyperref_bool  
-\bool_new:N \g_otex_load_cleveref_bool  
-\bool_new:N \g_otex_load_caption_bool   
-\bool_new:N \g_otex_load_algo_bool      
-\bool_new:N \g_otex_load_math_bool      
-\bool_new:N \g_otex_load_graphics_bool  
-\bool_new:N \g_otex_load_listings_bool  
-\bool_new:N \g_otex_load_minted_bool    
-\bool_new:N \g_otex_load_tables_bool    
-\bool_new:N \g_otex_load_floats_bool    % 浮动体高级控制
-\bool_new:N \g_otex_english_bool        
-
-
-% 新增开关
-\bool_new:N \g_otex_load_bib_bool       % 参考文献
-\bool_new:N \g_otex_load_toc_bool       % 目录增强
-\bool_new:N \g_otex_load_index_bool     % 索引
-\bool_new:N \g_otex_load_appendix_bool  % 附录
-\bool_new:N \g_otex_float_section_bool  % 浮动体限制在章节内
-
-% ------------------------------------------------------------------------------
-% 自动检测标准文档类 (Class Detection) - DEPRECATED
-% ------------------------------------------------------------------------------
-% We no longer detect standard classes explicitly.
-% We assume "Best Effort" mode: try to load everything, but back off if conflicts detected.
-
-% ------------------------------------------------------------------------------
-% 文本变量 (配置选项)
-% ------------------------------------------------------------------------------
-\tl_new:N \g_otex_bib_backend_tl        % bibtex 或 biblatex
-\tl_new:N \g_otex_bib_style_tl          % 参考文献样式
-\tl_new:N \g_otex_algo_backend_tl       % algorithm2e 或 algorithmicx
-\tl_new:N \g_otex_font_set_tl           % 字体预设 (windows, linux, adobe, none)
-\tl_new:N \g_otex_font_main_tl          % 自定义衬线体
-\tl_new:N \g_otex_font_sans_tl          % 自定义无衬线体
-\tl_new:N \g_otex_font_mono_tl          % 自定义等宽体
-\tl_new:N \g_otex_font_cjk_main_tl      % 自定义中文字体
-\tl_new:N \g_otex_pdf_title_tl          % PDF标题
-\tl_new:N \g_otex_pdf_author_tl         % PDF作者
-
-% ==============================================================================
-% 智能默认值设置 (Best Effort Defaults)
-% ------------------------------------------------------------------------------
-% 默认开启大部分功能，依靠 otex-pkgcheck 和子模块进行冲突避让
-% ==============================================================================
-
-% 默认开启所有主要模块
-\bool_gset_true:N \g_otex_load_layout_bool
-\bool_gset_true:N \g_otex_load_fonts_bool
-\bool_gset_true:N \g_otex_load_ctex_bool
-\bool_gset_true:N \g_otex_load_theorems_bool
-\bool_gset_true:N \g_otex_load_hyperref_bool
-\bool_gset_true:N \g_otex_load_cleveref_bool
-\bool_gset_true:N \g_otex_load_caption_bool
-\bool_gset_true:N \g_otex_load_algo_bool
-\bool_gset_true:N \g_otex_load_math_bool
-\bool_gset_true:N \g_otex_load_graphics_bool
-\bool_gset_true:N \g_otex_load_listings_bool
-\bool_gset_true:N \g_otex_load_minted_bool
-\bool_gset_true:N \g_otex_load_tables_bool
-\bool_gset_true:N \g_otex_load_floats_bool
-\bool_gset_true:N \g_otex_load_bib_bool
-\bool_gset_true:N \g_otex_load_toc_bool
-
-% 默认启用英文模式 (可通过选项更改)
-\bool_gset_true:N \g_otex_english_bool
-
-% 其他可选模块默认关闭 (需要显式开启或用户明确需要)
-\bool_gset_false:N \g_otex_load_index_bool
-\bool_gset_false:N \g_otex_load_appendix_bool
-\bool_gset_false:N \g_otex_float_section_bool
-
-% 通知用户
-\msg_new:nnn { otex } { best-effort } { otex~loaded~in~Best~Effort~mode.~Merging~configurations... }
-\msg_info:nn { otex } { best-effort }
-
-% ==============================================================================
-% 选项定义 (Option Definitions)
-% ------------------------------------------------------------------------------
-% 使用 l3keys 定义 key-value 选项接口
-% ==============================================================================
 \RequirePackage { l3keys2e }
 
+% Booleans
+\bool_new:N \g_otex_load_layout_bool
+\bool_new:N \g_otex_load_fonts_bool
+\bool_new:N \g_otex_load_ctex_bool
+\bool_new:N \g_otex_load_theorems_bool
+\bool_new:N \g_otex_load_hyperref_bool
+\bool_new:N \g_otex_load_cleveref_bool
+\bool_new:N \g_otex_load_caption_bool
+\bool_new:N \g_otex_load_algo_bool
+\bool_new:N \g_otex_load_math_bool
+\bool_new:N \g_otex_load_graphics_bool
+\bool_new:N \g_otex_load_listings_bool
+\bool_new:N \g_otex_load_minted_bool
+\bool_new:N \g_otex_load_tables_bool
+\bool_new:N \g_otex_load_floats_bool
+\bool_new:N \g_otex_load_bib_bool
+\bool_new:N \g_otex_load_toc_bool
+\bool_new:N \g_otex_load_index_bool
+\bool_new:N \g_otex_load_appendix_bool
+\bool_new:N \g_otex_float_section_bool
+\bool_new:N \g_otex_english_bool
+
+% Text Variables
+\tl_new:N \g_otex_bib_backend_tl
+\tl_new:N \g_otex_bib_style_tl
+\tl_new:N \g_otex_algo_backend_tl
+\tl_new:N \g_otex_font_set_tl
+\tl_new:N \g_otex_font_main_tl
+\tl_new:N \g_otex_font_sans_tl
+\tl_new:N \g_otex_font_mono_tl
+\tl_new:N \g_otex_font_cjk_main_tl
+\tl_new:N \g_otex_pdf_title_tl
+\tl_new:N \g_otex_pdf_author_tl
+
+% Key Definitions
 \keys_define:nn { otex }
   {
-    % 现有选项
-    layout      .bool_set:N = \g_otex_load_layout_bool,
-    layout      .default:n  = true,
-    
-    fonts       .bool_set:N = \g_otex_load_fonts_bool,
-    fonts       .default:n  = true,
-    
-    ctex        .bool_set:N = \g_otex_load_ctex_bool,
-    ctex        .default:n  = true,
+    layout      .bool_set:N = \g_otex_load_layout_bool,   layout      .initial:n = true,
+    fonts       .bool_set:N = \g_otex_load_fonts_bool,    fonts       .initial:n = true,
+    ctex        .bool_set:N = \g_otex_load_ctex_bool,     ctex        .initial:n = true,
+    theorems    .bool_set:N = \g_otex_load_theorems_bool, theorems    .initial:n = true,
+    hyperref    .bool_set:N = \g_otex_load_hyperref_bool, hyperref    .initial:n = true,
+    cleveref    .bool_set:N = \g_otex_load_cleveref_bool, cleveref    .initial:n = true,
+    caption     .bool_set:N = \g_otex_load_caption_bool,  caption     .initial:n = true,
+    algo        .bool_set:N = \g_otex_load_algo_bool,     algo        .initial:n = true,
+    math        .bool_set:N = \g_otex_load_math_bool,     math        .initial:n = true,
+    graphics    .bool_set:N = \g_otex_load_graphics_bool, graphics    .initial:n = true,
+    listings    .bool_set:N = \g_otex_load_listings_bool, listings    .initial:n = true,
+    minted      .bool_set:N = \g_otex_load_minted_bool,   minted      .initial:n = true,
+    tables      .bool_set:N = \g_otex_load_tables_bool,   tables      .initial:n = true,
+    floats      .bool_set:N = \g_otex_load_floats_bool,   floats      .initial:n = true,
+    bib         .bool_set:N = \g_otex_load_bib_bool,      bib         .initial:n = true,
+    toc         .bool_set:N = \g_otex_load_toc_bool,      toc         .initial:n = true,
+    english     .bool_set:N = \g_otex_english_bool,       english     .initial:n = true,
 
-    theorems    .bool_set:N = \g_otex_load_theorems_bool,
-    theorems    .default:n  = true,
-
-    hyperref    .bool_set:N = \g_otex_load_hyperref_bool,
-    hyperref    .default:n  = true,
-
-    cleveref    .bool_set:N = \g_otex_load_cleveref_bool,
-    cleveref    .default:n  = true,
-
-    caption     .bool_set:N = \g_otex_load_caption_bool,
-    caption     .default:n  = true,
-
-    algo        .bool_set:N = \g_otex_load_algo_bool,
-    algo        .default:n  = true,
+    index       .bool_set:N = \g_otex_load_index_bool,    index       .initial:n = false,
+    appendix    .bool_set:N = \g_otex_load_appendix_bool, appendix    .initial:n = false,
+    floats-in-section .bool_set:N = \g_otex_float_section_bool, floats-in-section .initial:n = false,
 
     algorithms  .meta:n     = { algo = #1 },
-    algorithms  .default:n  = true,
+    nolayout    .meta:n     = { layout = false },
+    nofonts     .meta:n     = { fonts = false },
+    noctex      .meta:n     = { ctex = false },
+    notheorems  .meta:n     = { theorems = false },
+    nohyperref  .meta:n     = { hyperref = false },
+    nocleveref  .meta:n     = { cleveref = false },
+    nocaption   .meta:n     = { caption = false },
+    noalgo      .meta:n     = { algo = false },
+    nomath      .meta:n     = { math = false },
+    nographics  .meta:n     = { graphics = false },
+    nolistings  .meta:n     = { listings = false },
+    nominted    .meta:n     = { minted = false },
+    notables    .meta:n     = { tables = false },
+    nofloats    .meta:n     = { floats = false },
+    nobib       .meta:n     = { bib = false },
+    notoc       .meta:n     = { toc = false },
 
-    math        .bool_set:N = \g_otex_load_math_bool,
-    math        .default:n  = true,
-
-    graphics    .bool_set:N = \g_otex_load_graphics_bool,
-    graphics    .default:n  = true,
-
-    listings    .bool_set:N = \g_otex_load_listings_bool,
-    listings    .default:n  = true,
-
-    minted      .bool_set:N = \g_otex_load_minted_bool,
-    minted      .default:n  = true,
-
-    tables      .bool_set:N = \g_otex_load_tables_bool,
-    tables      .default:n  = true,
-
-    floats      .bool_set:N = \g_otex_load_floats_bool,
-    floats      .default:n  = true,
-
-    english     .bool_set:N = \g_otex_english_bool,
-    english     .default:n  = true,
-
-    bib         .bool_set:N = \g_otex_load_bib_bool,
-    bib         .default:n  = true,
-
-    bib-backend .tl_set:N   = \g_otex_bib_backend_tl,
-    bib-backend .initial:n  = biblatex, % 默认 biblatex
-
-    bib-style   .tl_set:N   = \g_otex_bib_style_tl,
-    bib-style   .initial:n  = ieee,     % 默认样式
-
-    toc         .bool_set:N = \g_otex_load_toc_bool,
-    toc         .default:n  = true,
-
-    index       .bool_set:N = \g_otex_load_index_bool,
-    index       .default:n  = true,
-
-    appendix    .bool_set:N = \g_otex_load_appendix_bool,
-    appendix    .default:n  = true,
-
-    floats-in-section .bool_set:N = \g_otex_float_section_bool,
-    floats-in-section .default:n  = true,
-
-    algo-backend .tl_set:N  = \g_otex_algo_backend_tl,
-    algo-backend .initial:n = algorithm2e,
-
-    % 字体配置
-    font-set    .tl_set:N   = \g_otex_font_set_tl,
-    font-set    .initial:n  = auto,
+    bib-backend .tl_set:N   = \g_otex_bib_backend_tl,   bib-backend .initial:n = biblatex,
+    bib-style   .tl_set:N   = \g_otex_bib_style_tl,     bib-style   .initial:n = ieee,
+    algo-backend.tl_set:N   = \g_otex_algo_backend_tl,  algo-backend.initial:n = algorithm2e,
+    font-set    .tl_set:N   = \g_otex_font_set_tl,      font-set    .initial:n = auto,
 
     main-font   .tl_set:N   = \g_otex_font_main_tl,
     sans-font   .tl_set:N   = \g_otex_font_sans_tl,
     mono-font   .tl_set:N   = \g_otex_font_mono_tl,
     cjk-main-font .tl_set:N = \g_otex_font_cjk_main_tl,
 
-    % PDF 元数据
-    pdf-title   .tl_set:N   = \g_otex_pdf_title_tl,
-    pdf-title   .initial:n  = {Generated~Document},
-    pdf-author  .tl_set:N   = \g_otex_pdf_author_tl,
-    pdf-author  .initial:n  = {Orion},
-
-    % 反向别名
-    nolayout    .meta:n = { layout = false },
-    nofonts     .meta:n = { fonts = false },
-    noctex      .meta:n = { ctex = false },
-    notheorems  .meta:n = { theorems = false },
-    nohyperref  .meta:n = { hyperref = false },
-    nocleveref  .meta:n = { cleveref = false },
-    nocaption   .meta:n = { caption = false },
-    noalgo      .meta:n = { algo = false },
-    noalgorithms.meta:n = { algo = false },
-    nomath      .meta:n = { math = false },
-    nographics  .meta:n = { graphics = false },
-    nolistings  .meta:n = { listings = false },
-    nominted    .meta:n = { minted = false },
-    notables    .meta:n = { tables = false },
-    nofloats    .meta:n = { floats = false },
-    nobib       .meta:n = { bib = false },
-    notoc       .meta:n = { toc = false },
-    noindex     .meta:n = { index = false },
-    noappendix  .meta:n = { appendix = false },
+    pdf-title   .tl_set:N   = \g_otex_pdf_title_tl,   pdf-title   .initial:n = {Generated~Document},
+    pdf-author  .tl_set:N   = \g_otex_pdf_author_tl,  pdf-author  .initial:n = {Orion},
   }
 
-% 语法讲解:
-% \ProcessKeysOptions { <module> }
-%   处理当前包接收到的选项。它会查看 \usepackage[...]{otex} 中的内容，
-%   并匹配上面定义的 keys。这一步会将用户选项应用到变量中。
 \ProcessKeysOptions { otex }
 
-% ==============================================================================
-% 智能包检测 (Smart Package Check)
-% ------------------------------------------------------------------------------
-% 加载智能检测模块，供子模块使用，不再粗暴禁用模块。
-% ==============================================================================
 \RequirePackage { otex/otex-pkgcheck }
-
-% ==============================================================================
-% 模块加载 (Module Loading)
-% ------------------------------------------------------------------------------
-% 根据布尔变量的最终状态 (用户选项 + 自动检测 + 冲突熔断)，加载对应模块。
-% ==============================================================================
-
-% 1. 基础模块 (Always loaded) - 包含一些通用宏
 \RequirePackage { otex/otex-base }
 
-% 2. 根据布尔变量加载模块
 \bool_if:NT \g_otex_load_math_bool     { \RequirePackage { otex/otex-math } }
 \bool_if:NT \g_otex_load_theorems_bool { \RequirePackage { otex/otex-theorems } }
 \bool_if:NT \g_otex_load_algo_bool     { \RequirePackage { otex/otex-algo } }
@@ -251,17 +109,19 @@
 \bool_if:NT \g_otex_load_tables_bool   { \RequirePackage { otex/otex-tables } }
 \bool_if:NT \g_otex_load_floats_bool   { \RequirePackage { otex/otex-floats } }
 
-% 新增模块
 \bool_if:NT \g_otex_load_bib_bool      { \RequirePackage { otex/otex-bib } }
 \bool_if:NT \g_otex_load_toc_bool      { \RequirePackage { otex/otex-toc } }
+\bool_if:NT \g_otex_load_index_bool    { \RequirePackage { otex/otex-index } }
 \bool_if:NT \g_otex_load_appendix_bool { \RequirePackage { otex/otex-appendix } }
 
-% 语言与字体 (顺序重要)
 \RequirePackage { otex/otex-chinese }
-\RequirePackage { otex/otex-fonts } % 内部会使用 font-set 变量
+\RequirePackage { otex/otex-fonts }
 
 \bool_if:NT \g_otex_load_layout_bool   { \RequirePackage { otex/otex-layout } }
-\RequirePackage { otex/otex-refs }     % 处理引用和元数据
+\RequirePackage { otex/otex-refs }
 \RequirePackage { otex/otex-commands }
+
+\msg_new:nnn { otex } { best-effort } { otex~loaded~in~Best~Effort~mode. }
+\msg_info:nn { otex } { best-effort }
 
 \endinput

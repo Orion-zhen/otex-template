@@ -1,114 +1,50 @@
-\ProvidesExplPackage {otex/otex-refs} {2025-01-16} {1.1} {Orion's References}
-
-% ==============================================================================
-% 引用与PDF元数据 (Hyperref)
-% ==============================================================================
+\ProvidesExplPackage {otex/otex-refs} {2025-01-16} {1.1} {Orion's References - Minimalist}
 
 \bool_if:NT \g_otex_load_hyperref_bool
   {
-    % 仅在未开启参考文献模块时加载 cite (避免与 natbib/biblatex 冲突)
-    \bool_if:NF \g_otex_load_bib_bool 
-      { 
-        \otex_smart_require:nnnn { cite } {} {} {}
-      }
+     \bool_if:NF \g_otex_load_bib_bool { \otex_require:nnnn { cite } {} {} {} }
 
-    % --- Smart Load Hyperref ---
-    % 策略：如果 hyperref 已被用户加载，则不强行覆盖样式（如颜色），
-    % 除非用户明确希望 otex 接管（这里按"退避"原则处理）。
-    \@ifpackageloaded { hyperref }
-      {
-        \otex_smart_require:nnnn { hyperref } { } { } { }
-        \msg_info:nnn { otex } { config-backoff } { hyperref }
-      }
-      {
-        \otex_smart_require:nnnn { hyperref }
-          { pdfborder = {0~0~0} } % Default options
-          { } % Validation
-          {
-            % Post-load setup
-            \AddToHook{begindocument/before}{
-                \hypersetup{
-                    colorlinks = true,             
-                    linkcolor  = blue!70!black,    
-                    filecolor  = magenta,          
-                    urlcolor   = cyan!70!black,    
-                    citecolor  = green!40!black,   
-                    pdftitle   = { \g_otex_pdf_title_tl },
-                    pdfauthor  = { \g_otex_pdf_author_tl },
-                    pdfcreator = { LaTeX~with~otex },
-                }
-            }
-          }
-      }
+     % Load hyperref if not loaded
+     \otex_require:nnnn { hyperref }
+       { pdfborder={0~0~0} }
+       {}
+       {}
+
+     % Configure hyperref (only if we loaded it or if we want to force config? Minimalist: only if not configured? 
+     % Actually we usually want common colors. Let's apply setup via hook)
+     \AddToHook{begindocument/before}{
+         \hypersetup{
+             colorlinks = true,             
+             linkcolor  = blue!70!black,    
+             filecolor  = magenta,          
+             urlcolor   = cyan!70!black,    
+             citecolor  = green!40!black,   
+             pdftitle   = { \g_otex_pdf_title_tl },
+             pdfauthor  = { \g_otex_pdf_author_tl },
+             pdfcreator = { LaTeX~with~otex },
+         }
+     }
   }
-
-% ==============================================================================
-% 智能交叉引用 (Cleveref)
-% ==============================================================================
-% 功能: 自动识别引用类型, 生成智能引用格式
-% 警告: 必须在 hyperref 之后加载!
 
 \bool_if:NT \g_otex_load_cleveref_bool
   {
-    \bool_if:NTF \g_otex_load_hyperref_bool
-      {
-        \@ifpackageloaded { cleveref }
-          {
-             \otex_smart_require:nnnn { cleveref } { } { } { }
-             \msg_info:nnn { otex } { config-backoff } { cleveref }
-          }
-          {
-            % --- Smart Load Cleveref ---
-            \otex_smart_require:nnnn { cleveref }
-              { capitalise,nameinlink }
-              { }
-              {
-                % --- 中英文本地化配置 ---
-                \bool_if:NTF \g_otex_english_bool
-                  {
-                    % 英文环境: 使用默认
-                  }
-                  {
-                    % 中文环境: 自定义中文引用格式 (仅当我们需要且我们加载了包时)
-                    \crefname{figure}{图}{图}
-                    \crefname{table}{表}{表}
-                    \crefname{equation}{式}{式}
-                    \crefname{section}{节}{节}
-                    \crefname{chapter}{章}{章}
-                    \crefname{appendix}{附录}{附录}
-                    
-                    % 定理环境
-                    \bool_if:NT \g_otex_load_theorems_bool
-                      {
-                        \crefname{theorem}{定理}{定理}
-                        \crefname{lemma}{引理}{引理}
-                        \crefname{proposition}{命题}{命题}
-                        \crefname{corollary}{推论}{推论}
-                        \crefname{definition}{定义}{定义}
-                        \crefname{example}{例}{例}
-                        \crefname{remark}{注}{注}
-                        \crefname{assumption}{假设}{假设}
-                        \crefname{conjecture}{猜想}{猜想}
-                        \crefname{axiom}{公理}{公理}
-                        \crefname{problem}{问题}{问题}
-                        \crefname{exercise}{练习}{练习}
-                      }
-                      
-                    % 算法环境
-                    \bool_if:NT \g_otex_load_algo_bool
-                      {
-                        \crefname{algocf}{算法}{算法}
-                      }
-                  }
-              }
-          }
-      }
-      {
-        \msg_warning:nn { otex } { cleveref-req-hyperref }
-        \bool_gset_false:N \g_otex_load_cleveref_bool
-      }
+      \bool_if:NTF \g_otex_load_hyperref_bool
+        {
+           \otex_require:nnnn { cleveref } { capitalise,nameinlink } {} {}
+           
+           \bool_if:NF \g_otex_english_bool
+             {
+               % Chinese localizations
+               \crefname{figure}{图}{图}
+               \crefname{table}{表}{表}
+               \crefname{equation}{式}{式}
+               \crefname{theorem}{定理}{定理}
+               \crefname{lemma}{引理}{引理}
+             }
+        }
+        {
+           % Warning? Or just silent backoff for minimalism.
+        }
   }
-
-\msg_new:nnn { otex } { cleveref-req-hyperref } { cleveref~requires~hyperref!~Auto-disabling~cleveref. }
 
 \endinput

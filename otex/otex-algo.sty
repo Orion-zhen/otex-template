@@ -1,32 +1,12 @@
-\ProvidesExplPackage {otex/otex-algo} {2025-01-16} {1.1} {Orion's Algorithms}
+\ProvidesExplPackage {otex/otex-algo} {2025-01-16} {1.1} {Orion's Algorithms - Minimalist}
 
-% ==============================================================================
-% 算法与伪代码 (Algorithms)
-% ==============================================================================
-
-\str_case:VnF \g_otex_algo_backend_tl
+\str_if_eq:VnTF \g_otex_algo_backend_tl { algorithmicx }
   {
-    {algorithm2e}
-    {
-      % --- Smart Load algorithm2e ---
-      \otex_smart_require:nnnn { algorithm2e }
-        { ruled, linesnumbered, vlined } % Defaults
-        { required = { ruled } }         % Validation: Warn if not ruled
-        { }                              % Post-setup
-    }
-    {algorithmicx}
-    {
-      % --- Smart Load algorithmicx ---
-      \otex_smart_require:nnnn { algorithm } {} {} {}
-      \otex_smart_require:nnnn { algpseudocode } {} {} {}
-    }
+     \otex_require:nnnn { algorithm } {} {} {}
+     \otex_require:nnnn { algpseudocode } {} {} {}
   }
   {
-    % Default
-    \otex_smart_require:nnnn { algorithm2e }
-      { ruled, linesnumbered, vlined }
-      { required = { ruled } }
-      { }
+     \otex_require:nnnn { algorithm2e } { ruled, linesnumbered, vlined } { required={ruled} } {}
   }
 
 \endinput

@@ -1,114 +1,70 @@
-\ProvidesExplPackage {otex/otex-fonts} {2025-01-16} {1.1} {Orion's Font Configuration}
+\ProvidesExplPackage {otex/otex-fonts} {2025-01-16} {1.1} {Orion's Font Configuration - Minimalist}
 
-% ==============================================================================
-% 字体配置模块 (Font Configuration)
-% ==============================================================================
+\bool_if:NF \g_otex_load_fonts_bool { \endinput }
 
-\bool_if:NT \g_otex_load_fonts_bool
+% Resolve auto preset
+\str_if_eq:VnT \g_otex_font_set_tl { auto }
   {
-    % --- Resolve 'auto' preset FIRST ---
-    % --- Resolve 'auto' preset FIRST ---
-    \str_if_eq:VnT \g_otex_font_set_tl { auto }
+    \tl_gset:Nn \g_otex_font_set_tl { none }
+    \clist_map_inline:nn { article, report, book, ctexart, ctexrep, ctexbook }
       {
-         % Default to SAFE (none) -> Do NOT touch fonts by default
-         \tl_gset:Nn \g_otex_font_set_tl { none }
-         
-         % Only enable 'windows' preset for known SAFE classes
-         \@ifclassloaded{article} { \tl_gset:Nn \g_otex_font_set_tl { windows } } {}
-         \@ifclassloaded{report}  { \tl_gset:Nn \g_otex_font_set_tl { windows } } {}
-         \@ifclassloaded{book}    { \tl_gset:Nn \g_otex_font_set_tl { windows } } {}
-         
-         % CTEX classes usually handle fonts, but otex enhances them with specific font sets if requested
-         \@ifclassloaded{ctexart} { \tl_gset:Nn \g_otex_font_set_tl { windows } } {}
-         \@ifclassloaded{ctexrep} { \tl_gset:Nn \g_otex_font_set_tl { windows } } {}
-         \@ifclassloaded{ctexbook}{ \tl_gset:Nn \g_otex_font_set_tl { windows } } {}
-      }
-
-    % --- If font-set is 'none', skip all font configuration ---
-    \str_if_eq:VnF \g_otex_font_set_tl { none }
-      {
-        % Check if fontspec already loaded
-        \@ifpackageloaded{fontspec}
-          { }
-          { \RequirePackage { fontspec } }
-        
-        % --- 辅助函数：如果用户提供了覆盖变量则使用，否则使用默认值 ---
-        \cs_new:Nn \otex_set_font:nnn
-          {
-            % #1 = tl var (user override)
-            % #2 = fontspec command (e.g. \setmainfont)
-            % #3 = default font name
-            \tl_if_empty:NTF #1
-              { #2 { #3 } }
-              { #2 { #1 } }
-          }
-
-        % --- 字体预设 (Presets) ---
-        % Only apply main font settings if fontspec is actually usable (it is since we required it)
-        % But if acmart is loaded, it might have defined its own fonts even if font-set != none (if user forced it).
-        % We trust the user if they explicitly set font-set != auto.
-        
-        \str_case:Vn \g_otex_font_set_tl
-          {
-            {windows}
-            {
-              \otex_set_font:nnn \g_otex_font_main_tl \setmainfont { Times~New~Roman }
-              \otex_set_font:nnn \g_otex_font_sans_tl \setsansfont { Arial }
-              \otex_set_font:nnn \g_otex_font_mono_tl \setmonofont { Courier~New }
-            }
-            {linux}
-            {
-              \otex_set_font:nnn \g_otex_font_main_tl \setmainfont { Liberation~Serif }
-              \otex_set_font:nnn \g_otex_font_sans_tl \setsansfont { Liberation~Sans }
-              \otex_set_font:nnn \g_otex_font_mono_tl \setmonofont { Liberation~Mono }
-            }
-            {adobe}
-            {
-              \otex_set_font:nnn \g_otex_font_main_tl \setmainfont { Adobe~Garamond~Pro }
-              \otex_set_font:nnn \g_otex_font_sans_tl \setsansfont { Myriad~Pro }
-              \otex_set_font:nnn \g_otex_font_mono_tl \setmonofont { Source~Code~Pro }
-            }
-          }
-
-        % --- CJK 字体 (only for standard classes usually) ---
-        \bool_if:NT \g_otex_load_ctex_bool
-          {
-            % Check if xeCJK loaded? ctex loads it.
-             \@ifpackageloaded{xeCJK}
-             {
-                \tl_if_empty:NTF \g_otex_font_cjk_main_tl
-                  {
-                     \str_case:VnF \g_otex_font_set_tl
-                       {
-                         {linux} { 
-                           \setCJKmainfont { Noto~Serif~CJK~SC } 
-                           \setCJKsansfont { Noto~Sans~CJK~SC }
-                         }
-                         {adobe} {
-                           \setCJKmainfont { Adobe~Song~Std }
-                           \setCJKsansfont { Adobe~Heiti~Std }
-                         }
-                       }
-                       {
-                         % Default / Windows
-                         \setCJKmainfont { SimSun }
-                         \setCJKsansfont { SimHei }
-                       }
-                  }
-                  {
-                    \setCJKmainfont { \g_otex_font_cjk_main_tl }
-                  }
-             }
-             {}
-          }
-          
-        % --- Unicode Math Font 设置 ---
-        \@ifpackageloaded{unicode-math}
-          {
-            \setmathfont{DejaVu~Math~TeX~Gyre}
-          }
-          {}
+        \@ifclassloaded { #1 } { \tl_gset:Nn \g_otex_font_set_tl { windows } } {}
       }
   }
+
+\str_if_eq:VnT \g_otex_font_set_tl { none } { \endinput }
+
+\RequirePackage { fontspec }
+
+% Helper
+\cs_new:Nn \otex_set_font:nnn
+  {
+    \tl_if_empty:NTF #1 { #2 { #3 } } { #2 { #1 } }
+  }
+
+% Presets
+\str_case:Vn \g_otex_font_set_tl
+  {
+    {windows}
+    {
+      \otex_set_font:nnn \g_otex_font_main_tl \setmainfont { Times~New~Roman }
+      \otex_set_font:nnn \g_otex_font_sans_tl \setsansfont { Arial }
+      \otex_set_font:nnn \g_otex_font_mono_tl \setmonofont { Courier~New }
+    }
+    {linux}
+    {
+      \otex_set_font:nnn \g_otex_font_main_tl \setmainfont { Liberation~Serif }
+      \otex_set_font:nnn \g_otex_font_sans_tl \setsansfont { Liberation~Sans }
+      \otex_set_font:nnn \g_otex_font_mono_tl \setmonofont { Liberation~Mono }
+    }
+    {adobe}
+    {
+      \otex_set_font:nnn \g_otex_font_main_tl \setmainfont { Adobe~Garamond~Pro }
+      \otex_set_font:nnn \g_otex_font_sans_tl \setsansfont { Myriad~Pro }
+      \otex_set_font:nnn \g_otex_font_mono_tl \setmonofont { Source~Code~Pro }
+    }
+  }
+
+% CJK
+\bool_if:NT \g_otex_load_ctex_bool
+  {
+     \@ifpackageloaded{xeCJK}
+     {
+        \tl_if_empty:NTF \g_otex_font_cjk_main_tl
+          {
+             \str_case:VnF \g_otex_font_set_tl
+               {
+                 {linux} { \setCJKmainfont { Noto~Serif~CJK~SC } \setCJKsansfont { Noto~Sans~CJK~SC } }
+                 {adobe} { \setCJKmainfont { Adobe~Song~Std }    \setCJKsansfont { Adobe~Heiti~Std } }
+               }
+               { \setCJKmainfont { SimSun } \setCJKsansfont { SimHei } }
+          }
+          { \setCJKmainfont { \g_otex_font_cjk_main_tl } }
+     }
+     {}
+  }
+
+% Math
+\@ifpackageloaded{unicode-math} { \setmathfont{DejaVu~Math~TeX~Gyre} } {}
 
 \endinput

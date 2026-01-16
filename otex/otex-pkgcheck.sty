@@ -1,173 +1,57 @@
-\ProvidesExplPackage {otex/otex-pkgcheck} {2025-01-16} {1.0} {Orion's Smart Package Checker}
+\ProvidesExplPackage {otex/otex-pkgcheck} {2025-01-16} {1.1} {Orion's Smart Package Checker - Minimalist}
 
-% ==============================================================================
-% 智能包加载与冲突检测 (Smart Package Loading & Conflict Detection)
-% ==============================================================================
+\msg_new:nnn { otex } { pkg-conflict } { Package~'#1'~conflict:~'#2'.~Removing~option. }
+\msg_new:nnn { otex } { pkg-required } { Package~'#1'~missing~required:~'#2'. }
 
-\msg_new:nnn { otex } { pkg-loaded-ok }
-  { Package~'#1'~already~loaded.~Skipping~load.~(Mode:~Smart~Merge) }
-
-\msg_new:nnn { otex } { pkg-missing-req }
+% Simple smart require
+% #1 = Package Name
+% #2 = Package Options
+% #3 = Conflict Options (clist)
+% #4 = Required Options (clist)
+\cs_new_protected:Npn \otex_require:nnnn #1#2#3#4
   {
-    Package~'#1'~is~loaded~missing~REQUIRED~option~'#2'. \\
-    This~may~break~otex~functionality. \\
-    Please~load~it~as~:~\usepackage[#2,...]{#1}
-  }
-
-\msg_new:nnn { otex } { pkg-conflict-found }
-  {
-    Package~'#1'~is~loaded~with~CONFLICTING~option~'#2'. \\
-    This~will~clash~with~otex~style. \\
-    Please~remove~'#2'~from~your~\usepackage~call.
-  }
-
-% ------------------------------------------------------------------------------
-% 内部变量
-% ------------------------------------------------------------------------------
-\clist_new:N \l__otex_pkg_required_clist
-\clist_new:N \l__otex_pkg_conflict_clist
-\bool_new:N \l__otex_check_result_bool
-
-% 定义规则键值解析
-\keys_define:nn { otex / pkgcheck }
-  {
-    required .clist_set:N = \l__otex_pkg_required_clist,
-    conflict .clist_set:N = \l__otex_pkg_conflict_clist,
-  }
-
-% ------------------------------------------------------------------------------
-% 核心命令: \otex_smart_require:nnnn
-% ------------------------------------------------------------------------------
-\cs_new_protected:Npn \otex_smart_require:nnnn #1#2#3#4
-  {
-    \clist_clear:N \l__otex_pkg_required_clist
-    \clist_clear:N \l__otex_pkg_conflict_clist
-    
-    % 解析验证规则
-    \keys_set:nn { otex / pkgcheck } { #3 }
-
-    % 检查包是否已加载
     \@ifpackageloaded { #1 }
       {
-        % --- 已加载：执行检查 ---
-        \msg_info:nnn { otex } { pkg-loaded-ok } { #1 }
-
-        % 1. 检查必需选项 (Required)
-        \clist_map_inline:Nn \l__otex_pkg_required_clist
-          {
-            \bool_set_true:N \l__otex_check_result_bool
-            \@ifpackagewith { #1 } { ##1 }
-              { } % OK
-              { \bool_set_false:N \l__otex_check_result_bool }
-            
-            \bool_if:NF \l__otex_check_result_bool
-              { \msg_warning:nnnn { otex } { pkg-missing-req } { #1 } { ##1 } }
-          }
-
-        % 2. 检查冲突选项 (Conflict)
-        \clist_map_inline:Nn \l__otex_pkg_conflict_clist
-          {
-            \bool_set_false:N \l__otex_check_result_bool
-            \@ifpackagewith { #1 } { ##1 }
-              { \bool_set_true:N \l__otex_check_result_bool }
-              { } % OK
-            
-            \bool_if:NT \l__otex_check_result_bool
-              { \msg_warning:nnnn { otex } { pkg-conflict-found } { #1 } { ##1 } }
-          }
-
-        % 3. 执行后续配置
-        #4
+         % Check conflicts
+         \clist_map_inline:nn { #3 }
+           {
+             \@ifpackagewith { #1 } { ##1 }
+               { \msg_warning:nnnn { otex } { pkg-conflict } { #1 } { ##1 } }
+               {}
+           }
+         % Check required
+         \clist_map_inline:nn { #4 }
+           {
+             \@ifpackagewith { #1 } { ##1 }
+               {}
+               { \msg_warning:nnnn { otex } { pkg-required } { #1 } { ##1 } }
+           }
       }
       {
-        % --- 未加载：正常加载 ---
-        \tl_if_empty:nTF { #2 }
-          { \RequirePackage { #1 } }
-          { \RequirePackage [ #2 ] { #1 } }
-        
-        % 执行后续配置
-        #4
+         \tl_if_empty:nTF { #2 }
+           { \RequirePackage { #1 } }
+           { \RequirePackage [ #2 ] { #1 } }
       }
   }
 
-\cs_new_eq:NN \otex_require:nnnn \otex_smart_require:nnnn
+% Alias for backward compatibility if needed, though we should update calls
+\cs_new_eq:NN \otex_smart_require:nnnn \otex_require:nnnn
 
-% ------------------------------------------------------------------------------
-% 增量配置辅助函数 (Incremental Configuration Helpers)
-% ------------------------------------------------------------------------------
-
-% 消息定义
-\msg_new:nnn { otex } { skipping-existing-cmd }
-  { Command~'#1'~already~defined.~Skipping~redefinition. }
-\msg_new:nnn { otex } { skipping-existing-env }
-  { Environment~'#1'~already~defined.~Skipping~redefinition. }
-\msg_new:nnn { otex } { merging-config }
-  { Merging~configuration~for~'#1'~(Best~Effort~Mode). }
-\msg_new:nnn { otex } { config-backoff }
-  { Package~'#1'~pre-loaded.~Skipping~otex~default~config~to~avoid~conflicts. }
-
-% 检查命令是否存在 (check if command exists)
-\cs_new:Npn \otex_if_cmd_exists:NTF #1#2#3
+% Helper for merging config
+\cs_new_protected:Npn \otex_merge_setup:nn #1#2
   {
-    \cs_if_exist:NTF #1 { #2 } { #3 }
+    \@ifpackageloaded { #1 } { #2 } { #2 } 
   }
 
-\cs_new:Npn \otex_if_cmd_exists:cTF #1#2#3
-  {
-    \cs_if_exist:cTF { #1 } { #2 } { #3 }
-  }
-
-% 类似 \providecommand，但用于 expl3 上下文，并带日志
+% Helper for providing commands
 \cs_new_protected:Npn \otex_provide_command:Nnn #1#2#3
   {
-    % #1 = command control sequence (e.g. \mycmd)
-    % #2 = args spec (e.g. {m}) or number of args [opt]
-    % #3 = definition
-    \cs_if_exist:NTF #1
-      {
-        %\msg_info:nnn { otex } { skipping-existing-cmd } { \token_to_str:N #1 }
-      }
-      {
-        \DeclareDocumentCommand #1 { #2 } { #3 }
-      }
+    \cs_if_exist:NF #1 { \DeclareDocumentCommand #1 { #2 } { #3 } }
   }
 
-% 类似 \provideenvironment
 \cs_new_protected:Npn \otex_provide_env:nnn #1#2#3
   {
-    % #1 = env name
-    % #2 = args
-    % #3 = begin def
-    % Note: end def usually handled by \NewDocumentEnvironment automatically or split
-    % 这里为了通用性，我们假设使用 \NewDocumentEnvironment
-    % 如果环境已存在，跳过。
-    
-    \cs_if_exist:cTF { #1 }
-      {
-        \msg_info:nnn { otex } { skipping-existing-env } { #1 }
-      }
-      {
-        \NewDocumentEnvironment { #1 } { #2 } { #3 } { }
-      }
-  }
-
-% 增量 Setup (通用钩子)
-\cs_new_protected:Npn \otex_merge_setup:nnn #1#2#3
-  {
-    % #1 = package name
-    % #2 = setup command (e.g. \hypersetup) - passed as functionality, not raw cmd
-    % Not fully generic yet. Let's make it simpler:
-    % Just run the code if package loaded.
-    \@ifpackageloaded { #1 }
-      {
-        \msg_info:nnn { otex } { merging-config } { #1 }
-        #3
-      }
-      {
-        % Packge not loaded yet, maybe load it or hook it?
-        % For now we assume this is called inside smart_require's success branch
-        #3
-      }
+     \cs_if_exist:cF { #1 } { \NewDocumentEnvironment { #1 } { #2 } { #3 } { } }
   }
 
 \endinput

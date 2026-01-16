@@ -1,68 +1,32 @@
-\ProvidesExplPackage {otex/otex-math} {2025-01-16} {1.1} {Orion's Math Enhancements}
+\ProvidesExplPackage {otex/otex-math} {2025-01-16} {1.1} {Orion's Math Enhancements - Minimalist}
 
-% ==============================================================================
-% 数学宏包 loading
-% ==============================================================================
+\otex_require:nnnn { amsmath } {} {} {}
+\otex_require:nnnn { mathtools } {} {} {}
+\otex_require:nnnn { amsthm } {} {} {}
 
-\msg_new:nnn { otex } { amssymb-conflict }
-  { Package~'amssymb'~detected.~It~is~often~redundant~or~conflicting~with~'unicode-math'. }
+\msg_new:nnn { otex } { amssymb-conflict } { Package~'amssymb'~conflict~with~'unicode-math'. }
 
-\otex_smart_require:nnnn { amsmath } {} {} {}
-\otex_smart_require:nnnn { mathtools } {} {} {}
-\otex_smart_require:nnnn { amsthm } {} {} {}
+% Logic: If pdfTeX or Conflict Class -> Standard. Else -> Unicode Math.
+\bool_new:N \l_otex_math_conflict_bool
+\clist_map_inline:nn { acmart, IEEEtran, elsarticle, CjC }
+  { \@ifclassloaded{#1}{ \bool_set_true:N \l_otex_math_conflict_bool } {} }
 
-% 引擎检测与 Unicode Math 支持
-% 引擎检测与 Unicode Math 支持
-\bool_new:N \l_otex_math_conflict_class_bool
-\bool_set_false:N \l_otex_math_conflict_class_bool
-
-\@ifclassloaded{acmart}{\bool_set_true:N \l_otex_math_conflict_class_bool}{}
-\@ifclassloaded{IEEEtran}{\bool_set_true:N \l_otex_math_conflict_class_bool}{}
-\@ifclassloaded{elsarticle}{\bool_set_true:N \l_otex_math_conflict_class_bool}{}
-\@ifclassloaded{CjC}{\bool_set_true:N \l_otex_math_conflict_class_bool}{}
-
-% If pdfTeX OR Bad Class -> Standard Math (amsmath)
-\bool_lazy_or:nnTF { \sys_if_engine_pdftex_p: } { \l_otex_math_conflict_class_bool }
+\bool_lazy_or:nnTF { \sys_if_engine_pdftex_p: } { \l_otex_math_conflict_bool }
   {
-    % pdfLaTeX or Conflict Class -> Use standard amsmath
-    \otex_smart_require:nnnn { amsmath } {} {} {}
-    
-    % acmart already loads math fonts/symbols, loading amssymb causes clash (\eth, etc.)
-    \@ifclassloaded{acmart}
-      { }
-      { \otex_smart_require:nnnn { amssymb } {} {} {} }
+    \otex_require:nnnn { amsmath } {} {} {}
+    % Load amssymb unless acmart (which has own symbols)
+    \@ifclassloaded{acmart} {} { \otex_require:nnnn { amssymb } {} {} {} }
   }
   {
-    % XeLaTeX / LuaLaTeX 模式 (且非冲突类): Unicode Math
-    % 注意: unicode-math 通常不应与 amssymb 同时加载
-    \@ifpackageloaded { amssymb }
-      {
-         \msg_warning:nn { otex } { amssymb-conflict }
-         % 仍然尝试加载 unicode-math，因为它可能修补? 或者用户可能知道自己在做什么
-         \otex_smart_require:nnnn { unicode-math }
-            { math-style=ISO, bold-style=ISO }
-            { }
-            {
-               \AtBeginDocument{
-                 \otex_provide_command:Nnn \square { } { \mdlgwhtsquare }
-                 \otex_provide_command:Nnn \boxtimes { } { \boxtimes }
-               }
-            }
-      }
-      {
-         \otex_smart_require:nnnn { unicode-math }
-            { math-style=ISO, bold-style=ISO }
-            { }
-            {
-               \AtBeginDocument{
-                 \otex_provide_command:Nnn \square { } { \mdlgwhtsquare }
-                 \otex_provide_command:Nnn \boxtimes { } { \boxtimes }
-               }
-            }
-      }
+     % Unicode Math
+     \@ifpackageloaded{amssymb} { \msg_warning:nn { otex } { amssymb-conflict } } {}
+     
+     \otex_require:nnnn { unicode-math } { math-style=ISO, bold-style=ISO } {} {}
+     
+     \AtBeginDocument{
+       \otex_provide_command:Nnn \square { } { \mdlgwhtsquare }
+       \otex_provide_command:Nnn \boxtimes { } { \boxtimes }
+     }
   }
-
-
-
 
 \endinput

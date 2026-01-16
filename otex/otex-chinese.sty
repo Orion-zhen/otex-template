@@ -1,55 +1,24 @@
-\ProvidesExplPackage {otex/otex-chinese} {2025-01-16} {1.1} {Orion's Chinese Support}
+\ProvidesExplPackage {otex/otex-chinese} {2025-01-16} {1.1} {Orion's Chinese Support - Minimalist}
 
-% ==============================================================================
-% 中文支持与排版优化 (Chinese Support)
-% ==============================================================================
+\bool_if:NF \g_otex_load_ctex_bool { \endinput }
 
-% 模块局部变量定义 (使用有意义的名称)
-\bool_new:N \l_otex_class_conflicts_heading_bool  % 文档类是否与CTEX标题冲突
-\bool_new:N \l_otex_skip_ctex_loading_bool        % 是否跳过CTEX加载
+\bool_new:N \l_otex_safe_header_bool
+% Allowlist specific classes for full ctex heading support
+\clist_map_inline:nn { article, report, book, ctexart, ctexrep, ctexbook }
+  { \@ifclassloaded{#1} { \bool_set_true:N \l_otex_safe_header_bool } {} }
 
-\bool_if:NT \g_otex_load_ctex_bool
+\tl_new:N \l_otex_ctex_scheme_tl
+\bool_if:NTF \g_otex_english_bool
+  { \tl_set:Nn \l_otex_ctex_scheme_tl { plain } }
+  { \tl_set:Nn \l_otex_ctex_scheme_tl { chinese } }
+
+\bool_if:NTF \l_otex_safe_header_bool
   {
-    % 初始化标志
-    \bool_set_false:N \l_otex_class_conflicts_heading_bool
-    \bool_set_false:N \l_otex_skip_ctex_loading_bool
-    
-    % 智能检测: 采用 "Allowlist" (白名单) 策略
-    % 默认假设所有未知文档类都可能产生冲突 (Backoff by default)
-    \bool_set_true:N \l_otex_class_conflicts_heading_bool
-    
-    % 仅对已知安全的标准文档类解除冲突标记
-    \@ifclassloaded{article} { \bool_set_false:N \l_otex_class_conflicts_heading_bool } {}
-    \@ifclassloaded{report}  { \bool_set_false:N \l_otex_class_conflicts_heading_bool } {}
-    \@ifclassloaded{book}    { \bool_set_false:N \l_otex_class_conflicts_heading_bool } {}
-    
-    % ctex 系列文档类本身就是 ctex 核心，我们视为无冲突 (不需要 otex 强行干预，但也无需恐慌)
-    \@ifclassloaded{ctexart} { \bool_set_false:N \l_otex_class_conflicts_heading_bool } {}
-    \@ifclassloaded{ctexrep} { \bool_set_false:N \l_otex_class_conflicts_heading_bool } {}
-    \@ifclassloaded{ctexbook}{ \bool_set_false:N \l_otex_class_conflicts_heading_bool } {}
-
-    % (已移除跳过逻辑)
-    % 即使在冲突类中，我们仍然尝试以安全模式加载 ctex (scheme=plain)，
-    % 这样至少 xeCJK 会被加载，字体配置可能生效。
-    % 如果不加载 ctex，CjC 这种需要中文环境的模板在英文模式下会缺失字体支持。
-
-    % 根据标志决定是否加载CTEX及其选项
-    \bool_if:NF \l_otex_skip_ctex_loading_bool
-      {
-        \bool_if:NTF \g_otex_english_bool
-          {
-            % 英文模式: 使用 plain scheme
-            \bool_if:NTF \l_otex_class_conflicts_heading_bool
-              { \otex_smart_require:nnnn { ctex } { UTF8, scheme=plain, heading=false } { } { } }
-              { \otex_smart_require:nnnn { ctex } { UTF8, scheme=plain, heading=true } { } { } }
-          }
-          {
-            % 中文模式: 使用 chinese scheme
-            \bool_if:NTF \l_otex_class_conflicts_heading_bool
-              { \otex_smart_require:nnnn { ctex } { UTF8, scheme=plain, heading=false } { } { } }
-              { \otex_smart_require:nnnn { ctex } { UTF8, heading=true, scheme=chinese } { } { } }
-          }
-      }
+    \otex_require:nnnn { ctex } { UTF8, scheme=\l_otex_ctex_scheme_tl, heading=true } {} {}
+  }
+  {
+    % Conflict or unknown class: Backoff to plain scheme and disable heading
+    \otex_require:nnnn { ctex } { UTF8, scheme=plain, heading=false } {} {}
   }
 
 \endinput

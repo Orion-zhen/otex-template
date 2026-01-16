@@ -1,0 +1,9 @@
+\ProvidesExplPackage {otex/otex-index} {2025-01-16} {1.1} {Orion's Index - Minimalist}
+
+\bool_if:NT \g_otex_load_index_bool
+  {
+    \otex_require:nnnn { imakeidx } {} {} {}
+    \@ifpackageloaded{imakeidx} { \makeindex[columns=2, title=Index, intoc] } {}
+  }
+
+\endinput

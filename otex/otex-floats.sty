@@ -1,29 +1,12 @@
-\ProvidesExplPackage {otex/otex-floats} {2025-01-16} {1.1} {Orion's Floats}
+\ProvidesExplPackage {otex/otex-floats} {2025-01-16} {1.1} {Orion's Floats - Minimalist}
 
-% ==============================================================================
-% 浮动体控制宏包 (Floats Control)
-% ==============================================================================
+\otex_require:nnnn { float } {} {} {}
+\otex_require:nnnn { flafter } {} {} {}
 
-% 1. 强力浮动体控制 (float)
-\otex_smart_require:nnnn { float } {} {} {}
-
-% 2. placeins (限制浮动体在章节内)
 \bool_if:NT \g_otex_float_section_bool
-  {
-    \otex_smart_require:nnnn { placeins }
-      { section }            % Default: add section barriers
-      { required={section} } % Validation: Warn if loaded without section support? 
-                             % Actually section option just redefines \section. 
-                             % If user didn't load it, we can manual patch too.
-      { }
-  }
+  { \otex_require:nnnn { placeins } { section } {} {} }
 
-% 3. flafter (确保浮动体在引用之后)
-\otex_smart_require:nnnn { flafter } {} {} {}
-
-% ------------------------------------------------------------------------------
-% 放宽浮动体默认参数
-% ------------------------------------------------------------------------------
+% Float Parameters
 \cs_set:Npn \topfraction { 0.85 }
 \cs_set:Npn \bottomfraction { 0.70 }
 \cs_set:Npn \textfraction { 0.10 }
