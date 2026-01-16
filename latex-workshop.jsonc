@@ -60,6 +60,24 @@
             "env": {
                 "TERM": "xterm-256color" // 指定终端类型
             }
+        },
+        {
+            "name": "latexmk-pdflatex",
+            "command": "latexmk",
+            "args": [
+                "-pdf", // 使用 pdflatex 构建
+                "-gg", // 每次编译前强制清理所有旧的文件
+                "-synctex=1",
+                "-interaction=nonstopmode",
+                "-file-line-error",
+                "-silent", // 屏蔽 warning 以下的输出
+                "-latexoption=-shell-escape",
+                "-output-directory=%OUTDIR%",
+                "%DOCFILE%"
+            ],
+            "env": {
+                "TERM": "xterm-256color" // 指定终端类型
+            }
         }
     ],
     "latex-workshop.latex.recipes": [
@@ -77,6 +95,13 @@
             "name": "Release Build (w/LuaLaTeX)",
             "tools": [
                 "latexmk-lualatex"
+            ]
+        },
+        // 兼容模式
+        {
+            "name": "Legacy Build (w/pdfLaTeX)",
+            "tools": [
+                "latexmk-pdflatex"
             ]
         }
     ],
