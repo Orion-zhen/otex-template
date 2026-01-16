@@ -1,13 +1,36 @@
-\ProvidesExplPackage {otex/otex-math} {2025-01-16} {1.0} {Orion's Math Enhancements}
+\ProvidesExplPackage {otex/otex-math} {2025-01-16} {1.1} {Orion's Math Enhancements}
 
 % ==============================================================================
 % 数学宏包 loading
 % ==============================================================================
 
 \RequirePackage { amsmath }     % 基础数学宏包 (AMS)
-\RequirePackage { amssymb }     % 数学符号库 (如 \mathbb)
 \RequirePackage { mathtools }   % amsmath 的扩展修复和增强
 \RequirePackage { amsthm }      % 定理环境支持
+
+% 引擎检测与 Unicode Math 支持
+\sys_if_engine_pdftex:TF
+  {
+    % pdfLaTeX 模式: 传统数学字体
+    \RequirePackage { amssymb }     % 数学符号库 (如 \mathbb)
+  }
+  {
+    % XeLaTeX / LuaLaTeX 模式: Unicode Math
+    % 注意: unicode-math 应该在所有其他数学包之后加载
+    \RequirePackage [
+      math-style=ISO,
+      bold-style=ISO
+    ] { unicode-math }
+    
+    % 这里可以设置默认数学字体，如果 font 模块没有覆盖的话
+    % \setmathfont{Latin Modern Math} 
+    
+    % 兼容 amssymb 符号
+    \AtBeginDocument{
+      \providecommand{\square}{\mdlgwhtsquare}
+      \providecommand{\boxtimes}{\boxtimes} % unicode-math 通常已有，防万一
+    } 
+  }
 
 % 常用数学配置说明:
 % \begin{align} ... \end{align} 用于多行对齐公式

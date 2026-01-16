@@ -1,0 +1,29 @@
+\ProvidesExplPackage {otex/otex-toc} {2025-01-16} {1.0} {Orion's TOC & Index}
+
+% ==============================================================================
+% 目录定制 (TOC Customization)
+% ==============================================================================
+
+\RequirePackage { tocloft }
+
+% 调整目录深度
+\setcounter{tocdepth}{3}
+\setcounter{secnumdepth}{3}
+
+% 调整点线 (Dot Leaders)
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+
+% 颜色定制 (可选，如果 hyperref 已加载会自动有颜色，这里主要是间距调整)
+\setlength{\cftbeforesecskip}{0.5em}
+
+% ==============================================================================
+% 索引 (Index)
+% ==============================================================================
+
+\bool_if:NT \g_otex_load_index_bool
+  {
+    \RequirePackage { imakeidx }
+    \makeindex[columns=2, title=Index, intoc]
+  }
+
+\endinput

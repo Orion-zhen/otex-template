@@ -1,4 +1,4 @@
-\ProvidesExplPackage {otex/otex-fonts} {2025-01-16} {1.0} {Orion's Font Configuration}
+\ProvidesExplPackage {otex/otex-fonts} {2025-01-16} {1.1} {Orion's Font Configuration}
 
 % ==============================================================================
 % 字体配置模块 (Font Configuration)
@@ -8,20 +8,85 @@
   {
     \RequirePackage { fontspec }
     
-    % 西文字体设置 (建议根据系统安装字体调整)
-    % Win/Linux通用常用配置:
-    \setmainfont { Times~New~Roman }
-    \setsansfont { Arial }
-    % \setmonofont{Maple Mono NF}
+    % --- 辅助函数：如果用户提供了覆盖变量则使用，否则使用默认值 ---
+    \cs_new:Nn \otex_set_font:nnn
+      {
+        % #1 = tl var (user override)
+        % #2 = fontspec command (e.g. \setmainfont)
+        % #3 = default font name
+        \tl_if_empty:NTF #1
+          { #2 { #3 } }
+          { #2 { #1 } }
+      }
 
+    % --- 字体预设 (Presets) ---
+    \str_case:Vn \g_otex_font_set_tl
+      {
+        {windows}
+        {
+          \otex_set_font:nnn \g_otex_font_main_tl \setmainfont { Times~New~Roman }
+          \otex_set_font:nnn \g_otex_font_sans_tl \setsansfont { Arial }
+          \otex_set_font:nnn \g_otex_font_mono_tl \setmonofont { Courier~New }
+        }
+        {linux}
+        {
+          \otex_set_font:nnn \g_otex_font_main_tl \setmainfont { Liberation~Serif }
+          \otex_set_font:nnn \g_otex_font_sans_tl \setsansfont { Liberation~Sans }
+          \otex_set_font:nnn \g_otex_font_mono_tl \setmonofont { Liberation~Mono }
+        }
+        {adobe}
+        {
+          \otex_set_font:nnn \g_otex_font_main_tl \setmainfont { Adobe~Garamond~Pro }
+          \otex_set_font:nnn \g_otex_font_sans_tl \setsansfont { Myriad~Pro }
+          \otex_set_font:nnn \g_otex_font_mono_tl \setmonofont { Source~Code~Pro }
+        }
+        {none}
+        {
+          % 不加载任何默认字体，完全依赖用户手动设置或覆盖变量
+          \tl_if_empty:NF \g_otex_font_main_tl { \setmainfont { \g_otex_font_main_tl } }
+          \tl_if_empty:NF \g_otex_font_sans_tl { \setsansfont { \g_otex_font_sans_tl } }
+          \tl_if_empty:NF \g_otex_font_mono_tl { \setmonofont { \g_otex_font_mono_tl } }
+        }
+      }
+
+    % --- CJK 字体 ---
     \bool_if:NT \g_otex_load_ctex_bool
       {
-        % 中文字体 - 优先匹配系统常见字体
-        % 注意: 如果编译报错"Font not found", 请修改为系统实际存在的字体名
-        \setCJKmainfont { SimSun }             % 宋体
-        \setCJKsansfont { Source~Han~Sans~CN } % 黑体
-        % \setCJKmonofont{Source Han Sans CN}  % 黑体
+        % 这里同样可以使用逻辑判断，目前简单使用 Windows/系统 常见中文
+        % 如果用户指定了 cjk-main-font 则优先使用
+        \tl_if_empty:NTF \g_otex_font_cjk_main_tl
+          {
+             \str_case:VnF \g_otex_font_set_tl
+               {
+                 {linux} { 
+                   \setCJKmainfont { Noto~Serif~CJK~SC } 
+                   \setCJKsansfont { Noto~Sans~CJK~SC }
+                 }
+                 {adobe} {
+                   \setCJKmainfont { Adobe~Song~Std }
+                   \setCJKsansfont { Adobe~Heiti~Std }
+                 }
+               }
+               {
+                 % Default / Windows
+                 \setCJKmainfont { SimSun }
+                 \setCJKsansfont { SimHei }
+               }
+          }
+          {
+            \setCJKmainfont { \g_otex_font_cjk_main_tl }
+          }
       }
+      
+    % --- Unicode Math Font 设置 ---
+    % 如果 math 模块加载了 unicode-math，我们可以在这里统一字体风格
+    \@ifpackageloaded{unicode-math}
+      {
+        % 默认使用 Latin Modern Math，或者根据主字体选择匹配的数学字体
+        % 这是一个高级话题，暂时保留默认
+        \setmathfont{DejaVu~Math~TeX~Gyre}
+      }
+      {}
   }
 
 \endinput

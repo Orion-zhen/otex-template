@@ -1,4 +1,4 @@
-\ProvidesExplPackage {otex/otex-layout} {2025-01-16} {1.0} {Orion's Layout}
+\ProvidesExplPackage {otex/otex-layout} {2025-01-16} {1.1} {Orion's Layout}
 
 % ==============================================================================
 % 页面布局与页眉页脚 (Layout)
@@ -27,5 +27,18 @@
     \rfoot {}                  % 右页脚
   }
   {}
+
+% ==============================================================================
+% 浮动体控制 (Floats)
+% ==============================================================================
+
+\RequirePackage { placeins } % 提供 \FloatBarrier
+\RequirePackage { flafter }  % 确保浮动体不会出现在定义之前
+
+% 如果开启了 floats-in-section，则修改 section 命令自动添加 Barrier
+\bool_if:NT \g_otex_float_section_bool
+  {
+    \AddToHook{cmd/section/before}{\FloatBarrier}
+  }
 
 \endinput

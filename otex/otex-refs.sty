@@ -1,4 +1,4 @@
-\ProvidesExplPackage {otex/otex-refs} {2025-01-16} {1.0} {Orion's References}
+\ProvidesExplPackage {otex/otex-refs} {2025-01-16} {1.1} {Orion's References}
 
 % ==============================================================================
 % 引用与PDF元数据 (Hyperref)
@@ -6,17 +6,21 @@
 
 \bool_if:NT \g_otex_load_hyperref_bool
   {
-    \RequirePackage { cite } % [1-3] 样式引用
+    \bool_if:NF \g_otex_load_bib_bool { \RequirePackage { cite } } % 仅在未开启参考文献模块时加载 cite
     \RequirePackage [ pdfborder = {0~0~0} ] { hyperref } % 超链接
     
-    \hypersetup{
-        colorlinks = true,             % 激活彩色链接
-        linkcolor  = blue,             % 内部链接(目录, 公式引用)颜色
-        filecolor  = magenta,          % 文件链接颜色
-        urlcolor   = cyan,             % URL链接颜色
-        citecolor  = green!50!black,   % 引用颜色([1])
-        pdftitle   = {Generated~Document},
-        pdfauthor  = {Orion},
+    % \AtEndPreamble 确保所有配置都已生效
+    \AddToHook{begindocument/before}{
+        \hypersetup{
+            colorlinks = true,             % 激活彩色链接
+            linkcolor  = blue!70!black,    % 内部链接(目录, 公式引用)
+            filecolor  = magenta,          % 文件链接颜色
+            urlcolor   = cyan!70!black,    % URL链接颜色
+            citecolor  = green!40!black,   % 引用颜色([1])
+            pdftitle   = { \g_otex_pdf_title_tl },
+            pdfauthor  = { \g_otex_pdf_author_tl },
+            pdfcreator = { LaTeX~with~otex },
+        }
     }
   }
 
