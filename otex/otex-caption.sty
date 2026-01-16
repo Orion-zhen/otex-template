@@ -1,6 +1,7 @@
 \ProvidesExplPackage {otex/otex-caption} {2026-01-16} {1.1} {Orion's Captions}
 
-\otex_require:nnnn { caption } {} {} {}
+% Symbol detection for caption
+\cs_if_exist:NF \captionsetup { \otex_require:nnnn { caption } {} {} {} }
 
 \@ifpackageloaded{caption}
 {
@@ -8,13 +9,12 @@
 }
 {}
 
-% Subcaption check
+% Subcaption check - use symbol detection + conflict package detection
 \bool_new:N \l_otex_subcap_conflict_bool
-% Removed hardcoded CjC check. Rely on package detection.
 \@ifpackageloaded{subfig}{ \bool_set_true:N \l_otex_subcap_conflict_bool } {}
 \@ifpackageloaded{subfigure}{ \bool_set_true:N \l_otex_subcap_conflict_bool } {}
 
 \bool_if:NF \l_otex_subcap_conflict_bool
-{ \otex_require:nnnn { subcaption } {} {} {} }
+{ \cs_if_exist:NF \subcaptionbox { \otex_require:nnnn { subcaption } {} {} {} } }
 
 \endinput

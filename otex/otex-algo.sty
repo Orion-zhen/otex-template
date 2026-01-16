@@ -2,22 +2,29 @@
 
 \str_if_eq:VnTF \g_otex_algo_backend_tl { algorithmicx }
 {
-  \otex_require:nnnn { algorithm } {} {} {}
-  \otex_require:nnnn { algpseudocode } {} {} {}
+  % Symbol detection for algorithmicx
+  \cs_if_exist:NF \algorithmic { \otex_require:nnnn { algorithm } {} {} {} }
+  \cs_if_exist:NF \Require { \otex_require:nnnn { algpseudocode } {} {} {} }
 }
 {
-  \otex_require:nnnn { algorithm2e } { ruled, linesnumbered, vlined } { required={ruled} } {}
+  % Symbol detection for algorithm2e
+  \cs_if_exist:NF \SetKwInput 
+  { \otex_require:nnnn { algorithm2e } { ruled, linesnumbered, vlined } {} {} }
   
-  % Define Input and Output commands
-  \bool_if:NTF \g_otex_english_bool
+  % Define Input and Output commands (only if algorithm2e is loaded)
+  \@ifpackageloaded{algorithm2e}
   {
-    \SetKwInput{Input}{Input}
-    \SetKwInput{Output}{Output}
+    \bool_if:NTF \g_otex_english_bool
+    {
+      \SetKwInput{Input}{Input}
+      \SetKwInput{Output}{Output}
+    }
+    {
+      \SetKwInput{Input}{输入}
+      \SetKwInput{Output}{输出}
+    }
   }
-  {
-    \SetKwInput{Input}{输入}
-    \SetKwInput{Output}{输出}
-  }
+  {}
 }
 
 \endinput

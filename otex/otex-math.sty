@@ -25,8 +25,12 @@
 \bool_lazy_or:nnTF { \sys_if_engine_pdftex_p: } { \l_otex_math_conflict_bool }
 {
   \otex_require:nnnn { amsmath } {} {} {}
-  % Load amssymb unless acmart (which has own symbols)
-  \@ifclassloaded{acmart} {} { \otex_require:nnnn { amssymb } {} {} {} }
+  % Load amssymb only if its symbols are not already provided
+  % (newtxmath, stix, etc. already define these symbols)
+  \cs_if_exist:NF \Bbbk
+  {
+    \otex_require:nnnn { amssymb } {} {} {}
+  }
 }
 {
   % Unicode Math

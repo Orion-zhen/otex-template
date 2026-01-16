@@ -16,8 +16,8 @@
 {}
 { \RequirePackage [inline] { enumitem } }
 
-% 单位支持 (SI Units)
-\RequirePackage { siunitx }
+% 单位支持 (SI Units) - symbol detection
+\cs_if_exist:NF \SI { \RequirePackage { siunitx } }
 
 % 微排版优化 (Micro-typography)
 \RequirePackage { microtype }

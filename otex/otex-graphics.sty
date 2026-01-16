@@ -1,10 +1,11 @@
 \ProvidesExplPackage {otex/otex-graphics} {2026-01-16} {1.1} {Orion's Graphics}
 
-\otex_require:nnnn { graphicx } {} {} {}
-\otex_require:nnnn { tcolorbox } {} {} {}
+% Symbol detection: only load if representative symbols don't exist
+\cs_if_exist:NF \includegraphics { \otex_require:nnnn { graphicx } {} {} {} }
+\cs_if_exist:NF \tcbox { \otex_require:nnnn { tcolorbox } {} {} {} }
 
 % TikZ
-\otex_require:nnnn { tikz } {} {} {}
+\cs_if_exist:NF \tikz { \otex_require:nnnn { tikz } {} {} {} }
 
 % Switch to standard LaTeX catcodes for TikZ configuration
 \ExplSyntaxOff
@@ -45,6 +46,7 @@
 {}
 \ExplSyntaxOn
 
-\otex_require:nnnn { pgfplots } {} {} {}
+% pgfplots: check for axis environment
+\cs_if_exist:cF { axis } { \otex_require:nnnn { pgfplots } {} {} {} }
 
 \endinput
