@@ -31,6 +31,8 @@ my-project/
     pdfauthor={Orion}
 }
 
+\title{我的第一个 otex 文档}
+
 \begin{document}
 \maketitle
 
