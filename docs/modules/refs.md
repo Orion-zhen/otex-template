@@ -20,6 +20,24 @@
 - `hyperref`: (Boolean) 是否加载超链接支持，默认为 `true`。
 - `cleveref`: (Boolean) 是否加载智能引用支持，默认为 `true`。
 
+## 5. 兼容性策略 (Compatibility Mode)
+
+为了适应不同期刊模板对 `hyperref` 加载时机的不同要求，otex 实现了双模式加载机制：
+
+### 5.1 主动模式 (Active Mode)
+
+- **适用场景**：标准文档类（如 `article`, `report`）以及大多数一般模板。
+- **行为**：otex 会在导言区**立即加载** `hyperref`。
+- **日志**：`Hyperref loading mode: ACTIVE`
+
+### 5.2 被动模式 (Passive Mode)
+
+- **适用场景**：已知与早期 `hyperref` 加载冲突的复杂模板（**MDPI**, **acmart**, **beamer**）。
+- **行为**：otex **不加载** `hyperref`，而是等待文档类自行加载。配置逻辑会被推迟到 `\AtBeginDocument` 执行。
+- **日志**：`Hyperref loading mode: PASSIVE`
+
+> **注意**：如果您的自定义模板出现 `LaTeX hooks Error`，可能说明它需要被加入被动模式列表。目前的黑名单包括：`mdpi`, `acmart`, `beamer`。
+
 ## 4. 使用示例
 
 ```latex
