@@ -2,7 +2,14 @@
 
 \otex_require:nnnn { amsmath } {} {} {}
 \otex_require:nnnn { mathtools } {} {} {}
-\otex_require:nnnn { amsthm } {} {} {}
+% amsthm: Only load if \theoremstyle is not already defined (e.g., by ntheorem)
+\cs_if_exist:NTF \theoremstyle
+{
+  \msg_warning:nnnn { otex } { pkg-skip } { amsthm } { \\theoremstyle~already~defined~(ntheorem?) }
+}
+{
+  \otex_require:nnnn { amsthm } {} {} {}
+}
 
 \msg_new:nnn { otex } { amssymb-conflict } { Package~'amssymb'~conflict~with~'unicode-math'. }
 \msg_new:nnn { otex } { math-pkg-backoff } { Legacy~math~package~'#1'~detected.~Disabling~unicode-math. }
@@ -10,8 +17,8 @@
 % Logic: If pdfTeX or Font Package Detected -> Standard. Else -> Unicode Math.
 \bool_new:N \l_otex_math_conflict_bool
 
-% Dynamic detection of legacy math font packages
-\clist_map_inline:nn { mathpazo, newtxmath, fourier, stix, stix2, mtpro2, eulervm }
+% Dynamic detection of legacy math font packages and bm (boldsymbol conflicts with unicode-math)
+\clist_map_inline:nn { mathpazo, newtxmath, fourier, stix, stix2, mtpro2, eulervm, bm }
 { 
   \@ifpackageloaded{#1}
   { 
