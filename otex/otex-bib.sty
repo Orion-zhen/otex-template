@@ -25,6 +25,19 @@
   {
     \otex_require:nnnn { biblatex } { backend=biber, style=ieee } {} {}
   }
+  
+  % Chinese localization for biblatex bibliography title
+  % Only apply when otex loads biblatex (not when template pre-loads it)
+  \cs_if_exist:NT \DefineBibliographyStrings
+  {
+    \bool_if:NF \g_otex_english_bool
+    {
+      \DefineBibliographyStrings{english}{
+        bibliography = {参考文献},
+        references = {参考文献},
+      }
+    }
+  }
 }
 
 \endinput
