@@ -2,36 +2,55 @@
 
 \definecolor{code_bg}{rgb}{0.95, 0.95, 0.95}
 
-% Minted
+% Minted - with symbol detection
 \bool_if:NT \g_otex_load_minted_bool
 {
-  \int_compare:nNnTF { \pdf@shellescape } = { 1 }
+  % Check if minted is already loaded (by template)
+  \cs_if_exist:NTF \usemintedstyle
   {
-    \otex_require:nnnn { minted } {} {} {}
-    \usemintedstyle{friendly}
-    \setminted{bgcolor=code_bg, fontsize=\small, linenos, breaklines, frame=lines}
+    \msg_warning:nnnn { otex } { pkg-skip } { minted } { \\usemintedstyle~already~defined }
   }
   {
-    \msg_new:nnn { otex } { minted-skip } { Shell~escape~disabled.~Skipping~minted~(using~listings~fallback). }
-    \msg_warning:nn { otex } { minted-skip }
-    \bool_gset_false:N \g_otex_load_minted_bool
+    \int_compare:nNnTF { \pdf@shellescape } = { 1 }
+    {
+      \otex_require:nnnn { minted } {} {} {}
+      \usemintedstyle{friendly}
+      \setminted{bgcolor=code_bg, fontsize=\small, linenos, breaklines, frame=lines}
+    }
+    {
+      \msg_new:nnn { otex } { minted-skip } { Shell~escape~disabled.~Skipping~minted~(using~listings~fallback). }
+      \msg_warning:nn { otex } { minted-skip }
+      \bool_gset_false:N \g_otex_load_minted_bool
+    }
   }
 }
 
-% Listings (Fallback or primary if minted not loaded)
+% Listings (Fallback or primary if minted not loaded) - with symbol detection
 \bool_if:NT \g_otex_load_listings_bool
 {
-  \otex_require:nnnn { listings } {} {} {}
-  \lstset{
-    backgroundcolor=\color{code_bg},
-    basicstyle=\ttfamily\small,
-    keywordstyle=\bfseries\color{blue},
-    commentstyle=\itshape\color{green!40!black},
-    stringstyle=\color{purple},
-    frame=single,
-    breaklines=true,
-    numbers=left
+  % Check if listings is already loaded (by template)
+  \cs_if_exist:NTF \lstset
+  {
+    \msg_warning:nnnn { otex } { pkg-skip } { listings } { \\lstset~already~defined }
   }
+  {
+    \otex_require:nnnn { listings } {} {} {}
+  }
+  % Configure listings if loaded (either by us or template)
+  \@ifpackageloaded{listings}
+  {
+    \lstset{
+      backgroundcolor=\color{code_bg},
+      basicstyle=\ttfamily\small,
+      keywordstyle=\bfseries\color{blue},
+      commentstyle=\itshape\color{green!40!black},
+      stringstyle=\color{purple},
+      frame=single,
+      breaklines=true,
+      numbers=left
+    }
+  }
+  {}
 }
 
 % Fallback for minted environment if not loaded

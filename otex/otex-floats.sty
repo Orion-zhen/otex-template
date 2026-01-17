@@ -1,8 +1,19 @@
 \ProvidesExplPackage {otex/otex-floats} {2026-01-16} {1.1} {Orion's Floats}
 
 % Symbol detection for float package
-\cs_if_exist:NF \newfloat { \otex_require:nnnn { float } {} {} {} }
-\@ifpackageloaded{flafter} {} { \otex_require:nnnn { flafter } {} {} {} }
+% Note: floatrow also defines \newfloat, so check for it too
+\cs_if_exist:NTF \newfloat 
+{
+  \msg_warning:nnnn { otex } { pkg-skip } { float } { \\newfloat~already~defined }
+}
+{
+  \@ifpackageloaded{floatrow} 
+    { \msg_warning:nnnn { otex } { pkg-skip } { float } { floatrow~package~loaded } } 
+    { \otex_require:nnnn { float } {} {} {} }
+}
+\@ifpackageloaded{flafter} 
+  { \msg_warning:nnnn { otex } { pkg-skip } { flafter } { already~loaded } } 
+  { \otex_require:nnnn { flafter } {} {} {} }
 
 \bool_if:NT \g_otex_float_section_bool
 { \otex_require:nnnn { placeins } { section } {} {} }

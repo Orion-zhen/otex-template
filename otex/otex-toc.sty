@@ -4,7 +4,10 @@
 
 % Symbol detection for tocloft (use representative command)
 % Skip if tocloft or equivalent functionality already exists
-\cs_if_exist:NF \cftbeforetoctitleskip
+\cs_if_exist:NTF \cftbeforetoctitleskip
+{
+  \msg_warning:nnnn { otex } { pkg-skip } { tocloft } { \\cftbeforetoctitleskip~already~defined }
+}
 {
   \otex_require:nnnn { tocloft } {} {} {}
   \@ifpackageloaded{tocloft}{ \setcounter{tocdepth}{3} \setcounter{secnumdepth}{3} } {}

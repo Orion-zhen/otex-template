@@ -1,11 +1,18 @@
 \ProvidesExplPackage {otex/otex-graphics} {2026-01-16} {1.1} {Orion's Graphics}
 
 % Symbol detection: only load if representative symbols don't exist
-\cs_if_exist:NF \includegraphics { \otex_require:nnnn { graphicx } {} {} {} }
-\cs_if_exist:NF \tcbox { \otex_require:nnnn { tcolorbox } {} {} {} }
+\cs_if_exist:NTF \includegraphics 
+  { \msg_warning:nnnn { otex } { pkg-skip } { graphicx } { \\includegraphics~already~defined } }
+  { \otex_require:nnnn { graphicx } {} {} {} }
+
+\cs_if_exist:NTF \tcbox 
+  { \msg_warning:nnnn { otex } { pkg-skip } { tcolorbox } { \\tcbox~already~defined } }
+  { \otex_require:nnnn { tcolorbox } {} {} {} }
 
 % TikZ
-\cs_if_exist:NF \tikz { \otex_require:nnnn { tikz } {} {} {} }
+\cs_if_exist:NTF \tikz 
+  { \msg_warning:nnnn { otex } { pkg-skip } { tikz } { \\tikz~already~defined } }
+  { \otex_require:nnnn { tikz } {} {} {} }
 
 % Switch to standard LaTeX catcodes for TikZ configuration
 \ExplSyntaxOff
@@ -47,6 +54,8 @@
 \ExplSyntaxOn
 
 % pgfplots: check for axis environment
-\cs_if_exist:cF { axis } { \otex_require:nnnn { pgfplots } {} {} {} }
+\cs_if_exist:cTF { axis } 
+  { \msg_warning:nnnn { otex } { pkg-skip } { pgfplots } { axis~environment~already~defined } }
+  { \otex_require:nnnn { pgfplots } {} {} {} }
 
 \endinput

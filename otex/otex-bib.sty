@@ -10,6 +10,11 @@
 \cs_if_exist:NT \printbibliography {\bool_set_true:N \l_otex_bib_configured_bool}
 \cs_if_exist:NT \citep {\bool_set_true:N \l_otex_bib_configured_bool}
 
+\bool_if:NT \l_otex_bib_configured_bool
+{
+  \msg_warning:nnnn { otex } { pkg-skip } { biblatex/natbib } { bibliography~already~configured }
+}
+
 \bool_if:NF \l_otex_bib_configured_bool
 {
   \str_case:VnF \g_otex_bib_backend_tl
