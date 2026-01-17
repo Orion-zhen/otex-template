@@ -122,11 +122,10 @@
   {}
 }
 
-% Math
+% Math: Only set font if user explicitly specified one
 \@ifpackageloaded{unicode-math}
 {
-  \tl_if_empty:NTF \g_otex_font_math_tl
-  { \setmathfont { DejaVu~Math~TeX~Gyre } }
+  \tl_if_empty:NF \g_otex_font_math_tl
   { \setmathfont { \g_otex_font_math_tl } }
 }
 {}
