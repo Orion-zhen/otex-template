@@ -38,6 +38,15 @@
       }
     }
   }
+  
+  % URL/DOI line breaking configuration for biblatex
+  % Allow breaks at numbers (e.g., in DOIs like 10.3390/math14010158)
+  \cs_if_exist:NT \setcounter
+  {
+    \setcounter{biburlnumpenalty}{100}
+    \setcounter{biburlucpenalty}{100}
+    \setcounter{biburllcpenalty}{100}
+  }
 }
 
 \endinput
