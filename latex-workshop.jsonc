@@ -2,6 +2,7 @@
     "latex-workshop.bibtex-format.tab": "4 spaces",
     "latex-workshop.latex.autoClean.run": "never",
     "latex-workshop.latex.autoBuild.run": "onSave",
+    "latex-workshop.formatting.latex": "tex-fmt", // 更现代更快速, 无需额外配置文件
     "latex-workshop.showContextMenu": true,
     "latex-workshop.intellisense.package.enabled": true,
     "latex-workshop.message.error.show": true,
