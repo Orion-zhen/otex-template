@@ -18,6 +18,19 @@
 
 ## 3. 使用示例
 
+> [!CAUTION]
+> **请勿使用传统 BibTeX 语法！**
+>
+> `otex` 默认使用 `biblatex` 后端，你**必须**使用以下语法：
+>
+> - ✅ `\addbibresource{ref.bib}` — 加载 `.bib` 文件（注意需要 `.bib` 后缀）
+> - ✅ `\printbibliography` — 打印参考文献列表
+>
+> 以下传统 BibTeX 语法将**无法正常工作**：
+>
+> - ❌ `\bibliography{ref}` — 这是 BibTeX 语法，与 biblatex 不兼容
+> - ❌ `\bibliographystyle{...}` — biblatex 通过 `style` 选项配置样式
+
 ```latex
 % 在导言区指定 bib 文件
 \addbibresource{ref.bib}
