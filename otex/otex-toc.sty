@@ -4,9 +4,14 @@
 
 % Symbol detection for tocloft (use representative command)
 % Skip if tocloft or equivalent functionality already exists
-\cs_if_exist:NTF \cftbeforetoctitleskip
+% Also detect ccaption/subfig which defines \c@lofdepth and conflicts with tocloft
+\bool_new:N \l_otex_toc_skip_bool
+\cs_if_exist:NT \cftbeforetoctitleskip { \bool_set_true:N \l_otex_toc_skip_bool }
+\cs_if_exist:NT \c@lofdepth { \bool_set_true:N \l_otex_toc_skip_bool }
+
+\bool_if:NTF \l_otex_toc_skip_bool
 {
-  \msg_warning:nnnn { otex } { pkg-skip } { tocloft } { \\cftbeforetoctitleskip~already~defined }
+  \msg_warning:nnnn { otex } { pkg-skip } { tocloft } { TOC~already~configured~or~lofdepth~conflict }
 }
 {
   \otex_require:nnnn { tocloft } {} {} {}
