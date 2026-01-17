@@ -1,11 +1,14 @@
 \ProvidesExplPackage {otex/otex-bib} {2026-01-16} {1.1} {Orion's Bibliography}
 
+% Symbol detection for bibliography packages
+% \printbibliography is representative of biblatex
+% \citep is representative of natbib
 \bool_new:N \l_otex_bib_configured_bool
-\clist_map_inline:nn { IEEEtran, acmart, elsarticle, CjC }
-{ \@ifclassloaded{#1}{\bool_set_true:N \l_otex_bib_configured_bool}{} }
 
 \@ifpackageloaded{biblatex}{\bool_set_true:N \l_otex_bib_configured_bool}{}
 \@ifpackageloaded{natbib}{\bool_set_true:N \l_otex_bib_configured_bool}{}
+\cs_if_exist:NT \printbibliography {\bool_set_true:N \l_otex_bib_configured_bool}
+\cs_if_exist:NT \citep {\bool_set_true:N \l_otex_bib_configured_bool}
 
 \bool_if:NF \l_otex_bib_configured_bool
 {
