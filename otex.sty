@@ -19,6 +19,7 @@
 \bool_new:N \g_otex_load_minted_bool
 \bool_new:N \g_otex_load_tables_bool
 \bool_new:N \g_otex_load_floats_bool
+\bool_new:N \g_otex_load_titlesec_bool
 \bool_new:N \g_otex_load_bib_bool
 \bool_new:N \g_otex_load_toc_bool
 \bool_new:N \g_otex_load_index_bool
@@ -59,6 +60,7 @@
     minted      .bool_set:N = \g_otex_load_minted_bool,   minted      .initial:n = true,
     tables      .bool_set:N = \g_otex_load_tables_bool,   tables      .initial:n = true,
     floats      .bool_set:N = \g_otex_load_floats_bool,   floats      .initial:n = true,
+    titlesec    .bool_set:N = \g_otex_load_titlesec_bool, titlesec    .initial:n = true,
     bib         .bool_set:N = \g_otex_load_bib_bool,      bib         .initial:n = true,
     toc         .bool_set:N = \g_otex_load_toc_bool,      toc         .initial:n = true,
     english     .bool_set:N = \g_otex_english_bool,       english     .initial:n = false,
@@ -82,6 +84,7 @@
     nominted    .meta:n     = { minted = false },
     notables    .meta:n     = { tables = false },
     nofloats    .meta:n     = { floats = false },
+    notitlesec  .meta:n     = { titlesec = false },
     nobib       .meta:n     = { bib = false },
     notoc       .meta:n     = { toc = false },
 

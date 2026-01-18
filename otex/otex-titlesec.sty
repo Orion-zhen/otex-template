@@ -1,0 +1,61 @@
+\ProvidesExplPackage {otex/otex-titlesec} {2026-01-18} {1.1} {Orion's Titlesec Configuration}
+
+\bool_if:NF \g_otex_load_titlesec_bool { \endinput }
+
+% Symbol detection for standard sectioning commands
+% titlesec requires \l@section etc. to exist (beamer and similar classes don't define these)
+\cs_if_exist:NF \l@section
+{
+  \msg_warning:nnnn { otex } { pkg-skip } { titlesec } { \\l@section~undefined~(non-standard~document~class) }
+  \endinput
+}
+
+% Symbol detection for titlesec (use \titleformat as representative command)
+\cs_if_exist:NTF \titleformat
+{
+  \msg_warning:nnnn { otex } { pkg-skip } { titlesec } { already~configured }
+}
+{
+  \otex_require:nnnn { titlesec } {} {} {}
+  
+  % Academic style: clean, professional headings inspired by journal formats
+  \bool_if:NTF \g_otex_english_bool
+  {
+    % English academic style
+    \titleformat{\section}
+      {\normalfont\large\bfseries}
+      {\thesection.}{0.5em}{}
+    \titleformat{\subsection}
+      {\normalfont\normalsize\bfseries}
+      {\thesubsection}{0.5em}{}
+    \titleformat{\subsubsection}
+      {\normalfont\normalsize\bfseries}
+      {\thesubsubsection}{0.5em}{}
+    \titleformat{\paragraph}[runin]
+      {\normalfont\normalsize\bfseries}
+      {}{0em}{}[.]
+  }
+  {
+    % Chinese academic style: slightly larger section, left-aligned for modern look
+    \titleformat{\section}
+      {\normalfont\large\bfseries}
+      {\chinese{section}、}{0em}{}
+    \titleformat{\subsection}
+      {\normalfont\normalsize\bfseries}
+      {\thesubsection}{0.5em}{}
+    \titleformat{\subsubsection}
+      {\normalfont\normalsize\bfseries}
+      {\thesubsubsection}{0.5em}{}
+    \titleformat{\paragraph}[runin]
+      {\normalfont\normalsize\bfseries}
+      {}{0em}{}[。]
+  }
+  
+  % Compact, academic-style spacing
+  \titlespacing*{\section}{0pt}{2.5ex plus 0.8ex minus 0.2ex}{1.5ex plus 0.2ex}
+  \titlespacing*{\subsection}{0pt}{2ex plus 0.6ex minus 0.2ex}{1ex plus 0.2ex}
+  \titlespacing*{\subsubsection}{0pt}{1.5ex plus 0.4ex minus 0.1ex}{0.8ex plus 0.1ex}
+  \titlespacing*{\paragraph}{0pt}{1ex plus 0.2ex minus 0.1ex}{1em}
+}
+
+\endinput
