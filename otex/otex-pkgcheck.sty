@@ -35,15 +35,6 @@
   }
 }
 
-% Alias for backward compatibility if needed, though we should update calls
-\cs_new_eq:NN \otex_smart_require:nnnn \otex_require:nnnn
-
-% Helper for merging config
-\cs_new_protected:Npn \otex_merge_setup:nn #1#2
-{
-  \@ifpackageloaded { #1 } { #2 } { #2 } 
-}
-
 % Helper for providing commands
 \cs_new_protected:Npn \otex_provide_command:Nnn #1#2#3
 {
