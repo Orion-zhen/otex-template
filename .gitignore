@@ -19,3 +19,5 @@
 
 build/
 _minted/
+
+__pycache__
