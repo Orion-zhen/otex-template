@@ -2,14 +2,21 @@
 
 \otex_require:nnnn { geometry } { a4paper, left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm } {} {}
 
+% Track if fancyhdr was already loaded before otex
+\bool_new:N \l__otex_layout_fancyhdr_preloaded_bool
+\@ifpackageloaded { fancyhdr }
+{ \bool_set_true:N \l__otex_layout_fancyhdr_preloaded_bool }
+{ \bool_set_false:N \l__otex_layout_fancyhdr_preloaded_bool }
+
 \otex_require:nnnn { fancyhdr } {} {} {}
-\@ifpackageloaded{fancyhdr}
+
+% Only configure headers if fancyhdr was NOT preloaded (i.e., otex loaded it)
+\bool_if:NF \l__otex_layout_fancyhdr_preloaded_bool
 {
   \pagestyle{fancy}
   \fancyhf{}
   \lhead{\leftmark}
   \rhead{\thepage}
 }
-{}
 
 \endinput
