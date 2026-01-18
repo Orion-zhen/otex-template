@@ -151,7 +151,103 @@
 \end{document}
 ```
 
-## 7. 配置选项
+## 7. 封面页配置 (`titlepage` 环境)
+
+`otex` 自动为 `titlepage` 环境配置了以下特性：
+
+- **移除页码**：封面页不显示页眉页脚。
+- **重置页码计数**：封面后的第一页从 1 开始计数。
+
+### 基本用法
+
+使用 `titlepage` 环境而非 `\maketitle` 可以完全控制封面布局：
+
+```latex
+\begin{document}
+
+\begin{titlepage}
+  \centering
+  \vspace*{\fill}  % 将内容推向垂直中心
+  
+  {\Huge\bfseries 文档标题 \par}
+  \vspace{1cm}
+  {\Large 作者姓名 \par}
+  \vspace{0.5cm}
+  {\large \today \par}
+  
+  \vspace*{\fill}  % 底部填充，实现垂直居中
+\end{titlepage}
+
+\tableofcontents  % 目录从第 1 页开始
+\end{document}
+```
+
+### 布局调整技巧
+
+#### 垂直对齐
+
+```latex
+% 垂直居中（使用 \vspace*{\fill}）
+\vspace*{\fill}
+% 内容
+\vspace*{\fill}
+
+% 偏上布局（底部填充更多）
+\vspace*{2cm}
+% 内容
+\vspace*{\fill}
+
+% 偏下布局（顶部填充更多）
+\vspace*{\fill}
+% 内容
+\vspace*{3cm}
+```
+
+#### 添加摘要
+
+```latex
+\begin{titlepage}
+  \centering
+  \vspace*{\fill}
+  
+  {\Huge\bfseries 论文标题 \par}
+  \vspace{1cm}
+  {\Large 作者 \par}
+  \vspace{0.5cm}
+  {\large \today \par}
+  
+  \vspace{2cm}
+  \begin{minipage}{0.85\textwidth}
+    \textbf{摘要：} 这里是摘要内容...
+  \end{minipage}
+  
+  \vspace*{\fill}
+\end{titlepage}
+```
+
+#### 添加封面图片
+
+```latex
+\begin{titlepage}
+  \centering
+  \vspace*{2cm}
+  
+  \includegraphics[width=0.4\textwidth]{logo.png}
+  
+  \vspace{2cm}
+  {\Huge\bfseries 项目报告 \par}
+  \vspace{1cm}
+  {\Large 团队名称 \par}
+  
+  \vfill
+  {\large 2026 年 1 月 \par}
+  \vspace{2cm}
+\end{titlepage}
+```
+
+> **注意**：`\vfill` 等价于 `\vspace{\fill}`，但 `\vspace*{\fill}` 在页面顶部时不会被忽略。
+
+## 8. 配置选项
 
 - `layout`: (Boolean) 是否加载此模块，默认为 `true`。
 
