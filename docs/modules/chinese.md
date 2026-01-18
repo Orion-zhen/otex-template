@@ -7,13 +7,21 @@
 ## 1. 加载的宏包
 
 - `ctex`: 智能加载，根据 `english` 选项自动设置 `scheme=chinese` 或 `scheme=plain`。
+- `otex-titlesec`: 本模块会自动加载 [titlesec 模块](titlesec.md) 来管理标题格式。
 
-## 2. 核心逻辑：智能 Heading 避让
+## 2. 核心逻辑：Heading 委托
 
-本模块会检测当前加载的文档类（document class）：
+> [!IMPORTANT]
+> **otex 始终使用 `heading=false` 加载 ctex**，将标题格式的管理权完全委托给 `titlesec` 模块。
 
-- 如果是标准类（如 `article`, `report`），则开启完整的 `ctex` 标题支持。
-- 如果是冲突类或未知类，则自动回退到 `heading=false` 模式，并禁用 `ctex` 的标题接管，以保证原有模板样式的完整性。
+这意味着：
+- ❌ **不要使用** `\ctexset{section/format = ...}` 等 ctex 标题配置
+- ✅ **应该使用** `titlesec` 的 `\titleformat` 和 `\titlespacing` 命令
+
+这样设计的好处：
+1. 避免 `ctex` 与 `titlesec` 的冲突
+2. 提供更强大的标题自定义能力
+3. 保证与第三方模板的兼容性
 
 ## 3. 配置选项
 

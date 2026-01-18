@@ -1,6 +1,6 @@
 # 🧩 子模块功能详解
 
-otex 将不同的 LaTeX 功能抽象为 19 个独立的子模块。这些模块位于 `otex/` 目录下，由 `otex.sty` 根据用户的选项自动管理加载。
+otex 将不同的 LaTeX 功能抽象为 20 个独立的子模块。这些模块位于 `otex/` 目录下，由 `otex.sty` 根据用户的选项自动管理加载。
 
 ---
 
@@ -15,6 +15,7 @@ otex 将不同的 LaTeX 功能抽象为 19 个独立的子模块。这些模块�
 - [**`otex-layout.sty`**](layout.md)：控制页边距、行间距和段落样式。
 - [**`otex-fonts.sty`**](fonts.md)：字体系统核心，通过 `fontspec` 实现。
 - [**`otex-chinese.sty`**](chinese.md)：CTEX 深度集成与中文环境适配。
+- [**`otex-titlesec.sty`**](titlesec.md)：章节标题格式化与间距控制。
 - [**`otex-toc.sty`**](toc.md)：目录与页码样式定制。
 - [**`otex-index.sty`**](index.md)：索引与术语表支持。
 
