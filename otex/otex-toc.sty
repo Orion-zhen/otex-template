@@ -1,6 +1,14 @@
-\ProvidesExplPackage {otex/otex-toc} {2026-01-16} {1.1} {Orion's TOC}
+\ProvidesExplPackage {otex/otex-toc} {2026-01-18} {1.3} {Orion's TOC}
 
 \bool_if:NF \g_otex_load_toc_bool { \endinput }
+
+% Symbol detection for standard sectioning commands
+% tocloft requires \l@section etc. to exist (beamer and similar classes don't define these)
+\cs_if_exist:NF \l@section
+{
+  \msg_warning:nnnn { otex } { pkg-skip } { tocloft } { \\l@section~undefined~(non-standard~document~class) }
+  \endinput
+}
 
 % Symbol detection for tocloft (use representative command)
 % Skip if tocloft or equivalent functionality already exists
