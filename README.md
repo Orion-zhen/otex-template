@@ -7,7 +7,7 @@
 
 ## ✨ 核心特性
 
-- 🧩 **模块化设计**：包含 19 个独立功能模块，支持按需加载。
+- 🧩 **模块化设计**：包含 120 个独立功能模块，支持按需加载。
 - 🌍 **全球化驱动**：内置完美的中英文双语支持，一键切换。
 - 🔧 **智能冲突解析**：自动检测并修正与第三方模板（如各个大学学位论文模板）的宏包冲突。
 - 🖋️ **极致字体兼容**：支持 Windows/Linux/macOS 预设，并提供 `fonts-dir` 免安装分发方案。
@@ -50,6 +50,41 @@
 ### 4. 示例文档
 
 本仓库提供了 `article.tex` 文件以供验证 otex 的构建情况。
+
+## 🖥️ 环境配置
+
+如需在 Windows 系统上使用 otex 的全部功能，请按顺序安装以下软件：
+
+### 1. TeX 发行版
+
+安装 **TeX Live** (推荐) 或 **MiKTeX**：
+
+- [TeX Live](https://tug.org/texlive/)：选择完整安装 (Full Scheme)，包含所有必要的宏包和工具
+- [MiKTeX](https://miktex.org/)：首次编译时会自动下载缺失的宏包
+
+> [!TIP]
+> TeX Live 完整安装约需 8GB 磁盘空间，但可避免宏包缺失问题。
+
+### 2. 编辑器
+
+推荐使用 **VS Code** + **LaTeX Workshop** 插件：
+
+1. 安装 [VS Code](https://code.visualstudio.com/)
+2. 在扩展商店搜索安装 `LaTeX Workshop`
+3. 将本仓库的 `latex-workshop.jsonc` 配置复制到 VS Code 设置中
+
+### 3. Python (可选，代码高亮功能需要)
+
+`minted` 代码高亮模块需要 Python 和 Pygments：
+
+1. 安装 [Python](https://www.python.org/downloads/)（勾选 "Add to PATH"）
+2. 命令行执行：`pip install Pygments`
+
+### 4. 字体 (可选)
+
+otex 在 Windows 上默认使用系统自带字体 (中易宋体、Times New Roman 等)。如需使用其他字体预设，请参考 [字体配置文档](docs/compatibility/fonts.md)。
+
+---
 
 ## 📚 详细文档
 
