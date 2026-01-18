@@ -1,9 +1,14 @@
-\ProvidesExplPackage {otex/otex-index} {2026-01-16} {1.1} {Orion's Index}
+\ProvidesExplPackage {otex/otex-index} {2026-01-18} {1.2} {Orion's Index}
 
 \bool_if:NT \g_otex_load_index_bool
+{
+  % Symbol detection: check if \printindex already exists (makeidx/imakeidx loaded)
+  \cs_if_exist:NTF \printindex
+  { \msg_warning:nnnn { otex } { pkg-skip } { imakeidx } { \\printindex~already~defined } }
   {
     \otex_require:nnnn { imakeidx } {} {} {}
     \@ifpackageloaded{imakeidx} { \makeindex[columns=2, title=Index, intoc] } {}
   }
+}
 
 \endinput

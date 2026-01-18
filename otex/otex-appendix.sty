@@ -1,5 +1,8 @@
-\ProvidesExplPackage {otex/otex-appendix} {2026-01-16} {1.1} {Orion's Appendix}
+\ProvidesExplPackage {otex/otex-appendix} {2026-01-18} {1.2} {Orion's Appendix}
 
-\otex_require:nnnn { appendix } {} {} {}
+% Symbol detection: check if appendices environment already exists
+\cs_if_exist:cTF { appendices }
+{ \msg_warning:nnnn { otex } { pkg-skip } { appendix } { appendices~environment~already~defined } }
+{ \otex_require:nnnn { appendix } {} {} {} }
 
 \endinput
