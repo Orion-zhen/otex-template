@@ -22,6 +22,9 @@
 
 将 `otex.sty` 文件和 `otex/` 文件夹复制到你的 LaTeX 项目根目录下。
 
+> [!TIP]
+> 如需长期使用，或者不想给每个项目都复制一次 otex 文件，可通过 `git clone` 将 otex 安装到 `TEXMFHOME`，详见 [快速入门指南 - 全局安装](docs/getting-started.md)。
+
 ### 2. 最小示例
 
 在你的 `.tex` 文件中使用：

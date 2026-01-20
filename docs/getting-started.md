@@ -6,6 +6,8 @@
 
 ## 1. 复用与安装
 
+### 方式一：项目内安装（推荐新手）
+
 将 `otex.sty` 文件和 `otex/` 模块文件夹复制到你的 `.tex` 源码同级目录下：
 
 ```text
@@ -13,6 +15,67 @@ my-project/
 ├── otex.sty
 ├── otex/ (文件夹)
 └── main.tex
+```
+
+### 方式二：全局安装（推荐长期使用）
+
+通过 `git clone` 将 otex 安装到用户目录下的 `TEXMFHOME`，使其全局可用并可通过 `git pull` 轻松更新。
+
+**步骤 1：查找你的 TEXMFHOME 路径**
+
+```bash
+kpsewhich -var-value=TEXMFHOME
+```
+
+通常输出为 `~/texmf`（Linux/macOS）或 `C:/Users/<用户名>/texmf`（Windows）。
+
+**步骤 2：克隆仓库到 TEXMFHOME**
+
+LaTeX 查找包的标准路径规则是 `TEXMFHOME/tex/latex/包名/`。注意文件结构：放置后的目录结构应该看起来像这样（这对 LaTeX 找到依赖文件很重要）：
+
+```text
+~/texmf/
+└── tex/
+    └── latex/
+        └── otex/
+            ├── otex.sty
+            └── otex/
+                ├── otex-algo.sty
+                └── ...
+```
+
+```bash
+# Linux/macOS
+git clone https://github.com/Orion-zhen/otex-template.git $(kpsewhich -var-value=TEXMFHOME)/tex/latex/otex
+```
+
+```pwsh
+# Windows (PowerShell)
+git clone https://github.com/Orion-zhen/otex-template.git "$env:USERPROFILE\texmf\tex\latex\otex"
+```
+
+**步骤 3：（可选）刷新 TeX 文件名数据库**
+
+```bash
+texhash ~/texmf  # 或 mktexlsr，部分发行版需要
+```
+
+打开终端，使用 `kpsewhich` 命令检查系统能否找到 otex 包：
+
+```bash
+kpsewhich otex.sty
+```
+
+如果输出了诸如 `~/texmf/tex/latex/otex/otex.sty` 的完整路径，说明配置成功。
+
+> [!TIP]
+> 安装完成后，任何项目都可以直接使用 `\usepackage{otex}`，无需再复制文件。
+
+**通过 git 更新 otex：**
+
+```bash
+cd $(kpsewhich -var-value=TEXMFHOME)/tex/latex/otex
+git pull
 ```
 
 ---
