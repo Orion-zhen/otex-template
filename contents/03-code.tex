@@ -79,8 +79,8 @@ Algorithm pseudocode provides a structured way to describe algorithmic logic, in
 
 \begin{itemize}
     \item \code{algorithm2e}: 使用的宏包。
-    \item \code{\textbackslash KwIn}, \code{\textbackslash KwOut}: 输入输出关键字。
-    \item \code{\textbackslash While}, \code{\textbackslash If}: 控制流结构。
+    \item \code{\KwIn}, \code{\KwOut}: 输入输出关键字。
+    \item \code{\While}, \code{\If}: 控制流结构。
     \item \code{\textbackslash;}: 语句结束的分号。
 \end{itemize}
 
@@ -91,13 +91,13 @@ Algorithm pseudocode provides a structured way to describe algorithmic logic, in
     \KwIn{Array $A$ of $n$ elements}
     \KwOut{Sorted Array $A$}
     \For{$i \gets 0$ \KwTo $n-2$}{
-        $min \gets i$\;
+        $\min \gets i$\;
         \For{$j \gets i+1$ \KwTo $n-1$}{
-            \If{$A[j] < A[min]$}{
-                $min \gets j$\;
+            \If{$A[j] < A[\min]$}{
+                $\min \gets j$\;
             }
         }
-        Swap $A[i]$ and $A[min]$\;
+        Swap $A[i]$ and $A[\min]$\;
     }
     \caption{Selection Sort Algorithm}
 \end{algorithm}

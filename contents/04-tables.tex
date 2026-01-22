@@ -39,20 +39,20 @@ Scientific papers recommend using "Three-line Tables", which use only top, middl
 \end{minted}
 
 \begin{itemize}
-    \item \textbf{列格式 (Column Specifiers)}: 定义在 \code{\textbackslash begin\{tabular\}} 后的花括号中。
+    \item \textbf{列格式 (Column Specifiers)}: 定义在 \code{\begin{tabular}} 后的花括号中。
     \begin{itemize}
         \item \code{l}: 左对齐 (Left-aligned column)。
         \item \code{c}: 居中对齐 (Centered column)。
         \item \code{r}: 右对齐 (Right-aligned column)。
-        \item \code{p\{width\}}: 指定宽度的段落列，内容会自动换行 (Paragraph column with fixed width, supports auto-wrapping)。
+        \item \code{p{width}}: 指定宽度的段落列，内容会自动换行 (Paragraph column with fixed width, supports auto-wrapping)。
         \item \code{|}: 绘制垂直分割线 (Vertical line)。例如 \code{|c|c|} 表示两列都有边框。
     \end{itemize}
     \item \textbf{行与列分隔}:
     \begin{itemize}
         \item \code{\&}: 分隔同一行中的不同列 (Separates columns).
-        \item \code{\textbackslash \textbackslash}: 结束当前行 (Ends the current row).
+        \item \code{\\}: 结束当前行 (Ends the current row).
     \end{itemize}
-    \item \code{booktabs}: 提供 \code{\textbackslash toprule}, \code{\textbackslash midrule}, \code{\textbackslash bottomrule} 以绘制不同粗细的专业横线，替代标准的 \code{\textbackslash hline}。
+    \item \code{booktabs}: 提供 \code{\toprule}, \code{\midrule}, \code{\bottomrule} 以绘制不同粗细的专业横线，替代标准的 \code{\hline}。
 \end{itemize}
 
 \subsubsection{效果展示 (Effect)}
@@ -77,11 +77,11 @@ Scientific papers recommend using "Three-line Tables", which use only top, middl
 
 The core of advanced tables lies in "merging". The key is to understand that a table is a grid; merging simply allows a cell to occupy the space of its neighbors without changing the underlying grid logic.
 
-\subsubsection{合并列 (\textbackslash multicolumn)}
+\subsubsection{合并列 (\\multicolumn)}
 
-合并列通过 \code{\textbackslash multicolumn} 命令实现。它不仅用于合并，也常用于改变单个单元格的对齐方式（例如表头居中，数据居左）。
+合并列通过 \code{\multicolumn} 命令实现。它不仅用于合并，也常用于改变单个单元格的对齐方式（例如表头居中，数据居左）。
 
-Column merging is done via \code{\textbackslash multicolumn}. It is also used to change the alignment of a single cell.
+Column merging is done via \code{\multicolumn}. It is also used to change the alignment of a single cell.
 
 \textbf{语法 (Syntax):}
 \begin{minted}{latex}
@@ -117,9 +117,9 @@ Column merging is done via \code{\textbackslash multicolumn}. It is also used to
 \end{tabular}
 \end{center}
 
-\subsubsection{合并行 (\textbackslash multirow)}
+\subsubsection{合并行 (\\multirow)}
 
-合并行需要 \code{multirow} 宏包，命令为 \code{\textbackslash multirow}。
+合并行需要 \code{multirow} 宏包，命令为 \code{\multirow}。
 
 Row merging requires the \code{multirow} package.
 
@@ -134,9 +134,9 @@ Row merging requires the \code{multirow} package.
 \end{itemize}
 
 \textbf{重要规则 (Crucial Rule):}
-当使用了 \code{\textbackslash multirow\{2\}\{...\}} 时，当前行占据了位置。\textbf{在下一行对应的位置必须留空}（即直接写 \code{\&} 而不填内容），否则内容会重叠。
+当使用了 \code{\multirow{2}{...}} 时，当前行占据了位置。\textbf{在下一行对应的位置必须留空}（即直接写 \code{\&} 而不填内容），否则内容会重叠。
 
-When using \code{\textbackslash multirow}, the corresponding cell in the \textbf{next rows} must be left empty.
+When using \code{\\multirow}, the corresponding cell in the \textbf{next rows} must be left empty.
 
 \textbf{示例分析 (Example Analysis):}
 
@@ -160,9 +160,9 @@ When using \code{\textbackslash multirow}, the corresponding cell in the \textbf
 \end{tabular}
 \end{center}
 
-注意使用 \code{\textbackslash cline\{2-2\}} 来只画第2列的横线，否则会穿过 "Common" 文本。
+注意使用 \code{\cline{2-2}} 来只画第2列的横线，否则会穿过 "Common" 文本。
 
-Notice using \code{\textbackslash cline\{2-2\}} to draw a horizontal line only across the 2nd column.
+Notice using \code{\cline{2-2}} to draw a horizontal line only across the 2nd column.
 
 \subsection{Step-by-Step Complex Table (手把手构建复杂表格)}
 
