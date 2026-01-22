@@ -6,7 +6,7 @@
 % 跨平台中文短文本修复：在 CJK 环境下提供 \zh 命令，强制切换至中文系统字体 (自动补齐 \cjkunifont)
 \providecommand{\zh}{} \renewcommand{\zh}[1]{{\CJKfamily{zhsong}#1}}
 % 语义化英文切换：提供 \en 命令，逻辑上与 \zh 对应，确保中西文混排时的字体准确性
-\otex_provide_command:Nnn \en { m } {{\fontfamily{lmr}\selectfont#1}}
+\otex_provide_command:Nnn \en { m } {{\rmfamily #1}}
 
 % 统一关键词样式：提供醒目的红色加粗字体，用于文档内核心术语的强调
 \otex_provide_command:Nnn \otexkeyword { m } {\textbf{\textcolor{red!80!black}{#1}}}
