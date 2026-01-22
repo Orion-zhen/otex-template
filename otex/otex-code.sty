@@ -51,12 +51,29 @@
 {
   % 接口仿真：将 minted 环境重定向至 listings 逻辑
   % 兼容用法：\begin{minted}[选项]{语言}
+  
+  % 定义垫片键值组 (Listings Compat-Layer)
+  % 既然 lstnewenvironment 会自动解析首个可选参数，我们必须让 listings 认识这些 minted 专用键
+  % 否则会直接报错 key undefined。我们通过 hack 内部命令 \lst@Key 注入定义。
+  
+  \cs_if_exist:cT { lstset }
+  {
+    \cs_set:cpn { KV@lst@linenos } #1 { \lstset{numbers=left} }
+    \cs_set:cpn { KV@lst@linenos@default } { \lstset{numbers=left} }
+
+    \cs_set:cpn { KV@lst@bgcolor } #1 { \lstset{backgroundcolor=\color{#1}} }
+    
+    \cs_set:cpn { KV@lst@fontsize } #1 { \lstset{basicstyle=\ttfamily#1} }
+    \cs_set:cpn { KV@lst@fontsize@default } { \lstset{basicstyle=\ttfamily\small} }
+  }
+
   \lstnewenvironment{minted}[2][]
   {
-    \lstset{#1}
     \lstset{language=#2}
   }
-  {}
+  {
+    % End code
+  }
 
   % 接口仿真：将 行内 \mintinline 命令映射至 \lstinline
   % 兼容用法：\mintinline[选项]{语言}{代码}
