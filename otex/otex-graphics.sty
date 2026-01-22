@@ -1,13 +1,13 @@
 \ProvidesExplPackage {otex/otex-graphics} {2026-01-16} {1.1} {Orion's Graphics}
 
-% Graphics (Safe Load)
+% 图形处理核心：集成基础的静态图片插入与装饰彩盒 (graphicx, tcolorbox)
 \otex_safe_require:nnnn { graphicx } {} { \includegraphics } {}
 \otex_safe_require:nnnn { tcolorbox } {} { \tcbox } {}
 
-% TikZ (Safe Load + Config)
+% 矢量绘图系统 (TikZ)：集成常用的绘图库并预设学术化的流程图样式
 \otex_safe_require:nnnn { tikz } {} { \tikz }
 {
-  % Configuration Hook
+  % 绘图环境初始化 Hook：自动加载常用 TikZ 库并定义全局对象样式 (Style)
   \ExplSyntaxOff
   \usetikzlibrary{
     shapes, arrows.meta, positioning, calc, patterns,
@@ -26,8 +26,7 @@
   \ExplSyntaxOn
 }
 
-% pgfplots (Safe Load + Config)
-% Guard: \pgfplotsset (axis environment uses this)
+% 科学绘图系统 (pgfplots)：用于绘制高质量的数据图表，通过 \pgfplotsset 探测加载状态
 \otex_safe_require:nnnn { pgfplots } {} { \pgfplotsset }
 {
   \pgfplotsset{compat=1.18}

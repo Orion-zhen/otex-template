@@ -2,11 +2,10 @@
 
 \definecolor{code_bg}{rgb}{0.95, 0.95, 0.95}
 
-% Minted - with symbol detection
+% 代码高亮方案 A (minted)：基于 Pygments 的高质量染色方案，通过 \usemintedstyle 探测冲突
 \bool_if:NT \g_otex_load_minted_bool
 {
-  % Minted (Safe Load)
-  % Guard: \usemintedstyle
+  % 安全加载流程：验证 shell escape 权限并探测 \usemintedstyle 是否已定义
   \int_compare:nNnTF { \pdf@shellescape } = { 1 }
   {
     \otex_safe_require:nnnn { minted } {} { \usemintedstyle }
@@ -19,17 +18,16 @@
     }
   }
   {
-    \msg_new:nnn { otex } { minted-skip } { Shell~escape~disabled.~Skipping~minted~(using~listings~fallback). }
+    \msg_new:nnn { otex } { minted-skip } { 系统检测到 Shell~escape~已禁用。自动跳过~minted~并重定向至~listings~回退方案。 }
     \msg_warning:nn { otex } { minted-skip }
     \bool_gset_false:N \g_otex_load_minted_bool
   }
 }
 
-% Listings (Fallback or primary if minted not loaded) - with symbol detection
+% 代码高亮方案 B (listings)：原生 LaTeX 方案，兼作 minted 的安全回退点，通过 \lstset 探测冲突
 \bool_if:NT \g_otex_load_listings_bool
 {
-  % Listings (Safe Load)
-  % Guard: \lstset
+  % 安全加载流程：检查 \lstset 命令是否存在以规避重复定义
   \otex_safe_require:nnnn { listings } {} { \lstset }
   {
     \bool_if:NF \l_otex_pkg_preloaded_bool
@@ -48,11 +46,11 @@
   }
 }
 
-% Fallback for minted environment if not loaded
+% 降级处理：若未开启 minted，则通过映射环境模拟其接口，确保源码兼容
 \bool_if:NF \g_otex_load_minted_bool
 {
-  % Map minted environment to listings
-  % Usage: \begin{minted}[options]{language}
+  % 接口仿真：将 minted 环境重定向至 listings 逻辑
+  % 兼容用法：\begin{minted}[选项]{语言}
   \lstnewenvironment{minted}[2][]
   {
     \lstset{#1}
@@ -60,13 +58,13 @@
   }
   {}
 
-  % Map \mintinline to \lstinline
-  % Usage: \mintinline[options]{language}{code}
+  % 接口仿真：将 行内 \mintinline 命令映射至 \lstinline
+  % 兼容用法：\mintinline[选项]{语言}{代码}
   \ProvideDocumentCommand{\mintinline}{O{}m}{%
     \lstinline[#1,language=#2]%
   }
 
-  % Map listing float environment if not defined
+  % 浮动体增强：若当前文档类未预定义 listing 环境，则利用 float 包手动补齐
   \cs_if_exist:NF \c@listing
   {
     \RequirePackage{float}

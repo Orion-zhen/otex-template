@@ -20,17 +20,17 @@
   \endinput
 }
 
-% Determine ctex scheme based on language
+% 方案选路：根据全局语言布尔值设置 ctex 的文案风格 (scheme=chinese/plain)
 \tl_new:N \l_otex_ctex_scheme_tl
 \bool_if:NTF \g_otex_english_bool
 { \tl_set:Nn \l_otex_ctex_scheme_tl { plain } }
 { \tl_set:Nn \l_otex_ctex_scheme_tl { chinese } }
 
-% Always load ctex with heading=false, delegate heading management to titlesec
-% This provides more powerful customization capabilities
+% 接口拆分策略：显式禁用 ctex 的标题管理 (heading=false)，转而由 titlesec 子模块统一接管。
+% 这种设计使得标题样式的定制更为灵活，且能有效规避 ctex 与部分文档类的底层冲突。
 \otex_safe_require:nnnn { ctex } { UTF8, scheme=\l_otex_ctex_scheme_tl, heading=false } { \CTEXsetup } {}
 
-% Load titlesec submodule for heading management (controlled by g_otex_load_titlesec_bool)
+% 加载专门的标题管理子模块 (仅在全局选项开启时激活)
 \RequirePackage { otex/otex-titlesec }
 
 \endinput

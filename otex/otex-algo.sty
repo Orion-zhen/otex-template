@@ -2,17 +2,16 @@
 
 \str_if_eq:VnTF \g_otex_algo_backend_tl { algorithmicx }
 {
-  % algorithmicx
-  % Guard: \algorithmic (algorithm), \Require (algpseudocode)
+  % 引擎 A (algorithmicx)：支持 \algorithmic 或 \Require 则判定为已在环境运行
   \otex_safe_require:nnnn { algorithm } {} { \algorithmic } {}
   \otex_safe_require:nnnn { algpseudocode } {} { \Require } {}
 }
 {
-  % algorithm2e
-  % Guard: \SetKwInput
+  % 引擎 B (algorithm2e)：以 \SetKwInput 命令作为核心加载特征
+  % 守护符号：\SetKwInput
   \otex_safe_require:nnnn { algorithm2e } { ruled, linesnumbered, vlined } { \SetKwInput }
   {
-    % Configuration Hook
+    % 环境定制 Hook：配置算法框的国际化标签及默认布局风格
     \bool_if:NTF \g_otex_english_bool
     {
       \SetKwInput{Input}{Input}

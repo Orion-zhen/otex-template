@@ -4,24 +4,24 @@
 % 基础宏包 (Basic Packages)
 % ==============================================================================
 
-% 跨平台 shell escape 检测 (Portable shell escape detection)
+% 跨平台 shell escape 检测：提供对 \pdf@shellescape 的访问，确保检测逻辑在多引擎下的一致性
 \RequirePackage { pdftexcmds }
 
-% 颜色支持 (Color support)
+% 颜色支持：加载 xcolor 并启用 table 选项以支持表格彩色行/格
 \RequirePackage [table] { xcolor }
 
-% 列表定制 (Lists) - Hybrid Safe Load
-% guard: \newlist (enumitem)
+% 列表环境增强 (enumitem)：提供行内列表等高级选项，通过 \newlist 符号探测实现安全共存
+% 守护符号探测：\newlist (由 enumitem 提供)
 \otex_safe_require:nnnn { enumitem } { inline } { \newlist } {}
 
-% 单位支持 (SI Units) - Hybrid Safe Load
-% guard: \SI (siunitx)
+% 国际单位制支持 (siunitx)：自动化单位排版，通过 \SI 符号探测防止重复加载冲突
+% 守护符号探测：\SI (由 siunitx 提供)
 \otex_safe_require:nnnn { siunitx } {} { \SI } {}
 
-% 微排版优化 (Micro-typography)
+% 微排版优化 (microtype)：通过调整字距和字母伸缩提升排版质量及视觉美感
 \RequirePackage { microtype }
 
-% 首行缩进 (Intent first paragraph after section header)
+% 首行缩进 (indentfirst)：强制章节后的首个段落也进行缩进，更符合中文排版习惯
 \RequirePackage { indentfirst }
 
 \endinput

@@ -2,12 +2,12 @@
 
 \bool_if:NT \g_otex_load_hyperref_bool
 {
-  % Use AtBeginDocument to handle classes that load hyperref late (like mdpi)
-  % or with specific options.
-  % Load citation dependency
+  % 生命周期管理：利用 AtBeginDocument 处理延迟加载场景 (如 mdpi 宏包后续动作)
+  % 从而确保所有超链接配置在最终渲染时刻准确生效
+  % 构建引用基石：安全解析文献包依赖关系
   \bool_if:NF \g_otex_load_bib_bool { \otex_safe_require:nnnn { cite } {} {} {} }
 
-  % [Explicit Class Detection for Hyperref Passive Mode]
+  % [引擎策略：针对特定文档类的“被动接管”模式白名单]
   \bool_new:N \l_otex_hyperref_passive_bool
   \bool_set_false:N \l_otex_hyperref_passive_bool
 
@@ -26,7 +26,7 @@
     Complex~class~detected.~Skipping~immediate~load.
   }
 
-  % Common Configuration Hook (Meta Info) - Running for BOTH Active and Passive
+  % 基础元数据注册：无论在主动还是被动模式下，均需向 PDF 文档写入标题与作者信息
   \otex_setup_package:nn { hyperref }
   {
     \hypersetup{
@@ -35,13 +35,12 @@
       pdfcreator = { LaTeX~with~otex },
     }
 
-    % Cleveref Logic: Load it AFTER hyperref is loaded
+    % 智能排序：Cleveref 必须在 hyperref 激活后方可执行配置逻辑
     \bool_if:NT \g_otex_load_cleveref_bool
     {
       \bool_if:NTF \l_otex_hyperref_passive_bool
       {
-        % Passive Mode: The CLASS will load cleveref (e.g. mdpi loads it).
-        % We just pass options and setup configurations.
+        % 被动注册：信任文档类自带的 cleveref 加载动作，我们仅负责注入学术样式预设
         \PassOptionsToPackage { capitalise, nameinlink } { cleveref }
 
         \otex_setup_package:nn { cleveref }
@@ -57,7 +56,7 @@
         }
       }
       {
-        % Active Mode: We are responsible for loading it safely.
+        % 主动介入：执行正式的安全加载逻辑，并同步完成标签国际化处理
         \otex_safe_require:nnnn { cleveref } { capitalise, nameinlink } {}
         {
           \bool_if:NF \g_otex_english_bool
@@ -73,7 +72,7 @@
     }
   }
 
-  % Common Styling Options (Applied only if otex loads hyperref)
+  % 视觉风格对齐：配置全局链接色彩方案 (仅在 hyperref 由本模块驱动时生效)
   \clist_set:Nn \l_tmpa_clist
   {
     colorlinks = true,
@@ -86,7 +85,7 @@
   \bool_if:NTF \l_otex_hyperref_passive_bool
   {
     \msg_warning:nn { otex } { hyperref-passive }
-    % Passive: Wait until begin document to see if class loaded it
+    % 观察策略：被动等待文档类加载流程结束，并在 \begin{document} 时刻进行检查补齐
     \AtBeginDocument
     {
       \otex_safe_require:nnnn { hyperref } { \l_tmpa_clist } {} {}
@@ -94,7 +93,7 @@
   }
   {
     \msg_warning:nn { otex } { hyperref-active }
-    % Active: Load immediately
+    % 积极策略：规避冲突风险，立即执行正式加载
     \otex_safe_require:nnnn { hyperref } { \l_tmpa_clist } {} {}
   }
 }

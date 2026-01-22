@@ -1,16 +1,16 @@
 \ProvidesExplPackage {otex/otex-floats} {2026-01-16} {1.1} {Orion's Floats}
 
-% Floats (Safe Load)
-% Guard: \newfloat (float/floatrow)
+% 浮动体深度控制 (float)：通过 \newfloat 探测实现与 float/floatrow 宏包的安全共存
+% 守护符号探测：\newfloat
 \otex_safe_require:nnnn { float } {} { \newfloat } {}
 
-% flafter (Safe Load, no specific guard but safe to load if no conflict known)
+% 顺序修正 (flafter)：确保浮动体始终在引用位置之后出现，防止常见的排版顺序倒置问题
 \otex_safe_require:nnnn { flafter } {} {} {}
 
 \bool_if:NT \g_otex_float_section_bool
 { \otex_safe_require:nnnn { placeins } { section } { \FloatBarrier } {} }
 
-% Float Parameters
+% 浮动体全局调节：优化页面各区域 (顶端、底端、单独页) 的浮动内容占比与密度限制
 \cs_set:Npn \topfraction { 0.85 }
 \cs_set:Npn \bottomfraction { 0.70 }
 \cs_set:Npn \textfraction { 0.10 }

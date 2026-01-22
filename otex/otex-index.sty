@@ -2,8 +2,7 @@
 
 \bool_if:NT \g_otex_load_index_bool
 {
-  % Index (Safe Load)
-  % Guard: \printindex
+  % 索引自动化支持 (imakeidx)：支持多索引生成，并利用 \printindex 守护符号防止环境污染
   \otex_safe_require:nnnn { imakeidx } {} { \printindex }
   {
     \makeindex[columns=2, title=Index, intoc]

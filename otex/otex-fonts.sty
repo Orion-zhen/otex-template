@@ -10,9 +10,9 @@
   \endinput
 }
 
-% Dynamic Font Preservation Check (MUST be done before loading fontspec)
-% Check if \rmdefault is standard (cmr) or if fontspec has already normalized it.
-% If the user hasn't explicitly set a font set (auto), and we detect a custom font, back off.
+% 字体生命周期管理：在正式激活 fontspec 前预检当前字体状态。
+% 判断 \rmdefault 是否仍为内核标准字体 (cmr/lmr)。若检测到用户已通过文档类或第三方包指定了非标字体，
+% otex 将自动启动“静默退避”机制 (font-set=none)，确保外部自定义设置的完整性。
 \str_if_eq:VnT \g_otex_font_set_tl { auto }
 {
   \tl_set:Nx \l_otex_rmdefault_tl { \rmdefault }
@@ -23,17 +23,17 @@
 
   \bool_if:NTF \l_otex_standard_font_detected_bool
   {
-    % Standard fonts detected, likely safe to proceed.
+    % 检测环境纯净：内核标准字体在线，可安全执行预设覆盖
   }
   {
-    % Non-standard font detected (e.g. ppl/mathpazo), back off completely.
+    % 锁定非标字体：检测到外部指令 (如 ppl/mathpazo)，otex 强制转入被动保护模式。
     \msg_new:nnn { otex } { font-backoff } { Non-standard~font~family~'\tl_use:N \l_otex_rmdefault_tl'~detected.~Preserving~external~font~settings. }
     \msg_warning:nn { otex } { font-backoff }
     \tl_gset:Nn \g_otex_font_set_tl { none }
   }
 }
 
-% If font set is none, exit early to avoid loading fontspec and overwriting fonts
+% 被动模式出口：若已触发退避逻辑，则立即终止加载过程，规避对 fontspec 的二次调用
 \str_if_eq:VnT \g_otex_font_set_tl { none } { \endinput }
 
 \RequirePackage { fontspec }
@@ -43,7 +43,7 @@
   \defaultfontfeatures+ { Path = \g_otex_fonts_dir_tl / }
 }
 
-% Resolve platform defaults (only if not backed off)
+% 自动推断逻辑：依据所在的操作系统环境 (Windows/macOS/Linux) 智能匹配最佳的系统字体预设
 \str_if_eq:VnT \g_otex_font_set_tl { auto }
 {
   \str_if_eq:VnTF \c_sys_platform_str { windows }
@@ -55,13 +55,13 @@
   }
 }
 
-% Helper
+% 辅助函数
 \cs_new:Nn \otex_set_font:nnn
 {
   \tl_if_empty:NTF #1 { #2 { #3 } } { #2 { #1 } }
 }
 
-% Presets
+% 预设
 \str_case:Vn \g_otex_font_set_tl
 {
   {windows}
@@ -84,7 +84,7 @@
   }
 }
 
-% CJK Helper
+% CJK 辅助函数
 \cs_new:Nn \otex_set_cjk_font:nnn
 {
   \tl_if_empty:NTF #1 { #2 { #3 } } { #2 { #1 } }
@@ -95,7 +95,7 @@
 {
   \@ifpackageloaded{xeCJK}
   {
-    % Determine preset defaults
+    % 确定预设默认值
     \tl_set:Nn \l_otex_cjk_main_default_tl { SimSun }
     \tl_set:Nn \l_otex_cjk_sans_default_tl { SimHei }
     \tl_set:Nn \l_otex_cjk_mono_default_tl { FangSong }
@@ -113,7 +113,7 @@
       }
     }
     {}
-    % Apply fonts with user overrides
+    % 应用带有用户覆盖项的字体
     \otex_set_cjk_font:nnn \g_otex_font_cjk_main_tl \setCJKmainfont { \l_otex_cjk_main_default_tl }
     \otex_set_cjk_font:nnn \g_otex_font_cjk_sans_tl \setCJKsansfont { \l_otex_cjk_sans_default_tl }
     \otex_set_cjk_font:nnn \g_otex_font_cjk_mono_tl \setCJKmonofont { \l_otex_cjk_mono_default_tl }
@@ -121,7 +121,7 @@
   {}
 }
 
-% Math: Only set font if user explicitly specified one
+% 现代数学字体适配：仅在用户通过全局选项明确指定数学字体时，才启用 unicode-math 的动态配置
 \@ifpackageloaded{unicode-math}
 {
   \tl_if_empty:NF \g_otex_font_math_tl

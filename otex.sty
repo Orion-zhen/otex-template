@@ -4,7 +4,7 @@
 
 \RequirePackage { l3keys2e }
 
-% Booleans
+% 全局配置布尔变量：用于控制各个子模块的加载状态
 \bool_new:N \g_otex_load_layout_bool
 \bool_new:N \g_otex_load_fonts_bool
 \bool_new:N \g_otex_load_ctex_bool
@@ -27,7 +27,7 @@
 \bool_new:N \g_otex_float_section_bool
 \bool_new:N \g_otex_english_bool
 
-% Text Variables
+% 全局配置令牌列表 (tl)：存储宏包后端、字体名称及 PDF 元数据
 \tl_new:N \g_otex_bib_backend_tl
 \tl_new:N \g_otex_bib_style_tl
 \tl_new:N \g_otex_algo_backend_tl
@@ -43,7 +43,7 @@
 \tl_new:N \g_otex_pdf_author_tl
 \tl_new:N \g_otex_fonts_dir_tl
 
-% Key Definitions
+% 定义宏包选项：通过 LaTeX3 键值对系统管理用户配置接口
 \keys_define:nn { otex }
   {
     layout      .bool_set:N = \g_otex_load_layout_bool,   layout      .initial:n = true,

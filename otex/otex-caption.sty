@@ -1,19 +1,19 @@
 \ProvidesExplPackage {otex/otex-caption} {2026-01-16} {1.1} {Orion's Captions}
 
-% Symbol detection for caption
-% Caption (Safe Load)
-% Guard: \captionsetup
+% 标题定制 (caption)：配置图表标题样式，通过 \captionsetup 探测加载状态
+% 安全加载逻辑：仅在环境纯净时接管标题样式
+% 守护符号探测：\captionsetup (由 caption 提供)
 \otex_safe_require:nnnn { caption } {} { \captionsetup }
 {
-  % Only apply opinionated defaults if otex loaded the package (i.e. not pre-loaded)
+  % 策略：仅当宏包由 otex 自行加载 (非预加载) 时，才注入推荐的学术标题预设，避免覆盖用户自定义设置
   \bool_if:NF \l_otex_pkg_preloaded_bool
   {
     \captionsetup{ font=small, labelfont=bf, labelsep=colon, textfont=it }
   }
 }
 
-% Subcaption check - use symbol detection + conflict package detection
-% If subfig/subfigure loaded, we skip.
+% 子标题支持 (subcaption)：检测并规避与旧版 subfig/subfigure 的包冲突
+% 冲突拦截：若已检测到 subfig 或 subfigure 宏包，则跳过 subcaption 以防止底层定义冲突
 \bool_new:N \l_otex_subcap_conflict_bool
 \@ifpackageloaded{subfig}{ \bool_set_true:N \l_otex_subcap_conflict_bool } {}
 \@ifpackageloaded{subfigure}{ \bool_set_true:N \l_otex_subcap_conflict_bool } {}
@@ -21,7 +21,7 @@
 \bool_if:NTF \l_otex_subcap_conflict_bool
 { \msg_warning:nnnn { otex } { pkg-skip } { subcaption } { subfig/subfigure~package~loaded } }
 {
-  % Guard: \subcaptionbox
+  % 守护符号探测：\subcaptionbox (由 subcaption 提供)
   \otex_safe_require:nnnn { subcaption } {} { \subcaptionbox } {}
 }
 

@@ -2,41 +2,41 @@
 
 \msg_new:nnn { otex } { amsthm-conflict } { Package~'ntheorem'~detected.~Skipping~'amsthm'. }
 
-% Determine Theorem Name
+% 国际化处理：根据全局语言设置动态确定“定理”名称
 \tl_new:N \l_otex_theorem_name_tl
 \bool_if:NTF \g_otex_english_bool { \tl_set:Nn \l_otex_theorem_name_tl { Theorem } } { \tl_set:Nn \l_otex_theorem_name_tl { 定理 } }
 
-% Legacy proof fix
+% 兼容性补丁：为旧版 IEEE 模板提供 proof 环境的占位符修复
 \cs_if_exist:NF \@IEEElegacywarn { \providecommand{\@IEEElegacywarn}[2]{} }
 
-% Helper definition for theorems
+% 自动化定义接口：批量创建基于 theorem 计数器的定理类环境
 \cs_new:Nn \__otex_def_thm:nn
 { \cs_if_exist:cF { #1 } { \newtheorem{#1}[theorem]{#2} } }
 
-% Main logic
-% Check if theorem counter already exists (defined by class, e.g. mdpi)
+% 逻辑入口：检测文档类是否已预设定理系统
+% 计数器占用检测：若文档类 (如 mdpi) 已定义 theorem 计数器，则退避以避免定义冲突
 \cs_if_exist:cTF { c@theorem }
 {
-  % Class already defined theorems. We should back off.
+  % 文类已定义同名计数器：otex 进入休眠状态以保护原生设置
 }
 {
-  % Inner check: if \theorem cmd exists? (Usually \newtheorem defines it)
-  % Actually, checking c@theorem is safer.
-  % But we proceed if c@theorem does NOT exist.
+  % 命令冲突检测：进一步判断 \theorem 命令的存在性
+  % 策略：c@theorem 是判断定理包加载状态的最可靠指标
+  % 判定：仅在计数器空闲时执行自动初始化
 
   \cs_if_exist:cTF { theorem }
   {
-    % theorem command exists but c@theorem didn't? matching logic...
-    % Assume conflicts if command exists.
+    % 异常处理：命令存在但计数器缺失
+    % 保守策略：怀疑存在未知冲突包，放弃接管
   }
   {
     \@ifpackageloaded{ntheorem}
     { \msg_warning:nn { otex } { amsthm-conflict } }
     {
-      % amsthm (Safe Load) (Wrapper logic above handles conflict detection)
+      % amsthm 初始化：基于符号探测的逻辑，本层由安全加载器驱动
       \otex_safe_require:nnnn { amsthm } {} {}
       {
-        % Configuration Hook
+        % 样式定制 Hook：在 amsthm 成功加载后注入学术风格预设
         \cs_if_exist:cF { th@mystyle }
         {
           \newtheoremstyle{mystyle}{3pt}{3pt}{\normalfont}{}{\bfseries}{:}{.5em}{}

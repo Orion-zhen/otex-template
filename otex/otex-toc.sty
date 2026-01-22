@@ -2,17 +2,15 @@
 
 \bool_if:NF \g_otex_load_toc_bool { \endinput }
 
-% Symbol detection for standard sectioning commands
-% tocloft requires \l@section etc. to exist (beamer and similar classes don't define these)
+% 环境支撑探测：验证文档类是否定义了标准章节命令接口 (\l@section)，防止非标准类 (如 beamer) 编译报错
 \cs_if_exist:NF \l@section
 {
   \msg_warning:nnnn { otex } { pkg-skip } { tocloft } { \\l@section~undefined~(non-standard~document~class) }
   \endinput
 }
 
-% Symbol detection for tocloft (use representative command)
-% Skip if tocloft or equivalent functionality already exists
-% Also detect ccaption/subfig which defines \c@lofdepth and conflicts with tocloft
+% 目录控制增强 (tocloft)：通过特征命令及计数器 (\cftbeforetoctitleskip, \c@lofdepth) 探测加载状态
+% 冲突预警：规避已定义 \c@lofdepth 的包 (如 subfig) 以防止底层计数器定义冲突
 \bool_new:N \l_otex_toc_skip_bool
 \cs_if_exist:NT \cftbeforetoctitleskip { \bool_set_true:N \l_otex_toc_skip_bool }
 \cs_if_exist:NT \c@lofdepth { \bool_set_true:N \l_otex_toc_skip_bool }
@@ -22,8 +20,8 @@
   \msg_warning:nnnn { otex } { pkg-skip } { tocloft } { TOC~already~configured~or~lofdepth~conflict }
 }
 {
-  % Logic Check: already done above (l_otex_toc_skip_bool checks cftbeforetoctitleskip etc)
-  % Passing empty guard symbol because we handle detection manually.
+  % 注入逻辑：基于上方的多重探测结果执行安全加载，并初始化推荐的目录深度 (tocdepth)
+  % 采用手动探测模式，故向安全加载器传递空的守护符号
   \otex_safe_require:nnnn { tocloft } {} {}
   {
     \setcounter{tocdepth}{3}

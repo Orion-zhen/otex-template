@@ -3,12 +3,17 @@
 \otex_safe_require:nnnn { etoolbox } {} { \AfterEndEnvironment } {}
 \otex_safe_require:nnnn { tcolorbox } {} { \tcbox } {}
 
+% 跨平台中文短文本修复：在 CJK 环境下提供 \zh 命令，强制切换至中文系统字体 (自动补齐 \cjkunifont)
 \providecommand{\zh}{} \renewcommand{\zh}[1]{{\CJKfamily{zhsong}#1}}
+% 语义化英文切换：提供 \en 命令，逻辑上与 \zh 对应，确保中西文混排时的字体准确性
 \otex_provide_command:Nnn \en { m } {{\fontfamily{lmr}\selectfont#1}}
 
+% 统一关键词样式：提供醒目的红色加粗字体，用于文档内核心术语的强调
 \otex_provide_command:Nnn \otexkeyword { m } {\textbf{\textcolor{red!80!black}{#1}}}
+% 待办事项标记：以醒目的黄色背景加粗字体提示文档中待完善或待确认的部分
 \otex_provide_command:Nnn \todo { m } {\par\noindent\colorbox{yellow}{\textbf{TODO: } #1}\par}
 
+% 语义化信息提示框组：基于 tcolorbox 构建，提供 alertbox, infobox 和 tipbox 专用样式
 \otex_provide_env:nnnn { alertbox } { O{} } {
 \begin{tcolorbox}[colback=red!5, colframe=red!75!black, title=Warning, #1] } {
 \end{tcolorbox} }

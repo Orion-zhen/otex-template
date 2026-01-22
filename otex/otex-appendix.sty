@@ -1,6 +1,6 @@
 \ProvidesExplPackage {otex/otex-appendix} {2026-01-18} {1.2} {Orion's Appendix}
 
-% Symbol detection: check if appendices environment already exists (via \appendices command)
+% 附录环境接管：通过探测 \appendices 命令防止与已内置附录系统的文档类产生逻辑碰撞
 \otex_safe_require:nnnn { appendix } {} { \appendices } {}
 
 \endinput

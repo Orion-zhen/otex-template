@@ -1,8 +1,6 @@
 \ProvidesExplPackage {otex/otex-bib} {2026-01-16} {1.1} {Orion's Bibliography}
 
-% Symbol detection for bibliography packages
-% \printbibliography is representative of biblatex
-% \citep is representative of natbib
+% 文献引用体系检测：通过探测核心命令 (\printbibliography, \citep) 来判断 biblatex 或 natbib 的加载状态
 \bool_new:N \l_otex_bib_configured_bool
 
 \@ifpackageloaded{biblatex}{\bool_set_true:N \l_otex_bib_configured_bool}{}
@@ -26,8 +24,8 @@
     \otex_safe_require:nnnn { biblatex } { backend=biber, style=ieee } {} {}
   }
 
-  % Chinese localization for biblatex bibliography title
-  % Only apply when otex loads biblatex (not when template pre-loads it)
+  % 国际化增强：为 biblatex 后端注入中文文献列表标题设置
+  % 注入策略：仅当 otex 负责加载 biblatex 时启用，避免干扰模板原生配置
   \cs_if_exist:NT \DefineBibliographyStrings
   {
     \bool_if:NF \g_otex_english_bool
@@ -39,8 +37,7 @@
     }
   }
 
-  % URL/DOI line breaking configuration for biblatex
-  % Allow breaks at numbers (e.g., in DOIs like 10.3390/math14010158)
+  % 视觉优化：调整 biblatex 链接断行惩罚值，确保长 DOI/URL 在窄行内能合理折行排版
   \cs_if_exist:NT \setcounter
   {
     \setcounter{biburlnumpenalty}{100}
