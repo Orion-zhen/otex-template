@@ -3,15 +3,10 @@
 \otex_safe_require:nnnn { geometry } { a4paper, left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm } { \geometry } {}
 
 % 状态敏感配置：实时追踪 fancyhdr 的加载谱系
-\bool_new:N \l__otex_layout_fancyhdr_preloaded_bool
-\@ifpackageloaded { fancyhdr }
-{ \bool_set_true:N \l__otex_layout_fancyhdr_preloaded_bool }
-{ \bool_set_false:N \l__otex_layout_fancyhdr_preloaded_bool }
-
 \otex_safe_require:nnnn { fancyhdr } {} { \fancyhead }
 {
   % 样式注入策略：仅当宏包由 otex 首次加载时启动，避免与模板原生定义的页眉页脚发生逻辑覆盖
-  \bool_if:NF \l__otex_layout_fancyhdr_preloaded_bool
+  \bool_if:NF \l_otex_pkg_preloaded_bool
   {
     \pagestyle{fancy}
     \fancyhf{}
