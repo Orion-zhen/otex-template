@@ -5,7 +5,7 @@
   % 生命周期管理：利用 AtBeginDocument 处理延迟加载场景 (如 mdpi 宏包后续动作)
   % 从而确保所有超链接配置在最终渲染时刻准确生效
   % 构建引用基石：安全解析文献包依赖关系
-  \bool_if:NF \g_otex_load_bib_bool { \otex_safe_require:nnnn { cite } {} {} {} }
+  \bool_if:NF \g_otex_load_bib_bool { \otex_safe_require:nnnn { cite } {} { \cite } {} }
 
   % [引擎策略：针对特定文档类的“被动接管”模式白名单]
   \bool_new:N \l_otex_hyperref_passive_bool
