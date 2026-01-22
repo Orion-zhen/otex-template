@@ -26,11 +26,11 @@
 \seq_new:N \g_otex_loaded_packages_seq
 
 % 自动追踪 Hook：
-% 每当一个宏包加载完成（package/after 钩子触发），我们将当前宏包名 (@currname) 存入追踪序列。
+% 每当一个宏包加载完成（package/after 钩子触发），我们将当前宏包名 (\g_file_curr_name_str) 存入追踪序列。
 % 这保证了序列始终包含当前编译周期中所有已加载的宏包名称。
 \AddToHook { package/after }
 {
-  \seq_gput_right:Nx \g_otex_loaded_packages_seq { \@currname }
+  \seq_gput_right:Nx \g_otex_loaded_packages_seq { \g_file_curr_name_str }
 }
 
 % ------------------------------------------------------------------------------
@@ -95,7 +95,13 @@
     \bool_lazy_any:nTF
     {
       { \tl_if_empty_p:n { #3 } } % 用户未定义守护符号，跳过此步
-      { \cs_if_exist_p:N #3 }     % 守护符号已存在，触发冲突
+      { 
+        % 增加防御性编程：仅当 #3 为单个 token 时才调用 \cs_if_exist_p:N
+        % 否则如果 #3 是 "{foo}" 或者 "invalid string"，会导致底层报错
+        \bool_lazy_and_p:nn 
+          { \tl_if_single_token_p:n { #3 } }
+          { \cs_if_exist_p:N #3 }
+      }     % 守护符号已存在，触发冲突
     }
     {
       \tl_if_empty:nTF { #3 }
