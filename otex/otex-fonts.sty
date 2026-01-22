@@ -15,20 +15,19 @@
 % If the user hasn't explicitly set a font set (auto), and we detect a custom font, back off.
 \str_if_eq:VnT \g_otex_font_set_tl { auto }
 {
-  \tl_set:Nx \l_tmpa_tl { \rmdefault }
+  \tl_set:Nx \l_otex_rmdefault_tl { \rmdefault }
 
-  
-  \bool_set_false:N \l_tmpa_bool
-  \tl_if_in:NnT \l_tmpa_tl { cmr } { \bool_set_true:N \l_tmpa_bool }
-  \tl_if_in:NnT \l_tmpa_tl { lmr } { \bool_set_true:N \l_tmpa_bool }
-  
-  \bool_if:NTF \l_tmpa_bool
+  \bool_set_false:N \l_otex_standard_font_detected_bool
+  \tl_if_in:NnT \l_otex_rmdefault_tl { cmr } { \bool_set_true:N \l_otex_standard_font_detected_bool }
+  \tl_if_in:NnT \l_otex_rmdefault_tl { lmr } { \bool_set_true:N \l_otex_standard_font_detected_bool }
+
+  \bool_if:NTF \l_otex_standard_font_detected_bool
   {
     % Standard fonts detected, likely safe to proceed.
   }
   {
     % Non-standard font detected (e.g. ppl/mathpazo), back off completely.
-    \msg_new:nnn { otex } { font-backoff } { Non-standard~font~family~'\tl_use:N \l_tmpa_tl'~detected.~Preserving~external~font~settings. }
+    \msg_new:nnn { otex } { font-backoff } { Non-standard~font~family~'\tl_use:N \l_otex_rmdefault_tl'~detected.~Preserving~external~font~settings. }
     \msg_warning:nn { otex } { font-backoff }
     \tl_gset:Nn \g_otex_font_set_tl { none }
   }
@@ -97,27 +96,27 @@
   \@ifpackageloaded{xeCJK}
   {
     % Determine preset defaults
-    \tl_set:Nn \l_tmpa_tl { SimSun }
-    \tl_set:Nn \l_tmpb_tl { SimHei }
-    \tl_set:Nn \l_tmpc_tl { FangSong }
+    \tl_set:Nn \l_otex_cjk_main_default_tl { SimSun }
+    \tl_set:Nn \l_otex_cjk_sans_default_tl { SimHei }
+    \tl_set:Nn \l_otex_cjk_mono_default_tl { FangSong }
     \str_case:VnF \g_otex_font_set_tl
     {
       {linux} {
-        \tl_set:Nn \l_tmpa_tl { Noto~Serif~CJK~SC }
-        \tl_set:Nn \l_tmpb_tl { Noto~Sans~CJK~SC }
-        \tl_set:Nn \l_tmpc_tl { Noto~Sans~Mono~CJK~SC }
+        \tl_set:Nn \l_otex_cjk_main_default_tl { Noto~Serif~CJK~SC }
+        \tl_set:Nn \l_otex_cjk_sans_default_tl { Noto~Sans~CJK~SC }
+        \tl_set:Nn \l_otex_cjk_mono_default_tl { Noto~Sans~Mono~CJK~SC }
       }
       {adobe} {
-        \tl_set:Nn \l_tmpa_tl { Source~Han~Serif~CN }
-        \tl_set:Nn \l_tmpb_tl { Source~Han~Sans~CN }
-        \tl_set:Nn \l_tmpc_tl { Source~Han~Sans~CN }
+        \tl_set:Nn \l_otex_cjk_main_default_tl { Source~Han~Serif~CN }
+        \tl_set:Nn \l_otex_cjk_sans_default_tl { Source~Han~Sans~CN }
+        \tl_set:Nn \l_otex_cjk_mono_default_tl { Source~Han~Sans~CN }
       }
     }
     {}
     % Apply fonts with user overrides
-    \otex_set_cjk_font:nnn \g_otex_font_cjk_main_tl \setCJKmainfont { \l_tmpa_tl }
-    \otex_set_cjk_font:nnn \g_otex_font_cjk_sans_tl \setCJKsansfont { \l_tmpb_tl }
-    \otex_set_cjk_font:nnn \g_otex_font_cjk_mono_tl \setCJKmonofont { \l_tmpc_tl }
+    \otex_set_cjk_font:nnn \g_otex_font_cjk_main_tl \setCJKmainfont { \l_otex_cjk_main_default_tl }
+    \otex_set_cjk_font:nnn \g_otex_font_cjk_sans_tl \setCJKsansfont { \l_otex_cjk_sans_default_tl }
+    \otex_set_cjk_font:nnn \g_otex_font_cjk_mono_tl \setCJKmonofont { \l_otex_cjk_mono_default_tl }
   }
   {}
 }
