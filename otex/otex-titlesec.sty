@@ -38,9 +38,18 @@
     }
     {
       % 国际化适配：中文学术标题预设 (增强的视觉留白与现代左对齐美感)
-      \titleformat{\section}
-      {\normalfont\Large\bfseries}
-      {\chinese{section}、}{0em}{}
+      \bool_if:nTF { \g_otex_load_ctex_bool && \cs_if_exist_p:N \chinese }
+      {
+        \titleformat{\section}
+        {\normalfont\Large\bfseries}
+        {\chinese{section}、}{0em}{}
+      }
+      {
+        % 如果 ctex 未加载或无中文环境，使用英文风格
+        \titleformat{\section}
+        {\normalfont\Large\bfseries}
+        {\thesection}{0.5em}{}
+      }
 
       \titleformat{\subsection}
       {\normalfont\large\bfseries}
