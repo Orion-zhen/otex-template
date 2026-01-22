@@ -2,6 +2,9 @@
 
 \otex_safe_require:nnnn { geometry } { a4paper, left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm } { \geometry } {}
 
+% 特殊类处理：standalone 类不需要页面布局
+\@ifclassloaded{standalone}{\endinput}{}
+
 % 状态敏感配置：实时追踪 fancyhdr 的加载谱系
 \otex_safe_require:nnnn { fancyhdr } {} { \fancyhead }
 {
