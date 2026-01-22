@@ -46,6 +46,17 @@ otex 引入了全新的**动态智能兼容性**机制。不再依赖硬编码�
 
 **效果**：解决了 MDPI 等模板因 `hyperref` 加载时机过晚导致的 `LaTeX hooks Error` 或 `Missing \begin{document}` 错误。
 
+### 安全配置合并 (Safe Configuration Merging)
+
+除了“退避”，otex 还引入了**增量合并**机制。当检测到某个包（如 `caption`, `titlesec`）已被模板预加载时：
+
+1.  **跳过破坏性配置**：otex 会自动停止应用其默认的、具有主观意见的样式（如字体大小、间距）。
+2.  **保留增强性配置**：otex 依然会运行那些必要的、无副作用的钩子（如元数据设置、兼容性补丁）。
+
+**示例**：
+
+如果您在导言区预先加载了 `\usepackage{caption}` 并设置了 `font=Large`，otex 识别到后，将不会强行将字体重置为 `small`，不仅消除了“选项冲突”错误，更完美保留了您的个性化设置。
+
 ### 符号存在性检测 (Symbol Existence Detection)
 
 otex 采用**符号存在性检测**作为核心兼容策略。相比包名检测或文档类检测，这种方式更加通用和健壮。
