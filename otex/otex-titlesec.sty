@@ -11,51 +11,58 @@
 }
 
 % Symbol detection for titlesec (use \titleformat as representative command)
-\cs_if_exist:NTF \titleformat
+% Symbol detection for titlesec (Safe Load + Config)
+% Guard: \titleformat
+\otex_safe_require:nnnn { titlesec } {} { \titleformat }
 {
-  \msg_warning:nnnn { otex } { pkg-skip } { titlesec } { already~configured }
-}
-{
-  \otex_require:nnnn { titlesec } {} {} {}
-  
-  % Academic style: clean, professional headings inspired by journal formats
-  \bool_if:NTF \g_otex_english_bool
+  % Configuration Hook
+  \bool_if:NF \l_otex_pkg_preloaded_bool
   {
-    % English academic style
-    \titleformat{\section}
+    % Academic style: clean, professional headings inspired by journal formats
+    \bool_if:NTF \g_otex_english_bool
+    {
+      % English academic style
+      \titleformat{\section}
       {\normalfont\Large\bfseries}
       {\thesection.}{0.5em}{}
-    \titleformat{\subsection}
+
+      \titleformat{\subsection}
       {\normalfont\large\bfseries}
       {\thesubsection}{0.5em}{}
-    \titleformat{\subsubsection}
+
+      \titleformat{\subsubsection}
       {\normalfont\normalsize\bfseries}
       {\thesubsubsection}{0.5em}{}
-    \titleformat{\paragraph}[runin]
+
+      \titleformat{\paragraph}[runin]
       {\normalfont\normalsize\bfseries}
       {}{0em}{}[.]
-  }
-  {
-    % Chinese academic style: slightly larger section, left-aligned for modern look
-    \titleformat{\section}
+    }
+    {
+      % Chinese academic style: slightly larger section, left-aligned for modern look
+      \titleformat{\section}
       {\normalfont\Large\bfseries}
       {\chinese{section}、}{0em}{}
-    \titleformat{\subsection}
+
+      \titleformat{\subsection}
       {\normalfont\large\bfseries}
       {\thesubsection}{0.5em}{}
-    \titleformat{\subsubsection}
+
+      \titleformat{\subsubsection}
       {\normalfont\normalsize\bfseries}
       {\thesubsubsection}{0.5em}{}
-    \titleformat{\paragraph}[runin]
+
+      \titleformat{\paragraph}[runin]
       {\normalfont\normalsize\bfseries}
       {}{0em}{}[。]
+    }
+
+    % Compact, academic-style spacing
+    \titlespacing*{\section}{0pt}{2.5ex plus 0.8ex minus 0.2ex}{1.5ex plus 0.2ex}
+    \titlespacing*{\subsection}{0pt}{2ex plus 0.6ex minus 0.2ex}{1ex plus 0.2ex}
+    \titlespacing*{\subsubsection}{0pt}{1.5ex plus 0.4ex minus 0.1ex}{0.8ex plus 0.1ex}
+    \titlespacing*{\paragraph}{0pt}{1ex plus 0.2ex minus 0.1ex}{1em}
   }
-  
-  % Compact, academic-style spacing
-  \titlespacing*{\section}{0pt}{2.5ex plus 0.8ex minus 0.2ex}{1.5ex plus 0.2ex}
-  \titlespacing*{\subsection}{0pt}{2ex plus 0.6ex minus 0.2ex}{1ex plus 0.2ex}
-  \titlespacing*{\subsubsection}{0pt}{1.5ex plus 0.4ex minus 0.1ex}{0.8ex plus 0.1ex}
-  \titlespacing*{\paragraph}{0pt}{1ex plus 0.2ex minus 0.1ex}{1em}
 }
 
 \endinput

@@ -1,7 +1,7 @@
 \ProvidesExplPackage {otex/otex-commands} {2026-01-16} {1.1} {Orion's Objectively Good Commands}
 
-\otex_require:nnnn { etoolbox } {} {} {}
-\otex_require:nnnn { tcolorbox } {} {} {}
+\otex_safe_require:nnnn { etoolbox } {} { \AfterEndEnvironment } {}
+\otex_safe_require:nnnn { tcolorbox } {} { \tcbox } {}
 
 \providecommand{\zh}{} \renewcommand{\zh}[1]{{\CJKfamily{zhsong}#1}}
 \otex_provide_command:Nnn \en { m } {{\fontfamily{lmr}\selectfont#1}}
@@ -9,8 +9,16 @@
 \otex_provide_command:Nnn \otexkeyword { m } {\textbf{\textcolor{red!80!black}{#1}}}
 \otex_provide_command:Nnn \todo { m } {\par\noindent\colorbox{yellow}{\textbf{TODO: } #1}\par}
 
-\otex_provide_env:nnnn { alertbox } { O{} } { \begin{tcolorbox}[colback=red!5, colframe=red!75!black, title=Warning, #1] } { \end{tcolorbox} }
-\otex_provide_env:nnnn { infobox }  { O{} } { \begin{tcolorbox}[colback=blue!5, colframe=blue!75!black, title=Note, #1] } { \end{tcolorbox} }
-\otex_provide_env:nnnn { tipbox }   { O{} } { \begin{tcolorbox}[colback=green!5, colframe=green!75!black, title=Tip, #1] } { \end{tcolorbox} }
+\otex_provide_env:nnnn { alertbox } { O{} } {
+\begin{tcolorbox}[colback=red!5, colframe=red!75!black, title=Warning, #1] } {
+\end{tcolorbox} }
+
+\otex_provide_env:nnnn { infobox }  { O{} } {
+\begin{tcolorbox}[colback=blue!5, colframe=blue!75!black, title=Note, #1] } {
+\end{tcolorbox} }
+
+\otex_provide_env:nnnn { tipbox }   { O{} } {
+\begin{tcolorbox}[colback=green!5, colframe=green!75!black, title=Tip, #1] } {
+\end{tcolorbox} }
 
 \endinput

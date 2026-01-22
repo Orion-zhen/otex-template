@@ -1,39 +1,98 @@
 \ProvidesExplPackage {otex/otex-pkgcheck} {2026-01-16} {1.1} {Orion's Smart Package Checker}
 
-\msg_new:nnn { otex } { pkg-conflict } { Package~'#1'~conflict:~'#2'.~Removing~option. }
-\msg_new:nnn { otex } { pkg-required } { Package~'#1'~missing~required:~'#2'. }
+% Modern hook support (requires LaTeX 2020/10/01+)
+% We assume the kernel provides \AddToHook, \IfPackageLoadedTF.
+
+\msg_new:nnn { otex } { pkg-conflict } { Package~'#1'~conflict:~symbol~'#2'~defined.~Skipping~load. }
+\msg_new:nnn { otex } { pkg-loaded } { Package~'#1'~already~loaded.~Skipping~otex~default~config. }
 \msg_new:nnn { otex } { pkg-skip } { Skipping~'#1':~#2. }
 
-% Simple smart require
-% #1 = Package Name
-% #2 = Package Options
-% #3 = Conflict Options (clist)
-% #4 = Required Options (clist)
-\cs_new_protected:Npn \otex_require:nnnn #1#2#3#4
+% Track packages loaded by otex to avoid redundant warnings
+\seq_new:N \g_otex_loaded_packages_seq
+
+% Hook to automatically track ALL packages loaded after this point
+\AddToHook { package/after }
 {
-  \@ifpackageloaded { #1 }
+  \seq_gput_right:Nx \g_otex_loaded_packages_seq { \@currname }
+}
+
+% ------------------------------------------------------------------------------
+% Core Primitives
+% ------------------------------------------------------------------------------
+
+% Configure a package cleanly using hooks.
+% This runs immediately if the package is already loaded, or deferred until it loads.
+% #1: Package Name
+% #2: Configuration Code
+\cs_new_protected:Npn \otex_setup_package:nn #1#2
+{
+  \AddToHook { package/#1/after } { #2 }
+}
+
+% Hybrid Safe Loader
+% 1. Checks if package is loaded -> If yes, configures it.
+% 2. Checks if guard symbol exists -> If yes, backs off (conflict).
+% 3. Otherwise -> Loads package.
+%
+% #1: Package Name
+% #2: Package Options (clist)
+% #3: Guard Symbol (cs) - e.g. \newlist
+% #4: Configuration Code
+\cs_new_protected:Npn \otex_safe_require:nnnn #1#2#3#4
+{
+  % 1. Check if package itself is already loaded
+  \IfPackageLoadedTF { #1 }
   {
-    % Check conflicts
-    \clist_map_inline:nn { #3 }
+    % Case A: Already loaded.
+    % We apply the configuration (#4), but set a flag so the module
+    % knows it WAS pre-loaded and can choose to skip "defaults".
+    \otex_setup_package:nn { #1 }
     {
-      \@ifpackagewith { #1 } { ##1 }
-      { \msg_warning:nnnn { otex } { pkg-conflict } { #1 } { ##1 } }
-      {}
+      \bool_set_true:N \l_otex_pkg_preloaded_bool
+      #4
     }
-    % Check required
-    \clist_map_inline:nn { #4 }
+
+    % Only warn if NOT loaded by otex previously
+    \seq_if_in:NnF \g_otex_loaded_packages_seq { #1 }
     {
-      \@ifpackagewith { #1 } { ##1 }
-      {}
-      { \msg_warning:nnnn { otex } { pkg-required } { #1 } { ##1 } }
+      \msg_warning:nnn { otex } { pkg-loaded } { #1 }
+      % Avoid repeating the warning for the same package
+      \seq_gput_right:Nn \g_otex_loaded_packages_seq { #1 }
     }
   }
   {
-    \tl_if_empty:nTF { #2 }
-    { \RequirePackage { #1 } }
-    { \RequirePackage [ #2 ] { #1 } }
+    % 2. Check for conflicts via Symbol Detection
+    \bool_lazy_any:nTF
+    {
+      { \tl_if_empty_p:n { #3 } } % If no guard symbol provided, skip check
+      { \cs_if_exist_p:N #3 }     % Or if symbol exists
+    }
+    {
+      \tl_if_empty:nTF { #3 }
+      {
+        % No guard symbol, safe to load
+        \otex_setup_package:nn { #1 } { \bool_set_false:N \l_otex_pkg_preloaded_bool #4 }
+        \tl_if_empty:nTF { #2 }
+        { \RequirePackage { #1 } }
+        { \RequirePackage [ #2 ] { #1 } }
+      }
+      {
+        % Guard symbol exists! Conflict.
+        \msg_warning:nnnn { otex } { pkg-conflict } { #1 } { #3 }
+      }
+    }
+    {
+      % 3. Safe to load
+      \otex_setup_package:nn { #1 } { \bool_set_false:N \l_otex_pkg_preloaded_bool #4 }
+      \tl_if_empty:nTF { #2 }
+      { \RequirePackage { #1 } }
+      { \RequirePackage [ #2 ] { #1 } }
+    }
   }
 }
+
+% Define the boolean flag
+\bool_new:N \l_otex_pkg_preloaded_bool
 
 % Helper for providing commands
 \cs_new_protected:Npn \otex_provide_command:Nnn #1#2#3

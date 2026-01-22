@@ -22,8 +22,13 @@
   \msg_warning:nnnn { otex } { pkg-skip } { tocloft } { TOC~already~configured~or~lofdepth~conflict }
 }
 {
-  \otex_require:nnnn { tocloft } {} {} {}
-  \@ifpackageloaded{tocloft}{ \setcounter{tocdepth}{3} \setcounter{secnumdepth}{3} } {}
+  % Logic Check: already done above (l_otex_toc_skip_bool checks cftbeforetoctitleskip etc)
+  % Passing empty guard symbol because we handle detection manually.
+  \otex_safe_require:nnnn { tocloft } {} {}
+  {
+    \setcounter{tocdepth}{3}
+    \setcounter{secnumdepth}{3}
+  }
 }
 
 \endinput

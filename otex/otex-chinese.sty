@@ -15,7 +15,7 @@
   {
     \msg_new:nnn { otex } { ctex-pdftex } { pdfTeX~detected.~Loading~ctex~with~CJK~backend~(limited~CJK~support). }
     \msg_warning:nn { otex } { ctex-pdftex }
-    \otex_require:nnnn { ctex } { UTF8, scheme=chinese, heading=false, fontset=none } {} {}
+    \otex_safe_require:nnnn { ctex } { UTF8, scheme=chinese, heading=false, fontset=none } { \CTEXsetup } {}
   }
   \endinput
 }
@@ -28,7 +28,7 @@
 
 % Always load ctex with heading=false, delegate heading management to titlesec
 % This provides more powerful customization capabilities
-\otex_require:nnnn { ctex } { UTF8, scheme=\l_otex_ctex_scheme_tl, heading=false } {} {}
+\otex_safe_require:nnnn { ctex } { UTF8, scheme=\l_otex_ctex_scheme_tl, heading=false } { \CTEXsetup } {}
 
 % Load titlesec submodule for heading management (controlled by g_otex_load_titlesec_bool)
 \RequirePackage { otex/otex-titlesec }

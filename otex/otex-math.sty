@@ -1,15 +1,11 @@
 \ProvidesExplPackage {otex/otex-math} {2026-01-16} {1.1} {Orion's Math Enhancements}
 
-\otex_require:nnnn { amsmath } {} {} {}
-\otex_require:nnnn { mathtools } {} {} {}
-% amsthm: Only load if \theoremstyle is not already defined (e.g., by ntheorem)
-\cs_if_exist:NTF \theoremstyle
-{
-  \msg_warning:nnnn { otex } { pkg-skip } { amsthm } { \\theoremstyle~already~defined~(ntheorem?) }
-}
-{
-  \otex_require:nnnn { amsthm } {} {} {}
-}
+% Standard Math (Safe Load)
+\otex_safe_require:nnnn { amsmath } {} {} {}
+\otex_safe_require:nnnn { mathtools } {} {} {}
+
+% amsthm: Safe load (Guard: \theoremstyle)
+\otex_safe_require:nnnn { amsthm } {} { \theoremstyle } {}
 
 \msg_new:nnn { otex } { amssymb-conflict } { Package~'amssymb'~conflict~with~'unicode-math'. }
 \msg_new:nnn { otex } { math-pkg-backoff } { Legacy~math~package~'#1'~detected.~Disabling~unicode-math. }
@@ -19,13 +15,13 @@
 
 % Dynamic detection of legacy math font packages and bm (boldsymbol conflicts with unicode-math)
 \clist_map_inline:nn { mathpazo, newtxmath, fourier, stix, stix2, mtpro2, eulervm, bm }
-{ 
+{
   \@ifpackageloaded{#1}
-  { 
-    \bool_set_true:N \l_otex_math_conflict_bool 
+  {
+    \bool_set_true:N \l_otex_math_conflict_bool
     \msg_warning:nnn { otex } { math-pkg-backoff } { #1 }
-  } 
-  {} 
+  }
+  {}
 }
 % Also check if class has set a flag (optional, but good practice) or simply rely on package loading.
 
@@ -37,24 +33,20 @@
     \msg_new:nnn { otex } { math-pdftex } { pdfTeX~detected.~Using~amssymb~instead~of~unicode-math. }
     \msg_warning:nn { otex } { math-pdftex }
   }
-  \otex_require:nnnn { amsmath } {} {} {}
-  % Load amssymb only if its symbols are not already provided
-  % (newtxmath, stix, etc. already define these symbols)
-  \cs_if_exist:NTF \Bbbk
-  {
-    \msg_warning:nnnn { otex } { pkg-skip } { amssymb } { symbol~\\Bbbk~already~defined }
-  }
-  {
-    \otex_require:nnnn { amssymb } {} {} {}
-  }
+  \otex_safe_require:nnnn { amsmath } {} {} {}
+  % Load amssymb only if its symbols are not already provided (Guard: \Bbbk)
+  \otex_safe_require:nnnn { amssymb } {} { \Bbbk } {}
 }
 {
   % Unicode Math
   \@ifpackageloaded{amssymb} { \msg_warning:nn { otex } { amssymb-conflict } } {}
 
-  \otex_require:nnnn { unicode-math } { math-style=ISO, bold-style=ISO } {} {}
+  % Unicode Math (Safe Load)
+  % Guard: \setmathfont (though less likely to be defined by others without package)
+  \@ifpackageloaded{amssymb} { \msg_warning:nn { otex } { amssymb-conflict } } {}
 
-  \AtBeginDocument{
+  \otex_safe_require:nnnn { unicode-math } { math-style=ISO, bold-style=ISO } { \setmathfont }
+  {
     \otex_provide_command:Nnn \square { } { \mdlgwhtsquare }
     \otex_provide_command:Nnn \boxtimes { } { \boxtimes }
   }

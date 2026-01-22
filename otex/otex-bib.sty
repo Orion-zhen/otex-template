@@ -19,13 +19,13 @@
 {
   \str_case:VnF \g_otex_bib_backend_tl
   {
-    {biblatex} { \otex_require:nnnn { biblatex } { backend=bibtex, style=\g_otex_bib_style_tl, sorting=none, doi=true } {} {} }
-    {natbib}   { \otex_require:nnnn { natbib } { numbers, sort&compress } {} {} }
+    {biblatex} { \otex_safe_require:nnnn { biblatex } { backend=bibtex, style=\g_otex_bib_style_tl, sorting=none, doi=true } {} {} }
+    {natbib}   { \otex_safe_require:nnnn { natbib } { numbers, sort&compress } {} {} }
   }
   {
-    \otex_require:nnnn { biblatex } { backend=biber, style=ieee } {} {}
+    \otex_safe_require:nnnn { biblatex } { backend=biber, style=ieee } {} {}
   }
-  
+
   % Chinese localization for biblatex bibliography title
   % Only apply when otex loads biblatex (not when template pre-loads it)
   \cs_if_exist:NT \DefineBibliographyStrings
@@ -38,7 +38,7 @@
       }
     }
   }
-  
+
   % URL/DOI line breaking configuration for biblatex
   % Allow breaks at numbers (e.g., in DOIs like 10.3390/math14010158)
   \cs_if_exist:NT \setcounter

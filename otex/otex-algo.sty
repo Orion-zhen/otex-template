@@ -2,18 +2,17 @@
 
 \str_if_eq:VnTF \g_otex_algo_backend_tl { algorithmicx }
 {
-  % Symbol detection for algorithmicx
-  \cs_if_exist:NF \algorithmic { \otex_require:nnnn { algorithm } {} {} {} }
-  \cs_if_exist:NF \Require { \otex_require:nnnn { algpseudocode } {} {} {} }
+  % algorithmicx
+  % Guard: \algorithmic (algorithm), \Require (algpseudocode)
+  \otex_safe_require:nnnn { algorithm } {} { \algorithmic } {}
+  \otex_safe_require:nnnn { algpseudocode } {} { \Require } {}
 }
 {
-  % Symbol detection for algorithm2e
-  \cs_if_exist:NF \SetKwInput 
-  { \otex_require:nnnn { algorithm2e } { ruled, linesnumbered, vlined } {} {} }
-  
-  % Define Input and Output commands (only if algorithm2e is loaded)
-  \@ifpackageloaded{algorithm2e}
+  % algorithm2e
+  % Guard: \SetKwInput
+  \otex_safe_require:nnnn { algorithm2e } { ruled, linesnumbered, vlined } { \SetKwInput }
   {
+    % Configuration Hook
     \bool_if:NTF \g_otex_english_bool
     {
       \SetKwInput{Input}{Input}
@@ -24,7 +23,6 @@
       \SetKwInput{Output}{输出}
     }
   }
-  {}
 }
 
 \endinput

@@ -5,21 +5,18 @@
 % ==============================================================================
 
 % 跨平台 shell escape 检测 (Portable shell escape detection)
-\RequirePackage { pdftexcmds } 
+\RequirePackage { pdftexcmds }
 
 % 颜色支持 (Color support)
-\RequirePackage [table] { xcolor } 
+\RequirePackage [table] { xcolor }
 
-% 列表定制 (Lists) - symbol detection
-% \newlist is representative of enumitem
-\cs_if_exist:NTF \newlist 
-  { \msg_warning:nnnn { otex } { pkg-skip } { enumitem } { \\newlist~already~defined } }
-  { \RequirePackage [inline] { enumitem } }
+% 列表定制 (Lists) - Hybrid Safe Load
+% guard: \newlist (enumitem)
+\otex_safe_require:nnnn { enumitem } { inline } { \newlist } {}
 
-% 单位支持 (SI Units) - symbol detection
-\cs_if_exist:NTF \SI 
-  { \msg_warning:nnnn { otex } { pkg-skip } { siunitx } { \\SI~already~defined } }
-  { \RequirePackage { siunitx } }
+% 单位支持 (SI Units) - Hybrid Safe Load
+% guard: \SI (siunitx)
+\otex_safe_require:nnnn { siunitx } {} { \SI } {}
 
 % 微排版优化 (Micro-typography)
 \RequirePackage { microtype }

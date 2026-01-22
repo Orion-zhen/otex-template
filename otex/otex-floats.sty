@@ -1,22 +1,14 @@
 \ProvidesExplPackage {otex/otex-floats} {2026-01-16} {1.1} {Orion's Floats}
 
-% Symbol detection for float package
-% Note: floatrow also defines \newfloat, so check for it too
-\cs_if_exist:NTF \newfloat 
-{
-  \msg_warning:nnnn { otex } { pkg-skip } { float } { \\newfloat~already~defined }
-}
-{
-  \@ifpackageloaded{floatrow} 
-    { \msg_warning:nnnn { otex } { pkg-skip } { float } { floatrow~package~loaded } } 
-    { \otex_require:nnnn { float } {} {} {} }
-}
-\@ifpackageloaded{flafter} 
-  { \msg_warning:nnnn { otex } { pkg-skip } { flafter } { already~loaded } } 
-  { \otex_require:nnnn { flafter } {} {} {} }
+% Floats (Safe Load)
+% Guard: \newfloat (float/floatrow)
+\otex_safe_require:nnnn { float } {} { \newfloat } {}
+
+% flafter (Safe Load, no specific guard but safe to load if no conflict known)
+\otex_safe_require:nnnn { flafter } {} {} {}
 
 \bool_if:NT \g_otex_float_section_bool
-{ \otex_require:nnnn { placeins } { section } {} {} }
+{ \otex_safe_require:nnnn { placeins } { section } { \FloatBarrier } {} }
 
 % Float Parameters
 \cs_set:Npn \topfraction { 0.85 }

@@ -4,123 +4,98 @@
 {
   % Use AtBeginDocument to handle classes that load hyperref late (like mdpi)
   % or with specific options.
-    % Load bib dependency if needed (usually handled by otex-bib, but check here)
-    \bool_if:NF \g_otex_load_bib_bool { \otex_require:nnnn { cite } {} {} {} }
+  % Load citation dependency
+  \bool_if:NF \g_otex_load_bib_bool { \otex_safe_require:nnnn { cite } {} {} {} }
 
-    % [Explicit Class Detection]
-    % We detect specific classes known to have conflicts with early hyperref detection.
-    % 1. mdpi: Loads hyperref in AtBeginDocument (very late).
-    % 2. acmart: Loads hyperref internally.
-    % 3. beamer: Loads hyperref internally.
-    
-    \bool_new:N \l_otex_hyperref_passive_bool
-    \bool_set_false:N \l_otex_hyperref_passive_bool
+  % [Explicit Class Detection for Hyperref Passive Mode]
+  \bool_new:N \l_otex_hyperref_passive_bool
+  \bool_set_false:N \l_otex_hyperref_passive_bool
 
-    \@ifclassloaded{mdpi}{ \bool_set_true:N \l_otex_hyperref_passive_bool }{}
-    \@ifclassloaded{acmart}{ \bool_set_true:N \l_otex_hyperref_passive_bool }{}
-    \@ifclassloaded{beamer}{ \bool_set_true:N \l_otex_hyperref_passive_bool }{}
+  \@ifclassloaded{mdpi}{ \bool_set_true:N \l_otex_hyperref_passive_bool }{}
+  \@ifclassloaded{acmart}{ \bool_set_true:N \l_otex_hyperref_passive_bool }{}
+  \@ifclassloaded{beamer}{ \bool_set_true:N \l_otex_hyperref_passive_bool }{}
 
-    \msg_new:nnn { otex } { hyperref-active } 
-      { 
-        Hyperref~loading~mode:~ACTIVE.~(Loading~immediately). \\
-        If~you~encounter~hook~errors,~your~document~class~might~need~Passive~Mode.
-      }
-    \msg_new:nnn { otex } { hyperref-passive } 
-      { 
-        Hyperref~loading~mode:~PASSIVE.~(Waiting~for~class). \\
-        Complex~class~detected.~Skipping~immediate~load.
-      }
+  \msg_new:nnn { otex } { hyperref-active }
+  {
+    Hyperref~loading~mode:~ACTIVE.~(Loading~immediately). \\
+    If~you~encounter~hook~errors,~your~document~class~might~need~Passive~Mode.
+  }
+  \msg_new:nnn { otex } { hyperref-passive }
+  {
+    Hyperref~loading~mode:~PASSIVE.~(Waiting~for~class). \\
+    Complex~class~detected.~Skipping~immediate~load.
+  }
 
-    \bool_if:NTF \l_otex_hyperref_passive_bool
+  % Common Configuration Hook (Meta Info) - Running for BOTH Active and Passive
+  \otex_setup_package:nn { hyperref }
+  {
+    \hypersetup{
+      pdftitle   = { \g_otex_pdf_title_tl },
+      pdfauthor  = { \g_otex_pdf_author_tl },
+      pdfcreator = { LaTeX~with~otex },
+    }
+
+    % Cleveref Logic: Load it AFTER hyperref is loaded
+    \bool_if:NT \g_otex_load_cleveref_bool
     {
-      % --- Complex Template Strategy (Passive) ---
-      \msg_warning:nn { otex } { hyperref-passive }
-      % We believe that hyperref is loaded before the document begins.
-      \AtBeginDocument
+      \bool_if:NTF \l_otex_hyperref_passive_bool
       {
-        \@ifpackageloaded{hyperref}
+        % Passive Mode: The CLASS will load cleveref (e.g. mdpi loads it).
+        % We just pass options and setup configurations.
+        \PassOptionsToPackage { capitalise, nameinlink } { cleveref }
+
+        \otex_setup_package:nn { cleveref }
         {
-          % It was loaded by the class (likely in its AtBeginDocument hook which ran before ours).
-          % We just configure it.
-          \hypersetup{
-            pdftitle   = { \g_otex_pdf_title_tl },
-            pdfauthor  = { \g_otex_pdf_author_tl },
-            pdfcreator = { LaTeX~with~otex },
+          \bool_if:NF \g_otex_english_bool
+          {
+            \crefname{figure}{图}{图}
+            \crefname{table}{表}{表}
+            \crefname{equation}{式}{式}
+            \crefname{theorem}{定理}{定理}
+            \crefname{lemma}{引理}{引理}
           }
         }
+      }
+      {
+        % Active Mode: We are responsible for loading it safely.
+        \otex_safe_require:nnnn { cleveref } { capitalise, nameinlink } {}
         {
-          % If the class is in black list but STILL didn't load hyperref,
-          % we can try to load it now as a last resort.
-          \RequirePackage[
-            colorlinks = true,
-            linkcolor  = black,
-            filecolor  = magenta,
-            urlcolor   = cyan!70!black,
-            citecolor  = green!40!black,
-            pdftitle   = { \g_otex_pdf_title_tl },
-            pdfauthor  = { \g_otex_pdf_author_tl },
-            pdfcreator = { LaTeX~with~otex },
-          ]{hyperref}
+          \bool_if:NF \g_otex_english_bool
+          {
+            \crefname{figure}{图}{图}
+            \crefname{table}{表}{表}
+            \crefname{equation}{式}{式}
+            \crefname{theorem}{定理}{定理}
+            \crefname{lemma}{引理}{引理}
+          }
         }
       }
     }
-    {
-      % --- Standard Template Strategy (Active) ---
-      \msg_warning:nn { otex } { hyperref-active }
-      % Check if hyperref is loaded (by class or user). If not, load it.
-      \@ifpackageloaded{hyperref}
-      {
-        \hypersetup{
-          pdftitle   = { \g_otex_pdf_title_tl },
-          pdfauthor  = { \g_otex_pdf_author_tl },
-          pdfcreator = { LaTeX~with~otex },
-        }
-      }
-      {
-        \RequirePackage[
-          colorlinks = true,
-          linkcolor  = black,
-          filecolor  = magenta,
-          urlcolor   = cyan!70!black,
-          citecolor  = green!40!black,
-          pdftitle   = { \g_otex_pdf_title_tl },
-          pdfauthor  = { \g_otex_pdf_author_tl },
-          pdfcreator = { LaTeX~with~otex },
-        ]{hyperref}
-      }
-    }
-}
+  }
 
-\bool_if:NT \g_otex_load_cleveref_bool
-{
-  \msg_new:nnn { otex } { cleveref-skip } { Hyperref~not~loaded.~Skipping~cleveref. }
-  
-  \AtBeginDocument
+  % Common Styling Options (Applied only if otex loads hyperref)
+  \clist_set:Nn \l_tmpa_clist
   {
-    \@ifpackageloaded{cleveref}
+    colorlinks = true,
+    linkcolor  = black,
+    filecolor  = magenta,
+    urlcolor   = cyan!70!black,
+    citecolor  = green!40!black
+  }
+
+  \bool_if:NTF \l_otex_hyperref_passive_bool
+  {
+    \msg_warning:nn { otex } { hyperref-passive }
+    % Passive: Wait until begin document to see if class loaded it
+    \AtBeginDocument
     {
-      % Already loaded, do nothing or minimal config
+      \otex_safe_require:nnnn { hyperref } { \l_tmpa_clist } {} {}
     }
-    {
-      % Only load if hyperref is present (it should be by now if enabled)
-      \@ifpackageloaded{hyperref}
-      {
-        \RequirePackage[capitalise,nameinlink]{cleveref}
-        
-        \bool_if:NF \g_otex_english_bool
-        {
-          % Chinese localizations
-          \crefname{figure}{图}{图}
-          \crefname{table}{表}{表}
-          \crefname{equation}{式}{式}
-          \crefname{theorem}{定理}{定理}
-          \crefname{lemma}{引理}{引理}
-        }
-      }
-      {
-        \msg_warning:nn { otex } { cleveref-skip }
-      }
-    }
+  }
+  {
+    \msg_warning:nn { otex } { hyperref-active }
+    % Active: Load immediately
+    \otex_safe_require:nnnn { hyperref } { \l_tmpa_clist } {} {}
   }
 }
 

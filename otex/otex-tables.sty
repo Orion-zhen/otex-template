@@ -1,24 +1,11 @@
 \ProvidesExplPackage {otex/otex-tables} {2026-01-16} {1.1} {Orion's Tables}
 
 % Symbol detection: only load if representative symbols don't exist
-\cs_if_exist:NTF \toprule 
-  { \msg_warning:nnnn { otex } { pkg-skip } { booktabs } { \\toprule~already~defined } }
-  { \otex_require:nnnn { booktabs } {} {} {} }
-
-\cs_if_exist:NTF \multirow 
-  { \msg_warning:nnnn { otex } { pkg-skip } { multirow } { \\multirow~already~defined } }
-  { \otex_require:nnnn { multirow } {} {} {} }
-
-\@ifpackageloaded{array} 
-  { \msg_warning:nnnn { otex } { pkg-skip } { array } { already~loaded } } 
-  { \otex_require:nnnn { array } {} {} {} }
-
-\cs_if_exist:cTF { longtable } 
-  { \msg_warning:nnnn { otex } { pkg-skip } { longtable } { environment~already~defined } }
-  { \otex_require:nnnn { longtable } {} {} {} }
-
-\cs_if_exist:NTF \wrapfigure 
-  { \msg_warning:nnnn { otex } { pkg-skip } { wrapfig } { \\wrapfigure~already~defined } }
-  { \otex_require:nnnn { wrapfig } {} {} {} }
+% Tables (Safe Load)
+\otex_safe_require:nnnn { booktabs } {} { \toprule } {}
+\otex_safe_require:nnnn { multirow } {} { \multirow } {}
+\otex_safe_require:nnnn { array } {} {} {}
+\otex_safe_require:nnnn { longtable } {} { \longtable } {}
+\otex_safe_require:nnnn { wrapfig } {} { \wrapfigure } {}
 
 \endinput

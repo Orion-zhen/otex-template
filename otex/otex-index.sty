@@ -2,12 +2,11 @@
 
 \bool_if:NT \g_otex_load_index_bool
 {
-  % Symbol detection: check if \printindex already exists (makeidx/imakeidx loaded)
-  \cs_if_exist:NTF \printindex
-  { \msg_warning:nnnn { otex } { pkg-skip } { imakeidx } { \\printindex~already~defined } }
+  % Index (Safe Load)
+  % Guard: \printindex
+  \otex_safe_require:nnnn { imakeidx } {} { \printindex }
   {
-    \otex_require:nnnn { imakeidx } {} {} {}
-    \@ifpackageloaded{imakeidx} { \makeindex[columns=2, title=Index, intoc] } {}
+    \makeindex[columns=2, title=Index, intoc]
   }
 }
 
