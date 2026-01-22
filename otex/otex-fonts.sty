@@ -36,7 +36,7 @@
 % 被动模式出口：若已触发退避逻辑，则立即终止加载过程，规避对 fontspec 的二次调用
 \str_if_eq:VnT \g_otex_font_set_tl { none } { \endinput }
 
-\RequirePackage { fontspec }
+\otex_safe_require:nnnn { fontspec } {} {} {}
 
 \tl_if_empty:NF \g_otex_fonts_dir_tl
 {

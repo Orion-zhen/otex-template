@@ -84,7 +84,7 @@
   % 浮动体增强：若当前文档类未预定义 listing 环境，则利用 float 包手动补齐
   \cs_if_exist:NF \c@listing
   {
-    \RequirePackage{float}
+    \otex_safe_require:nnnn { float } {} {} {}
     \newfloat{listing}{htbp}{lol}
     \floatname{listing}{Listing}
   }

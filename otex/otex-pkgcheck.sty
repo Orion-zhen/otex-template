@@ -21,16 +21,25 @@
 \msg_new:nnn { otex } { pkg-skip } { Skipping~'#1':~#2. }
 
 % 全局宏包追踪序列：
-% 记录所有由 otex 系统主动调用的 \RequirePackage 行为。
+% 记录所有由 otex 系统主动或被动调用的 \RequirePackage 行为。
 % 这是一个关键的数据结构，用于在 \otex_safe_require:nnnn 中区分是否应该报出“宏包已存在”的警告。
 \seq_new:N \g_otex_loaded_packages_seq
 
 % 自动追踪 Hook：
-% 每当一个宏包加载完成（package/after 钩子触发），我们将当前宏包名 (\g_file_curr_name_str) 存入追踪序列。
+% 每当一个宏包加载完成（package/after 钩子触发），我们将当前宏包名 (\@currname) 存入追踪序列。
 % 这保证了序列始终包含当前编译周期中所有已加载的宏包名称。
 \AddToHook { package/after }
 {
-  \seq_gput_right:Nx \g_otex_loaded_packages_seq { \g_file_curr_name_str }
+  \seq_gput_right:Nx \g_otex_loaded_packages_seq { \@currname }
+}
+
+% 自动追踪 Hook：
+% 每当一个宏包加载完成（package/after 钩子触发），我们将当前宏包名存入追踪序列。
+% 我们使用 \str_set:Nx 强制转换为字符串，消除 category code 差异带来的匹配失败。
+\AddToHook { package/after }
+{
+  \str_set:Nx \l_tmpa_str { \@currname }
+  \seq_gput_right:NV \g_otex_loaded_packages_seq \l_tmpa_str
 }
 
 % ------------------------------------------------------------------------------
@@ -81,13 +90,21 @@
       #4
     }
 
-    % 发出警告，前提是：这包不是 otex 自己刚才加载的。
-    % 这样可以过滤掉内部模块间相互依赖产生的 log 杂音。
-    \seq_if_in:NnF \g_otex_loaded_packages_seq { #1 }
+    % 检查是否由 otex 系统内部加载：
+    % 将 #1 转换为规范字符串并逐项比对 sequence
+    \str_set:Nn \l_otex_tmp_pkg_str { #1 }
+    \bool_set_false:N \l_otex_pkg_internal_bool
+    \seq_map_inline:Nn \g_otex_loaded_packages_seq
+    {
+        \str_if_eq:VnT \l_otex_tmp_pkg_str { ##1 }
+        { \bool_set_true:N \l_otex_pkg_internal_bool \seq_map_break: }
+    }
+
+    \bool_if:NF \l_otex_pkg_internal_bool
     {
       \msg_warning:nnn { otex } { pkg-loaded } { #1 }
-      % 将其加入序列，避免针对同一宏包产生多次重复警告（如多次 \RequirePackage{otex} 时）
-      \seq_gput_right:Nn \g_otex_loaded_packages_seq { #1 }
+      % 标记为已警告，存入序列防止二次爆发
+      \seq_gput_right:NV \g_otex_loaded_packages_seq \l_otex_tmp_pkg_str
     }
   }
   {
@@ -96,8 +113,6 @@
     {
       { \tl_if_empty_p:n { #3 } } % 用户未定义守护符号，跳过此步
       { 
-        % 增加防御性编程：仅当 #3 为单个 token 时才调用 \cs_if_exist_p:N
-        % 否则如果 #3 是 "{foo}" 或者 "invalid string"，会导致底层报错
         \bool_lazy_and_p:nn 
           { \tl_if_single_token_p:n { #3 } }
           { \cs_if_exist_p:N #3 }
@@ -108,6 +123,8 @@
       {
         % 符号为空，说明没有冲突风险，允许加载
         \otex_setup_package:nn { #1 } { \bool_set_false:N \l_otex_pkg_preloaded_bool #4 }
+        \str_set:Nn \l_otex_tmp_pkg_str { #1 }
+        \seq_gput_right:NV \g_otex_loaded_packages_seq \l_otex_tmp_pkg_str
         \tl_if_empty:nTF { #2 }
         { \RequirePackage { #1 } }
         { \RequirePackage [ #2 ] { #1 } }
@@ -118,8 +135,10 @@
       }
     }
     {
-      % 步骤 3：正式加载。设置 preloaded 标志为假，以便全额应用 otex 默认配置。
+      % 步骤 3：正式加载。
       \otex_setup_package:nn { #1 } { \bool_set_false:N \l_otex_pkg_preloaded_bool #4 }
+      \str_set:Nn \l_otex_tmp_pkg_str { #1 }
+      \seq_gput_right:NV \g_otex_loaded_packages_seq \l_otex_tmp_pkg_str
       \tl_if_empty:nTF { #2 }
       { \RequirePackage { #1 } }
       { \RequirePackage [ #2 ] { #1 } }

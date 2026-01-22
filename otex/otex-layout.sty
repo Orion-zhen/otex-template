@@ -1,6 +1,6 @@
 \ProvidesExplPackage {otex/otex-layout} {2026-01-16} {1.1} {Orion's Layout}
 
-\otex_safe_require:nnnn { geometry } { a4paper, left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm } { \geometry } {}
+\otex_safe_require:nnnn { geometry } { a4paper, left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm } { \newgeometry } {}
 
 % 特殊类处理：standalone 类不需要页面布局
 \@ifclassloaded{standalone}{\endinput}{}
