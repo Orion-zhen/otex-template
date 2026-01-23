@@ -13,7 +13,7 @@
 ## 2. 配置选项
 
 - `bib`: (Boolean) 是否加载此模块，默认为 `true`。
-- `bib-backend`: 可选值为 `biblatex` (默认) 或 `natbib`。
+- `bib-backend`: 可选值为 `biber` (默认) 或 `bibtex` 或 `natbib`。
 - `bib-style`: 引用样式，如 `ieee`, `gb7714-2015` 等。
 
 ## 3. 使用示例
@@ -21,7 +21,7 @@
 > [!CAUTION]
 > **请勿使用传统 BibTeX 语法！**
 >
-> `otex` 默认使用 `biblatex` 后端，你**必须**使用以下语法：
+> `otex` 默认使用 `biber` 后端，你**必须**使用以下语法：
 >
 > - ✅ `\addbibresource{ref.bib}` — 加载 `.bib` 文件（注意需要 `.bib` 后缀）
 > - ✅ `\printbibliography` — 打印参考文献列表
