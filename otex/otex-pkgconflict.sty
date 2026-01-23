@@ -1,23 +1,23 @@
 \ProvidesExplPackage {otex/otex-pkgconflict} {2026-01-23} {1.0} {Orion's Package Conflict Registry}
 
 % ==============================================================================
-% otex-pkgconflict.sty - Conflict Edge Model Registry
+% otex-pkgconflict.sty - 宏包冲突关系模型注册表
 % ==============================================================================
-% Stores conflict relationships between packages to allow intelligent back-off.
+% 存储宏包之间的冲突关系，以实现智能退让机制。
 
-% Global sequence to store conflict edges (pairs of conflicting packages)
+% 用于存储冲突边（冲突宏包对）的全局序列
 \seq_new:N \g_otex_conflict_edges_seq
 
-% Helper: Define a mutual conflict between two packages
-% Usage: \otex_define_conflict_edge:nn {pkgA} {pkgB}
+% 助手函数：定义两个宏包之间的互斥冲突
+% 用法：\otex_define_conflict_edge:nn {宏包A} {宏包B}
 \cs_new_protected:Npn \otex_define_conflict_edge:nn #1#2
 {
-  % Store as comma-separated pair "pkgA,pkgB"
+  % 以逗号分隔的对 "pkgA,pkgB" 形式存储
   \seq_gput_right:Nn \g_otex_conflict_edges_seq { #1,#2 }
 }
 
-% Helper: Define a clique of mutually conflicting packages
-% Expands {A,B,C} into edges (A,B), (A,C), (B,C)
+% 助手函数：定义一组互斥冲突的宏包团（Clique）
+% 将 {A,B,C} 展开为边 (A,B), (A,C), (B,C)
 \cs_new_protected:Npn \otex_define_conflict_clique:n #1
 {
   \clist_set:Nn \l_otex_clique_list { #1 }
@@ -27,133 +27,145 @@
     {
       \str_if_eq:nnF { ##1 } { ####1 }
       {
-        % Avoid self-loops.
-        % Note: This will generate both (A,B) and (B,A).
-        % This redundancy is acceptable for the simple query logic used later.
+        % 避免自环（Self-loops）。
+        % 注：这将同时生成 (A,B) 和 (B,A)。
+        % 这种冗余对于后续使用的简单查询逻辑是可接受的。
         \otex_define_conflict_edge:nn { ##1 } { ####1 }
       }
     }
   }
 }
 
-% Query: Get all packages that conflict with a given package
-% #1: Package name
-% #2: Result clist variable to store conflicting package names
+% 查询：获取与给定宏包冲突的所有宏包
+% #1: 宏包名称
+% #2: 用于存储冲突宏包名称的结果 clist 变量
 \cs_new_protected:Npn \otex_get_conflicts:nN #1#2
 {
   \clist_clear:N #2
   \seq_map_inline:Nn \g_otex_conflict_edges_seq
   {
-    % Use meaningful local variable for the internal edge parsing
+    % 使用有意义的局部变量进行内部边解析
     \clist_set:Nn \l_otex_edge_pair_clist { ##1 }
     \clist_if_in:NnT \l_otex_edge_pair_clist { #1 }
     {
-      % Found an edge containing the target package
+      % 找到包含目标宏包的边
       \clist_map_inline:Nn \l_otex_edge_pair_clist
       {
         \str_if_eq:nnF { ####1 } { #1 }
         {
-          % Add the *other* package to the result
+          % 将“另一个”宏包添加到结果中
           \clist_put_right:Nn #2 { ####1 }
         }
       }
     }
   }
-  % Remove duplicates from result (due to bidirectional edges in cliques)
+  % 从结果中删除重复项（由于团中存在双向边）
   \clist_remove_duplicates:N #2
 }
 
-% Internal variables
+% 内部变量
 \clist_new:N \l_otex_clique_list
 \clist_new:N \l_otex_edge_pair_clist
 
 % ==============================================================================
-% Knowledge Base: Common Conflicts
+% 知识库：常见冲突
 % ==============================================================================
 
 % ------------------------------------------------------------------------------
-% Group 1: Math Fonts & Symbols
+% 第 1 组：数学字体与符号
 % ------------------------------------------------------------------------------
-% These packages fundamentally alter math font handling and usually cannot coexist.
-% unicode-math requires XeTeX/LuaTeX and disables legacy math font setups.
-\otex_define_conflict_clique:n { unicode-math, mathptmx, mathpazo, newtxmath, newpxmath, mtpro2, fourier, euler, mnsymbol, fourier-otf }
+% 这些宏包从根本上改变了数学字体的处理方式，通常不能共存。
+% unicode-math 需要 XeTeX/LuaTeX，并会禁用传统的数学字体设置。
+\otex_define_conflict_clique:n {
+  unicode-math, mathptmx, mathpazo, newtxmath, newpxmath, mtpro2, fourier, euler, mnsymbol, fourier-otf, bm, stix, stix2, txfonts, pxfonts, mathdesign, libertinust1math, fixmath, isomath
+}
+\otex_define_conflict_clique:n { amsthm, ntheorem, theorem }
 
 % ------------------------------------------------------------------------------
-% Group 2: Bibliography & Citations
+% 第 1a 组：物理与数学工具
 % ------------------------------------------------------------------------------
-% biblatex re-implements citation handling and is incompatible with natbib and cite.
+% physics 和 commath 都重新定义了标准数学算子以及 \abs/\normCMD
+\otex_define_conflict_edge:nn { physics } { commath }
+% bbold 重新定义了与 amsfonts/amssymb 不同的 \mathbb
+\otex_define_conflict_edge:nn { bbold } { amssymb }
+\otex_define_conflict_edge:nn { bbold } { amsfonts }
+
+% ------------------------------------------------------------------------------
+% 第 2 组：参考文献与引用
+% ------------------------------------------------------------------------------
+% biblatex 重新实现了引用的处理方式，与 natbib 和 cite 不兼容。
 \otex_define_conflict_edge:nn { biblatex } { natbib }
 \otex_define_conflict_edge:nn { biblatex } { cite }
-% opcit and notoccite manage citations in ways that can conflict
+% opcit 和 notoccite 以可能发生冲突的方式管理引用
 \otex_define_conflict_edge:nn { opcit } { cite }
 
 % ------------------------------------------------------------------------------
-% Group 3: Algorithms
+% 第 3 组：算法
 % ------------------------------------------------------------------------------
-% algorithm2e provides its own environments and is generally incompatible with 
-% the algorithmic/statistics family (algorithm, algorithmic, etc.)
+% algorithm2e 提供自己的环境，通常与 algorithmic/statistics 系列（algorithm, algorithmic 等）不兼容。
 \otex_define_conflict_edge:nn { algorithm2e } { algorithmic }
+\otex_define_conflict_edge:nn { algorithm2e } { algorithmicx }
 \otex_define_conflict_edge:nn { algorithm2e } { algorithms }
 \otex_define_conflict_edge:nn { algorithm2e } { program }
-% algorithmicx (algpseudocode) vs algorithmic (legacy)
-% They define the same environment names.
+% algorithmicx (algpseudocode) 与 algorithmic (传统)
+% 它们定义了相同的环境名称。
 \otex_define_conflict_edge:nn { algpseudocode } { algorithmic }
 
 % ------------------------------------------------------------------------------
-% Group 4: Subfigures & Captions
+% 第 4 组：子图与标题
 % ------------------------------------------------------------------------------
-% Modern: subcaption. Legacy: subfig, subfigure.
-% Do not mix them.
+% 现代：subcaption。传统：subfig, subfigure。
+% 不要混用它们。
 \otex_define_conflict_clique:n { subcaption, subfig, subfigure }
 
 % ------------------------------------------------------------------------------
-% Group 5: Geometry & Layout
+% 第 5 组：几何与布局
 % ------------------------------------------------------------------------------
-% different packages trying to set page margins
+% 尝试设置页边距的不同宏包
 \otex_define_conflict_clique:n { geometry, fullpage, vmargin, typearea }
 
 % ------------------------------------------------------------------------------
-% Group 6: Lists & Enums
+% 第 6 组：列表与枚举
 % ------------------------------------------------------------------------------
-% enumitem is the modern standard; conflicts with legacy enumerate package
-% if both try to redefine list environments.
+% enumitem 是现代标准；与传统的 enumerate 宏包冲突
+% 如果两者都尝试重新定义列表环境。
 \otex_define_conflict_edge:nn { enumitem } { enumerate }
 \otex_define_conflict_edge:nn { enumitem } { paranotes }
 
 % ------------------------------------------------------------------------------
-% Group 7: Graphics & Colors
+% 第 7 组：图形与颜色
 % ------------------------------------------------------------------------------
-% xcolor supersedes color. Loading both with overlapping options can cause errors.
-% We mark them as conflicting to prefer xcolor if possible, or warn.
+% xcolor 取代了 color。同时加载两者并带有重叠选项可能会导致错误。
+% 我们将它们标记为冲突，以便在可能的情况下优先选择 xcolor，或发出警告。
 \otex_define_conflict_edge:nn { xcolor } { color }
-% graphicx supersedes graphics
+% graphicx 取代了 graphics
 \otex_define_conflict_edge:nn { graphicx } { graphics }
 
 % ------------------------------------------------------------------------------
-% Group 8: Tables
+% 第 8 组：表格
 % ------------------------------------------------------------------------------
-% ctable loads booktabs, but if loaded separately with options, might clash.
-% This is a soft conflict usually, but helpful to know.
-% \otex_define_conflict_edge:nn { ctable } { booktabs } 
+% ctable 会加载 booktabs，但如果带选项单独加载，可能会发生冲突。
+% 这通常是一个软冲突，但了解这一点很有帮助。
+% \otex_define_conflict_edge:nn { ctable } { booktabs }
 
 % ------------------------------------------------------------------------------
-% Group 9: Hyperref & Interactive
+% 第 9 组：Hyperref 与交互
 % ------------------------------------------------------------------------------
-% hyperref is notoriously sensitive.
-% nameref is loaded by hyperref; loading it explicitly before can be tricky if versions mismatch.
-% url is loaded by hyperref.
+% hyperref 是出了名的敏感。
+% nameref 由 hyperref 加载；如果版本不匹配，显式地提前加载它可能会很麻烦。
+% url 由 hyperref 加载。
 
 % ------------------------------------------------------------------------------
-% Group 10: Glossaries
+% 第 10 组：术语表
 % ------------------------------------------------------------------------------
-% glossaries vs glossaries-extra (extra should load glossaries, but parallel loading is bad)
-% glossary (obsolete) vs glossaries
+% glossaries 与 glossaries-extra（extra 应该加载 glossaries，但并行加载是不好的）
+% glossary（已废弃）与 glossaries
 \otex_define_conflict_edge:nn { glossaries } { glossary }
 
 % ------------------------------------------------------------------------------
-% Group 11: Setspace
+% 第 11 组：Setspace
 % ------------------------------------------------------------------------------
-% doublespace is obsolete; setspace is the replacement
+% doublespace 已废弃；setspace 是其替代品
 \otex_define_conflict_edge:nn { setspace } { doublespace }
 
 \endinput
