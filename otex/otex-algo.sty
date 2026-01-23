@@ -7,9 +7,9 @@
   \otex_safe_require:nnnn { algpseudocode } {} { \Require } {}
 }
 {
-  % 引擎 B (algorithm2e)：以 \SetKwInput 命令作为核心加载特征
-  % 守护符号：\SetKwInput
-  \otex_safe_require:nnnn { algorithm2e } { ruled, linesnumbered, vlined } { \SetKwInput }
+  % 引擎 B (algorithm2e)
+  % 守护符号：\algorithm (如果此符号已存在，说明如 algorithm 包已加载，则跳过)
+  \otex_safe_require:nnnn { algorithm2e } { ruled, linesnumbered, vlined } { \algorithm }
   {
     % 环境定制 Hook：配置算法框的国际化标签及默认布局风格
     \bool_if:NTF \g_otex_english_bool
