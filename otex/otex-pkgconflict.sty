@@ -1,0 +1,159 @@
+\ProvidesExplPackage {otex/otex-pkgconflict} {2026-01-23} {1.0} {Orion's Package Conflict Registry}
+
+% ==============================================================================
+% otex-pkgconflict.sty - Conflict Edge Model Registry
+% ==============================================================================
+% Stores conflict relationships between packages to allow intelligent back-off.
+
+% Global sequence to store conflict edges (pairs of conflicting packages)
+\seq_new:N \g_otex_conflict_edges_seq
+
+% Helper: Define a mutual conflict between two packages
+% Usage: \otex_define_conflict_edge:nn {pkgA} {pkgB}
+\cs_new_protected:Npn \otex_define_conflict_edge:nn #1#2
+{
+  % Store as comma-separated pair "pkgA,pkgB"
+  \seq_gput_right:Nn \g_otex_conflict_edges_seq { #1,#2 }
+}
+
+% Helper: Define a clique of mutually conflicting packages
+% Expands {A,B,C} into edges (A,B), (A,C), (B,C)
+\cs_new_protected:Npn \otex_define_conflict_clique:n #1
+{
+  \clist_set:Nn \l_otex_clique_list { #1 }
+  \clist_map_inline:Nn \l_otex_clique_list
+  {
+    \clist_map_inline:Nn \l_otex_clique_list
+    {
+      \str_if_eq:nnF { ##1 } { ####1 }
+      {
+        % Avoid self-loops.
+        % Note: This will generate both (A,B) and (B,A).
+        % This redundancy is acceptable for the simple query logic used later.
+        \otex_define_conflict_edge:nn { ##1 } { ####1 }
+      }
+    }
+  }
+}
+
+% Query: Get all packages that conflict with a given package
+% #1: Package name
+% #2: Result clist variable to store conflicting package names
+\cs_new_protected:Npn \otex_get_conflicts:nN #1#2
+{
+  \clist_clear:N #2
+  \seq_map_inline:Nn \g_otex_conflict_edges_seq
+  {
+    % Use meaningful local variable for the internal edge parsing
+    \clist_set:Nn \l_otex_edge_pair_clist { ##1 }
+    \clist_if_in:NnT \l_otex_edge_pair_clist { #1 }
+    {
+      % Found an edge containing the target package
+      \clist_map_inline:Nn \l_otex_edge_pair_clist
+      {
+        \str_if_eq:nnF { ####1 } { #1 }
+        {
+          % Add the *other* package to the result
+          \clist_put_right:Nn #2 { ####1 }
+        }
+      }
+    }
+  }
+  % Remove duplicates from result (due to bidirectional edges in cliques)
+  \clist_remove_duplicates:N #2
+}
+
+% Internal variables
+\clist_new:N \l_otex_clique_list
+\clist_new:N \l_otex_edge_pair_clist
+
+% ==============================================================================
+% Knowledge Base: Common Conflicts
+% ==============================================================================
+
+% ------------------------------------------------------------------------------
+% Group 1: Math Fonts & Symbols
+% ------------------------------------------------------------------------------
+% These packages fundamentally alter math font handling and usually cannot coexist.
+% unicode-math requires XeTeX/LuaTeX and disables legacy math font setups.
+\otex_define_conflict_clique:n { unicode-math, mathptmx, mathpazo, newtxmath, newpxmath, mtpro2, fourier, euler, mnsymbol, fourier-otf }
+
+% ------------------------------------------------------------------------------
+% Group 2: Bibliography & Citations
+% ------------------------------------------------------------------------------
+% biblatex re-implements citation handling and is incompatible with natbib and cite.
+\otex_define_conflict_edge:nn { biblatex } { natbib }
+\otex_define_conflict_edge:nn { biblatex } { cite }
+% opcit and notoccite manage citations in ways that can conflict
+\otex_define_conflict_edge:nn { opcit } { cite }
+
+% ------------------------------------------------------------------------------
+% Group 3: Algorithms
+% ------------------------------------------------------------------------------
+% algorithm2e provides its own environments and is generally incompatible with 
+% the algorithmic/statistics family (algorithm, algorithmic, etc.)
+\otex_define_conflict_edge:nn { algorithm2e } { algorithmic }
+\otex_define_conflict_edge:nn { algorithm2e } { algorithms }
+\otex_define_conflict_edge:nn { algorithm2e } { program }
+% algorithmicx (algpseudocode) vs algorithmic (legacy)
+% They define the same environment names.
+\otex_define_conflict_edge:nn { algpseudocode } { algorithmic }
+
+% ------------------------------------------------------------------------------
+% Group 4: Subfigures & Captions
+% ------------------------------------------------------------------------------
+% Modern: subcaption. Legacy: subfig, subfigure.
+% Do not mix them.
+\otex_define_conflict_clique:n { subcaption, subfig, subfigure }
+
+% ------------------------------------------------------------------------------
+% Group 5: Geometry & Layout
+% ------------------------------------------------------------------------------
+% different packages trying to set page margins
+\otex_define_conflict_clique:n { geometry, fullpage, vmargin, typearea }
+
+% ------------------------------------------------------------------------------
+% Group 6: Lists & Enums
+% ------------------------------------------------------------------------------
+% enumitem is the modern standard; conflicts with legacy enumerate package
+% if both try to redefine list environments.
+\otex_define_conflict_edge:nn { enumitem } { enumerate }
+\otex_define_conflict_edge:nn { enumitem } { paranotes }
+
+% ------------------------------------------------------------------------------
+% Group 7: Graphics & Colors
+% ------------------------------------------------------------------------------
+% xcolor supersedes color. Loading both with overlapping options can cause errors.
+% We mark them as conflicting to prefer xcolor if possible, or warn.
+\otex_define_conflict_edge:nn { xcolor } { color }
+% graphicx supersedes graphics
+\otex_define_conflict_edge:nn { graphicx } { graphics }
+
+% ------------------------------------------------------------------------------
+% Group 8: Tables
+% ------------------------------------------------------------------------------
+% ctable loads booktabs, but if loaded separately with options, might clash.
+% This is a soft conflict usually, but helpful to know.
+% \otex_define_conflict_edge:nn { ctable } { booktabs } 
+
+% ------------------------------------------------------------------------------
+% Group 9: Hyperref & Interactive
+% ------------------------------------------------------------------------------
+% hyperref is notoriously sensitive.
+% nameref is loaded by hyperref; loading it explicitly before can be tricky if versions mismatch.
+% url is loaded by hyperref.
+
+% ------------------------------------------------------------------------------
+% Group 10: Glossaries
+% ------------------------------------------------------------------------------
+% glossaries vs glossaries-extra (extra should load glossaries, but parallel loading is bad)
+% glossary (obsolete) vs glossaries
+\otex_define_conflict_edge:nn { glossaries } { glossary }
+
+% ------------------------------------------------------------------------------
+% Group 11: Setspace
+% ------------------------------------------------------------------------------
+% doublespace is obsolete; setspace is the replacement
+\otex_define_conflict_edge:nn { setspace } { doublespace }
+
+\endinput

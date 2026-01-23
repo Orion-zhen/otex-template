@@ -1,4 +1,6 @@
 \ProvidesExplPackage {otex/otex-pkgcheck} {2026-01-16} {1.1} {Orion's Smart Package Checker}
+% 引入冲突知识库模块
+\RequirePackage{otex/otex-pkgconflict}
 
 % ==============================================================================
 % otex-pkgcheck.sty - Orion's 智能宏包管理器
@@ -11,35 +13,27 @@
 % 3. 精准通知：区分“otex 自加载”与“用户预加载”，避免对 otex 内部依赖产生多余警告。
 % ==============================================================================
 
-
 % 现代 Hook 系统支持：利用 LaTeX 2020 年 10 月版引入的新特性进行宏包管理
 % 我们假设内核已提供 \AddToHook 和 \IfPackageLoadedTF 命令。
 
 % 定义一系列消息，用于向用户报告宏包冲突、预加载状态或跳过操作。
-\msg_new:nnn { otex } { pkg-conflict } { Package~'#1'~conflict:~symbol~'#2'~defined.~Skipping~load. }
+\msg_new:nnn { otex } { pkg-conflict-symbol } { Package~'#1'~conflict:~symbol~'#2'~defined.~Skipping~load. }
 \msg_new:nnn { otex } { pkg-loaded } { Package~'#1'~already~loaded.~Skipping~otex~default~config. }
 \msg_new:nnn { otex } { pkg-skip } { Skipping~'#1':~#2. }
+\msg_new:nnn { otex } { pkg-conflict-group } { Conflict~detected:~Package~'#1'~conflicts~with~loaded~package~'#2'.~Skipping. }
 
-% 全局宏包追踪序列：
+% 全局宏包追踪集合（Property List）：
 % 记录所有由 otex 系统主动或被动调用的 \RequirePackage 行为。
-% 这是一个关键的数据结构，用于在 \otex_safe_require:nnnn 中区分是否应该报出“宏包已存在”的警告。
-\seq_new:N \g_otex_loaded_packages_seq
+% 使用 prop 结构以实现 O(1) 的快速查找，替代原本的线性序列扫描。
+\prop_new:N \g_otex_loaded_packages_prop
 
 % 自动追踪 Hook：
-% 每当一个宏包加载完成（package/after 钩子触发），我们将当前宏包名 (\@currname) 存入追踪序列。
-% 这保证了序列始终包含当前编译周期中所有已加载的宏包名称。
-\AddToHook { package/after }
-{
-  \seq_gput_right:Nx \g_otex_loaded_packages_seq { \@currname }
-}
-
-% 自动追踪 Hook：
-% 每当一个宏包加载完成（package/after 钩子触发），我们将当前宏包名存入追踪序列。
+% 每当一个宏包加载完成（package/after 钩子触发），我们将当前宏包名存入追踪集合。
 % 我们使用 \str_set:Nx 强制转换为字符串，消除 category code 差异带来的匹配失败。
 \AddToHook { package/after }
 {
-  \str_set:Nx \l_tmpa_str { \@currname }
-  \seq_gput_right:NV \g_otex_loaded_packages_seq \l_tmpa_str
+  \str_set:Nx \l_otex_hook_curr_pkg_str { \@currname }
+  \prop_gput:NVn \g_otex_loaded_packages_prop \l_otex_hook_curr_pkg_str { }
 }
 
 % ------------------------------------------------------------------------------
@@ -49,7 +43,7 @@
 % 宏包延迟配置机制：
 % #1: 宏包名称（不含 .sty 扩展名）
 % #2: 配置代码块（当宏包加载时执行）
-% 
+%
 % 设计逻辑：
 % 使用 LaTeX 核心 Hook 'package/#1/after'。即使该宏包尚未加载，配置也会被“排队”。
 % 这种方式比常规的 \AtBeginDocument 更早（紧随包加载），且解决了加载顺序的强依赖问题。
@@ -58,29 +52,35 @@
   \AddToHook { package/#1/after } { #2 }
 }
 
+% 辅助函数：简化版守卫符号检测
+% 检查 token #1 是否已定义
+\prg_new_conditional:Npnn \otex_symbol_defined:n #1 { TF }
+{
+  \tl_if_empty:nTF { #1 }
+  { \prg_return_false: }
+  { \cs_if_exist:NTF #1 { \prg_return_true: } { \prg_return_false: } }
+}
+
+% 定义内部变量用于存储冲突列表
+\clist_new:N \l_otex_conflicts_clist
 
 % 智能安全加载器 (otex_safe_require)
-% 这是 otex 解决宏包冲突的核心函数。它采用三层逻辑来确保系统的鲁棒性：
-% 
+% 增强版：结合“已知冲突库”与“守卫符号”双重检测
+%
 % 参数说明：
 % #1: 待加载的宏包名称 (e.g., hyperref)
 % #2: 传递给宏包的选项列表 (clist, e.g., colorlinks=true)
-% #3: 守护符号 (token, e.g., \hypersetup)。如果该符号已定义，则视为冲突。
+% #3: 守护符号 (token, e.g., \hypersetup)。仅作为冲突检测的最后防线。
 % #4: otex 的默认配置代码块。
-% 
+%
 % 逻辑流程：
-% 1. 检查宏包是否已加载：
-%    - 若已加载，我们注册 otex 的配置 (#4)，但置位 \l_otex_pkg_preloaded_bool 为真。
-%    - 这样 otex 的配置代码可以通过检查这个布尔变量来决定是否跳过某些“侵略性”设置（如强制修改页边距）。
-%    - 同时，如果该宏包不是由 otex 自身加载的，则发出警告提醒用户。
-% 2. 检查守护符号：
-%    - 有些模板可能通过非标准方式（如直接输入文件或在 class 中重定义）提供了包的功能。
-%    - 如果参数 #3 (守护符号) 存在，我们认为发生了潜在命名冲突，放弃加载。
-% 3. 环境干净：
-%    - 执行常规的 \RequirePackage 并注册配置。
+% 1. 检查宏包是否已加载 (\IfPackageLoadedTF)。
+% 2. 检查已知冲突 (Conflict Edge Registry)。
+% 3. 检查守护符号 (Guard Symbol Check)。
+% 4. 均无冲突则加载。
 \cs_new_protected:Npn \otex_safe_require:nnnn #1#2#3#4
 {
-  % 步骤 1：探测宏包名是否在 LaTeX 的 loaded 列表中
+  % 步骤 1：直接探测宏包名是否不在加载列表中
   \IfPackageLoadedTF { #1 }
   {
     % 宏包已存在。注册配置，并标记为“预加载”模式。
@@ -91,65 +91,73 @@
     }
 
     % 检查是否由 otex 系统内部加载：
-    % 将 #1 转换为规范字符串并逐项比对 sequence
-    \str_set:Nn \l_otex_tmp_pkg_str { #1 }
-    \bool_set_false:N \l_otex_pkg_internal_bool
-    \seq_map_inline:Nn \g_otex_loaded_packages_seq
+    % 直接查表 (O(1)) 判断 package 是否在追踪集合中
+    % 为了确保匹配准确性，先将输入包名转换为 string
+    \str_set:Nn \l_otex_target_pkg_str { #1 }
+    \prop_if_in:NVTF \g_otex_loaded_packages_prop \l_otex_target_pkg_str
     {
-        \str_if_eq:VnT \l_otex_tmp_pkg_str { ##1 }
-        { \bool_set_true:N \l_otex_pkg_internal_bool \seq_map_break: }
+      \bool_set_true:N \l_otex_pkg_internal_bool
+    }
+    {
+      \bool_set_false:N \l_otex_pkg_internal_bool
     }
 
     \bool_if:NF \l_otex_pkg_internal_bool
     {
       \msg_warning:nnn { otex } { pkg-loaded } { #1 }
-      % 标记为已警告，存入序列防止二次爆发
-      \seq_gput_right:NV \g_otex_loaded_packages_seq \l_otex_tmp_pkg_str
+      % 标记为已警告，存入集合防止二次爆发
+      \prop_gput:NVn \g_otex_loaded_packages_prop \l_otex_target_pkg_str { }
     }
   }
   {
-    % 步骤 2：守护符号冲突检查
-    \bool_lazy_any:nTF
+    % 宏包未加载。进入冲突检测流程。
+    \bool_set_false:N \l_otex_conflict_found_bool
+
+    % 步骤 2：基于知识库的冲突检测
+    \otex_get_conflicts:nN { #1 } \l_otex_conflicts_clist
+    \clist_map_inline:Nn \l_otex_conflicts_clist
     {
-      { \tl_if_empty_p:n { #3 } } % 用户未定义守护符号，跳过此步
-      { 
-        \bool_lazy_and_p:nn 
-          { \tl_if_single_token_p:n { #3 } }
-          { \cs_if_exist_p:N #3 }
-      }     % 守护符号已存在，触发冲突
+      \IfPackageLoadedTF { ##1 }
+      {
+        % 发现互斥包已加载
+        \msg_warning:nnnn { otex } { pkg-conflict-group } { #1 } { ##1 }
+        \bool_set_true:N \l_otex_conflict_found_bool
+        \clist_map_break:
+      }
+    }
+
+    \bool_if:NTF \l_otex_conflict_found_bool
+    {
+      % 发生主要冲突，跳过加载
     }
     {
-      \tl_if_empty:nTF { #3 }
+      % 步骤 3：守护符号冲突检测 (Fallback)
+      \otex_symbol_defined:nTF { #3 }
       {
-        % 符号为空，说明没有冲突风险，允许加载
-        \otex_setup_package:nn { #1 } { \bool_set_false:N \l_otex_pkg_preloaded_bool #4 }
-        \str_set:Nn \l_otex_tmp_pkg_str { #1 }
-        \seq_gput_right:NV \g_otex_loaded_packages_seq \l_otex_tmp_pkg_str
+        % 符号已定义，说明有隐式冲突
+        \msg_warning:nnnn { otex } { pkg-conflict-symbol } { #1 } { #3 }
+      }
+      {
+        % 步骤 4：环境干净，正式加载
+        \otex_setup_package:nn { #1 }
+        {
+          \bool_set_false:N \l_otex_pkg_preloaded_bool
+          #4
+        }
+        \str_set:Nn \l_otex_target_pkg_str { #1 }
+        \prop_gput:NVn \g_otex_loaded_packages_prop \l_otex_target_pkg_str { }
         \tl_if_empty:nTF { #2 }
         { \RequirePackage { #1 } }
         { \RequirePackage [ #2 ] { #1 } }
       }
-      {
-        % 发现冲突符号！
-        \msg_warning:nnnn { otex } { pkg-conflict } { #1 } { #3 }
-      }
-    }
-    {
-      % 步骤 3：正式加载。
-      \otex_setup_package:nn { #1 } { \bool_set_false:N \l_otex_pkg_preloaded_bool #4 }
-      \str_set:Nn \l_otex_tmp_pkg_str { #1 }
-      \seq_gput_right:NV \g_otex_loaded_packages_seq \l_otex_tmp_pkg_str
-      \tl_if_empty:nTF { #2 }
-      { \RequirePackage { #1 } }
-      { \RequirePackage [ #2 ] { #1 } }
     }
   }
 }
 
-
 % 定义布尔标志：用于区分是否在 otex 之前“预加载”与“非预加载”状态
 % 该标志在 \otex_safe_require:nnnn 中用于判断是否应该报出“宏包已存在”的警告。
 \bool_new:N \l_otex_pkg_preloaded_bool
+\bool_new:N \l_otex_conflict_found_bool
 
 % 定义辅助宏：提供容错性的命令/环境定义
 % 仅在目标命令或环境未被占用时才执行定义动作。
