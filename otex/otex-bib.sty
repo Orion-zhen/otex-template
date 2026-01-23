@@ -17,7 +17,8 @@
 {
   \str_case:VnF \g_otex_bib_backend_tl
   {
-    {biblatex} { \otex_safe_require:nnnn { biblatex } { backend=bibtex, style=\g_otex_bib_style_tl, sorting=none, doi=true } {} {} }
+    {biber} { \otex_safe_require:nnnn { biblatex } { backend=biber, style=\g_otex_bib_style_tl, sorting=none, doi=true } {} {} }
+    {bibtex} { \otex_safe_require:nnnn { biblatex } { backend=bibtex, style=\g_otex_bib_style_tl, sorting=none, doi=true } {} {} }
     {natbib}   { \otex_safe_require:nnnn { natbib } { numbers, sort&compress } {} {} }
   }
   {
