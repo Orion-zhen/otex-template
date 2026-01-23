@@ -15,35 +15,37 @@
 
 \bool_if:NF \l_otex_bib_configured_bool
 {
-  \str_case:VnF \g_otex_bib_backend_tl
+  \cs_new_protected:Npn \otex_setup_biblatex_config:
   {
-    {biber} { \otex_safe_require:nnnn { biblatex } { backend=biber, style=\g_otex_bib_style_tl, sorting=none, doi=true } {} {} }
-    {bibtex} { \otex_safe_require:nnnn { biblatex } { backend=bibtex, style=\g_otex_bib_style_tl, sorting=none, doi=true } {} {} }
-    {natbib}   { \otex_safe_require:nnnn { natbib } { numbers, sort&compress } {} {} }
-  }
-  {
-    \otex_safe_require:nnnn { biblatex } { backend=biber, style=ieee } {} {}
-  }
-
-  % 国际化增强：为 biblatex 后端注入中文文献列表标题设置
-  % 注入策略：仅当 otex 负责加载 biblatex 时启用，避免干扰模板原生配置
-  \cs_if_exist:NT \DefineBibliographyStrings
-  {
-    \bool_if:NF \g_otex_english_bool
+    % 国际化增强：为 biblatex 后端注入中文文献列表标题设置
+    \cs_if_exist:NT \DefineBibliographyStrings
     {
-      \DefineBibliographyStrings{english}{
-        bibliography = {参考文献},
-        references = {参考文献},
+      \bool_if:NF \g_otex_english_bool
+      {
+        \DefineBibliographyStrings{english}{
+          bibliography = {参考文献},
+          references = {参考文献},
+        }
       }
+    }
+
+    % 视觉优化：调整 biblatex 链接断行惩罚值
+    \cs_if_exist:NT \setcounter
+    {
+      \setcounter{biburlnumpenalty}{100}
+      \setcounter{biburlucpenalty}{100}
+      \setcounter{biburllcpenalty}{100}
     }
   }
 
-  % 视觉优化：调整 biblatex 链接断行惩罚值，确保长 DOI/URL 在窄行内能合理折行排版
-  \cs_if_exist:NT \setcounter
+  \str_case:VnF \g_otex_bib_backend_tl
   {
-    \setcounter{biburlnumpenalty}{100}
-    \setcounter{biburlucpenalty}{100}
-    \setcounter{biburllcpenalty}{100}
+    {biber} { \otex_safe_require:nnnn { biblatex } { backend=biber, style=\g_otex_bib_style_tl, sorting=none, doi=true } {} { \otex_setup_biblatex_config: } }
+    {bibtex} { \otex_safe_require:nnnn { biblatex } { backend=bibtex, style=\g_otex_bib_style_tl, sorting=none, doi=true } {} { \otex_setup_biblatex_config: } }
+    {natbib}   { \otex_safe_require:nnnn { natbib } { numbers, sort&compress } {} {} }
+  }
+  {
+    \otex_safe_require:nnnn { biblatex } { backend=biber, style=ieee } {} { \otex_setup_biblatex_config: }
   }
 }
 
