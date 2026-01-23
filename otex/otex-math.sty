@@ -7,49 +7,35 @@
 % 定理支撑 (amsthm)：配置定理环境样式，通过 \theoremstyle 探测避免与 ntheorem 等宏包冲突
 \otex_safe_require:nnnn { amsthm } {} { \theoremstyle } {}
 
-\msg_new:nnn { otex } { amssymb-conflict } { Package~'amssymb'~conflict~with~'unicode-math'. }
-\msg_new:nnn { otex } { math-pkg-backoff } { Legacy~math~package~'#1'~detected.~Disabling~unicode-math. }
-
 % 智能路由：根据编译引擎和已有宏包自动选择数学支持方案。
-% 若为 pdfTeX 或检测到特定字体包加载，则回退至经典模式；否则启用现代 unicode-math。
-\bool_new:N \l_otex_math_conflict_bool
+% 1. pdfTeX 引擎：不支持 unicode-math，回退至 amssymb。
+% 2. XeTeX/LuaTeX 引擎：尝试加载 unicode-math。
+%    - 若存在互斥包 (如 mathptmx)，otex_safe_require 会自动跳过 unicode-math。
+%    - 若 unicode-math 未加载 (因冲突跳过)，则回退至 amssymb 以确保兼容性。
 
-% 动态兼容性扫描：检测常见的传统数学字体包及 bm (boldsymbol 与 unicode-math 存在全局冲突)
-\clist_map_inline:nn { mathpazo, newtxmath, fourier, stix, stix2, mtpro2, eulervm, bm }
+\sys_if_engine_pdftex:TF
 {
-  \@ifpackageloaded{#1}
-  {
-    \bool_set_true:N \l_otex_math_conflict_bool
-    \msg_warning:nnn { otex } { math-pkg-backoff } { #1 }
-  }
-  {}
-}
-% 鲁棒性增强：主要依赖宏包加载状态探测，确保在各类复杂模板中也能平滑退避
-
-\bool_lazy_or:nnTF { \sys_if_engine_pdftex_p: } { \l_otex_math_conflict_bool }
-{
-  % pdfTeX 或检测到传统数学包 -> 使用 amssymb
-  \sys_if_engine_pdftex:T
-  {
-    \msg_new:nnn { otex } { math-pdftex } { pdfTeX~detected.~Using~amssymb~instead~of~unicode-math. }
-    \msg_warning:nn { otex } { math-pdftex }
-  }
-  \otex_safe_require:nnnn { amsmath } {} {} {}
-  % 经典符号补遗 (amssymb)：仅在 \Bbbk 命令缺失时加载，防止符号库重复定义报错
+  \msg_new:nnn { otex } { math-pdftex } { pdfTeX~detected.~Using~amssymb~instead~of~unicode-math. }
+  \msg_warning:nn { otex } { math-pdftex }
   \otex_safe_require:nnnn { amssymb } {} { \Bbbk } {}
 }
 {
-  % Unicode 数学
-  \@ifpackageloaded{amssymb} { \msg_warning:nn { otex } { amssymb-conflict } } {}
-
-  % Unicode 数学支持：通过 unicode-math 实现 OpenType 数学字体的原生适配 (仅限 XeTeX/LuaTeX)
-  % 守护符号探测：以 \setmathfont 为核心标志位
-  \@ifpackageloaded{amssymb} { \msg_warning:nn { otex } { amssymb-conflict } } {}
-
+  % 尝试加载 unicode-math
+  % 冲突检测由 otex-pkgconflict 自动处理 (Group 1: Math Fonts)
   \otex_safe_require:nnnn { unicode-math } { math-style=ISO, bold-style=ISO } { \setmathfont }
   {
     \otex_provide_command:Nnn \square { } { \mdlgwhtsquare }
     \otex_provide_command:Nnn \boxtimes { } { \boxtimes }
+  }
+
+  % 状态检查：如果 unicode-math 因冲突被跳过，则加载 amssymb 作为保底
+  \IfPackageLoadedTF { unicode-math }
+  {
+    \msg_new:nnn { otex } { amssymb-conflict } { Package~'amssymb'~conflict~with~'unicode-math'. }
+    \@ifpackageloaded{amssymb} { \msg_warning:nn { otex } { amssymb-conflict } } {}
+  }
+  {
+    \otex_safe_require:nnnn { amssymb } {} { \Bbbk } {}
   }
 }
 

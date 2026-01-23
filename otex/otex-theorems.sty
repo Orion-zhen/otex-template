@@ -24,61 +24,52 @@
   % 策略：c@theorem 是判断定理包加载状态的最可靠指标
   % 判定：仅在计数器空闲时执行自动初始化
 
-  \cs_if_exist:cTF { theorem }
+  % 智能加载 amsthm：
+  % 1. 自动检测互斥包 (ntheorem)
+  % 2. 自动检测守护符号 (\theorem) 防止覆盖现有定义
+  \otex_safe_require:nnnn { amsthm } {} { \theorem }
   {
-    % 异常处理：命令存在但计数器缺失
-    % 保守策略：怀疑存在未知冲突包，放弃接管
-  }
-  {
-    \@ifpackageloaded{ntheorem}
-    { \msg_warning:nn { otex } { amsthm-conflict } }
+    % 样式定制 Hook：在 amsthm 成功加载后注入学术风格预设
+    \cs_if_exist:cF { th@mystyle }
     {
-      % amsthm 初始化：基于符号探测的逻辑，本层由安全加载器驱动
-      \otex_safe_require:nnnn { amsthm } {} {}
-      {
-        % 样式定制 Hook：在 amsthm 成功加载后注入学术风格预设
-        \cs_if_exist:cF { th@mystyle }
-        {
-          \newtheoremstyle{mystyle}{3pt}{3pt}{\normalfont}{}{\bfseries}{:}{.5em}{}
-          \theoremstyle{mystyle}
-        }
+      \newtheoremstyle{mystyle}{3pt}{3pt}{\normalfont}{}{\bfseries}{:}{.5em}{}
+      \theoremstyle{mystyle}
+    }
 
-        \newtheorem{theorem}{\l_otex_theorem_name_tl}[section]
+    \newtheorem{theorem}{\l_otex_theorem_name_tl}[section]
 
-        \bool_if:NTF \g_otex_english_bool
-        {
-          \__otex_def_thm:nn { lemma } { Lemma }
-          \__otex_def_thm:nn { proposition } { Proposition }
-          \__otex_def_thm:nn { corollary } { Corollary }
-          \__otex_def_thm:nn { definition } { Definition }
-          \__otex_def_thm:nn { example } { Example }
-          \__otex_def_thm:nn { remark } { Remark }
-          \__otex_def_thm:nn { assumption } { Assumption }
-          \__otex_def_thm:nn { conjecture } { Conjecture }
-          \__otex_def_thm:nn { axiom } { Axiom }
-          \__otex_def_thm:nn { problem } { Problem }
-          \__otex_def_thm:nn { exercise } { Exercise }
-          \__otex_def_thm:nn { case } { Case }
+    \bool_if:NTF \g_otex_english_bool
+    {
+      \__otex_def_thm:nn { lemma } { Lemma }
+      \__otex_def_thm:nn { proposition } { Proposition }
+      \__otex_def_thm:nn { corollary } { Corollary }
+      \__otex_def_thm:nn { definition } { Definition }
+      \__otex_def_thm:nn { example } { Example }
+      \__otex_def_thm:nn { remark } { Remark }
+      \__otex_def_thm:nn { assumption } { Assumption }
+      \__otex_def_thm:nn { conjecture } { Conjecture }
+      \__otex_def_thm:nn { axiom } { Axiom }
+      \__otex_def_thm:nn { problem } { Problem }
+      \__otex_def_thm:nn { exercise } { Exercise }
+      \__otex_def_thm:nn { case } { Case }
 
-          \cs_if_exist:cF { solution } { \newtheorem*{solution}{Solution} }
-        }
-        {
-          \__otex_def_thm:nn { lemma } { 引理 }
-          \__otex_def_thm:nn { proposition } { 命题 }
-          \__otex_def_thm:nn { corollary } { 推论 }
-          \__otex_def_thm:nn { definition } { 定义 }
-          \__otex_def_thm:nn { example } { 例 }
-          \__otex_def_thm:nn { remark } { 注 }
-          \__otex_def_thm:nn { assumption } { 假设 }
-          \__otex_def_thm:nn { conjecture } { 猜想 }
-          \__otex_def_thm:nn { axiom } { 公理 }
-          \__otex_def_thm:nn { problem } { 问题 }
-          \__otex_def_thm:nn { exercise } { 练习 }
-          \__otex_def_thm:nn { case } { 情形 }
+      \cs_if_exist:cF { solution } { \newtheorem*{solution}{Solution} }
+    }
+    {
+      \__otex_def_thm:nn { lemma } { 引理 }
+      \__otex_def_thm:nn { proposition } { 命题 }
+      \__otex_def_thm:nn { corollary } { 推论 }
+      \__otex_def_thm:nn { definition } { 定义 }
+      \__otex_def_thm:nn { example } { 例 }
+      \__otex_def_thm:nn { remark } { 注 }
+      \__otex_def_thm:nn { assumption } { 假设 }
+      \__otex_def_thm:nn { conjecture } { 猜想 }
+      \__otex_def_thm:nn { axiom } { 公理 }
+      \__otex_def_thm:nn { problem } { 问题 }
+      \__otex_def_thm:nn { exercise } { 练习 }
+      \__otex_def_thm:nn { case } { 情形 }
 
-          \cs_if_exist:cF { solution } { \newtheorem*{solution}{解答} }
-        }
-      }
+      \cs_if_exist:cF { solution } { \newtheorem*{solution}{解答} }
     }
   }
 }
