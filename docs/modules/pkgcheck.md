@@ -14,15 +14,32 @@ otex 的所有子模块都不会直接调用标准的 `\RequirePackage`，而是
 
 ### 混合策略工作流 (Hybrid Strategy)
 
-该函数执行一种“混合检测”策略，结合了**Hook机制**、**符号检测**和**预加载保护**：
+该函数执行一种升级版的“四步混合检测”策略，引入了**冲突知识库**以增强安全性：
 
-1. **预加载检查**：首先通过 `\IfPackageLoadedTF` 询问 LaTeX 内核该包是否已被加载。
-    * **如果是**：标记 `\l_otex_pkg_preloaded_bool` 为真，并立即执行 `{配置代码}`（通过 Hook）。
-    * **如果否**：进入符号检测阶段。
+1. **预加载检查 (Preload Check)**：首先通过 `\IfPackageLoadedTF` 询问 LaTeX 内核该包是否已被加载。
+    - **如果是**：标记 `\l_otex_pkg_preloaded_bool` 为真，并立即执行 `{配置代码}`（通过 Hook）。
+    - **如果否**：进入下一步。
 
-2. **符号冲突检测**：检查 `{守卫符号}`（如 `\newlist` 之于 `enumitem`）是否已存在。
-    * **冲突**：如果包未加载但符号已存在，说明有冲突的包（如 `paralist`）占据了生态位。此时 otex **跳过加载**并发出警告（Backoff）。
-    * **安全**：如果符号不存在，说明安全。此时 otex 加载该包，标记 `\l_otex_pkg_preloaded_bool` 为假，并注册 `{配置代码}`。
+2. **知识库冲突检测 (Registry Conflict Check)**：otex 查询内置的 `otex-pkgconflict` 知识库，检查是否有**已知的互斥包**（如 `unicode-math` vs `mathpazo`）已被加载。
+    - **冲突**：如果发现互斥包，otex **跳过加载**并发出这种分组冲突的明确警告。
+    - **无冲突**：进入下一步。
+
+3. **符号冲突检测 (Symbol Safeguard)**：作为最后一道防线，检查 `{守卫符号}`（如 `\newlist` 之于 `enumitem`）是否已存在。这用于捕捉那些知识库尚未收录的隐式冲突。
+    - **冲突**：如果包未加载但符号已存在，说明有未知冲突包占据了生态位。otex **跳过加载**并发出符号冲突警告。
+    - **安全**：进入下一步。
+
+4. **安全加载 (Safe Load)**：确认为安全环境。otex 加载该包，标记 `\l_otex_pkg_preloaded_bool` 为假，并注册 `{配置代码}`。
+
+### 📚 冲突知识库 (Conflict Registry)
+
+otex 现在维护着一个名为 `otex-pkgconflict.sty` 的注册表，记录了 TeX 生态中常见的互斥关系。主要覆盖：
+
+- **数学字体**：`unicode-math`, `mathpazo`, `newtxmath`, `mtpro2` 等。
+- **参考文献**：`biblatex` vs `natbib`, `cite`。
+- **算法包**：`algorithm2e` vs `algorithmic`, `algorithmicx`。
+- **其他**：`subcaption` vs `subfig`, `geometry` vs `fullpage, typearea` 等。
+
+这种集中式的管理让 otex 能够比以往更智能地由“全自动”转为“退避模式”。
 
 ---
 
@@ -34,8 +51,8 @@ otex 遵循“不破坏”原则。当一个包已经被模板或用户预加载
 
 在 `{配置代码}` 中，模块开发者可以使用此布尔标志来区分“加载者”：
 
-* **False (由 otex 加载)**：此时 otex 拥有该包的控制权，应用所有**默认配置**（包括侵入性的样式修改，如字体大小、章节格式等）。
-* **True (被预加载)**：此时 otex 仅作为“客人”。模块应当**跳过**默认样式配置，仅应用**无副作用的增强**（如设置 PDF 元数据、定义辅助命令等）。
+- **False (由 otex 加载)**：此时 otex 拥有该包的控制权，应用所有**默认配置**（包括侵入性的样式修改，如字体大小、章节格式等）。
+- **True (被预加载)**：此时 otex 仅作为“客人”。模块应当**跳过**默认样式配置，仅应用**无副作用的增强**（如设置 PDF 元数据、定义辅助命令等）。
 
 ### 示例 (`otex-caption`)
 

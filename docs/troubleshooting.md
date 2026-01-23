@@ -18,13 +18,18 @@
 
 ## 2. 宏包冲突 (Package Conflict)
 
-**现象**：报错 `Command \XXX already defined` 或 `Option clash for package XXX`。
+**现象**：
+
+- 报错 `Command \XXX already defined` 或 `Option clash for package XXX`。
+- 或者，您可能会看到 otex 的智能警告（非错误）：
+  - `Package 'xxx' conflict: symbol 'yyy' defined. Skipping load.`
+  - `Conflict detected: Package 'xxx' conflicts with loaded package 'yyy'. Skipping.`
 
 **解决方案**：
 
-- otex 内置了智能检测。如果你先于 otex 引入了某个包，otex 会尝试适配。
-- **建议**：尝试将 `\usepackage{otex}` 放在导言区的最前面，让它来管理包的加载顺序和选项平衡。
-- **极致手段**：如果某个模块冲突严重，请禁用它。例如 `\usepackage[notheorems]{otex}`。
+1. **相信 otex 的判断**：如果 otex 提示因为冲突而跳过了某个包的加载（如因 `mathpazo` 而跳过 `unicode-math`），这通常是保护性措施，避免编译崩溃。
+2. **调整加载顺序**：尝试将 `\usepackage{otex}` 放在导言区的最后面，即恰好在 `\begin{document}` 之前，以让 otex 来管理包的加载顺序和选项平衡。
+3. **极致手段**：如果某个模块冲突严重，请禁用它。例如 `\usepackage[notheorems]{otex}`。
 
 ---
 
