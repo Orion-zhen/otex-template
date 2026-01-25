@@ -27,29 +27,6 @@
   }
 }
 
-% ------------------------------------------------------------------------------
-% 兼容层：如果 biblatex 无法加载（由于 natbib 冲突），则为 biblatex 常用命令提供 natbib 封装
-% ------------------------------------------------------------------------------
-\tl_new:N \g_otex_bib_resource_tl
-
-\otex_provide_command:Nnn \addbibresource { m } 
-{ 
-  \tl_gset:Nn \g_otex_bib_resource_tl { #1 } 
-}
-
-\otex_provide_command:Nnn \printbibliography { } 
-{
-  \tl_if_empty:NF \g_otex_bib_resource_tl
-  {
-    \tl_set:NV \l_otex_bib_tmp_tl \g_otex_bib_resource_tl
-    % 移除 .bib 后缀，因为 \bibliography 命令不需要它
-    \regex_replace_once:nnN { \.bib$ } { } \l_otex_bib_tmp_tl
-    \exp_args:NV \bibliography \l_otex_bib_tmp_tl
-  }
-}
-
-\tl_new:N \l_otex_bib_tmp_tl
-
 \str_case:VnF \g_otex_bib_backend_tl
 {
   {biber} { \otex_safe_require:nnnn { biblatex } { backend=biber, style=\g_otex_bib_style_tl, sorting=none, doi=true } { \printbibliography } { \otex_setup_biblatex_config: } }
@@ -58,6 +35,28 @@
 }
 {
   \otex_safe_require:nnnn { biblatex } { backend=biber, style=ieee } { \printbibliography } { \otex_setup_biblatex_config: }
+}
+
+% ------------------------------------------------------------------------------
+% 兼容层：如果 biblatex 无法加载（由于 natbib 冲突），则为 biblatex 常用命令提供 natbib 封装
+% ------------------------------------------------------------------------------
+\tl_new:N \g_otex_bib_resource_tl
+\tl_new:N \l_otex_bib_tmp_tl
+
+\otex_provide_command:Nnn \addbibresource { m }
+{
+  \tl_gset:Nn \g_otex_bib_resource_tl { #1 }
+}
+
+\otex_provide_command:Nnn \printbibliography { }
+{
+  \tl_if_empty:NF \g_otex_bib_resource_tl
+  {
+    \tl_set:NV \l_otex_bib_tmp_tl \g_otex_bib_resource_tl
+    % 移除 .bib 后缀，因为 \bibliography 命令不需要它
+    \regex_replace_once:nnN { \.bib$ } { } \l_otex_bib_tmp_tl
+    \exp_args:NV \bibliography \l_otex_bib_tmp_tl
+  }
 }
 
 \endinput
