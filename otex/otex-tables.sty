@@ -3,8 +3,9 @@
 % 符号冲突检测：通过探测代表性核心命令 (如 \toprule, \multirow) 来判断相关宏包是否已被外部加载
 % 表格功能增强包组：安全地加载 booktabs, multirow, array, longtable, wrapfig
 \otex_safe_require:nnnn { booktabs } {} { \toprule } {}
+\otex_safe_require:nnnn { tabularx } {} { \tabularx } {}
 \otex_safe_require:nnnn { multirow } {} { \multirow } {}
-\otex_safe_require:nnnn { array } {} {} {}
+\otex_safe_require:nnnn { array } {} { \newcolumntype } {}
 \otex_safe_require:nnnn { longtable } {} { \longtable } {}
 \otex_safe_require:nnnn { wrapfig } {} { \wrapfigure } {}
 
