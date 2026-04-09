@@ -26,7 +26,7 @@ otex 将不同的 LaTeX 功能抽象为 20 个独立的子模块。这些模块�
 
 ## 4. 图形、表格与浮动体
 
-- [**`otex-graphics.sty`**](graphics.md)：图片插入 (`graphicx`) 与绘图 (`tikz`)。
+- [**`otex-graphics.sty`**](graphics.md)：图片插入 (`graphicx`) 与彩色盒子 (`tcolorbox`)。
 - [**`otex-tables.sty`**](tables.md)：增强型表格支持 (`tabularx`, `booktabs`)。
 - [**`otex-floats.sty`**](floats.md)：浮动体位置策略与标题 (`caption`) 定制。
 - [**`otex-caption.sty`**](caption.md)：图表标题格式化与子图支持。

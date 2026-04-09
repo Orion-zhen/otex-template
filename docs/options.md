@@ -15,7 +15,7 @@ otex 通过 LaTeX3 的 `keys` 机制提供了一套非常直观的参数配置�
 | `ctex` | `noctex` | `true` | 中文支持 |
 | `theorems` | `notheorems` | `true` | 定理环境 (Theorem, Lemma 等) |
 | `math` | `nomath` | `true` | 数学宏包 (amsmath, unicode-math 等) |
-| `graphics` | `nographics` | `true` | 图片支持 (graphicx, tikz 等) |
+| `graphics` | `nographics` | `true` | 图片支持 (graphicx, tcolorbox) |
 | `code` | - | `true` | 代码块支持 (由 listings 和 minted 开关控制) |
 | `minted` | `nominted` | `true` | 使用 minted (Pygments) 进行代码高亮 |
 | `bib` | `nobib` | `true` | 参考文献支持 |
