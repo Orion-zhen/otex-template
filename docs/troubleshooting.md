@@ -10,7 +10,7 @@
 
 **解决方案**：
 
-1. **检查预设**：虽然 otex 能够自动检测并匹配 `windows`/`linux`/`adobe` 预设，但如果你的系统环境非标准（如在不支持 Noto 的精简版 Linux 上），可能仍会报错。请手动指定 `font-set=linux` 或使用手动模式。
+1. **检查预设**：虽然 otex 能够自动检测并匹配 `windows`/`linux`/`macos` 预设，但如果你的系统环境非标准（如在不支持 Noto 的精简版 Linux 上），可能仍会报错。请手动指定 `font-set=linux` 或使用手动模式。
 2. **使用 fonts-dir**：将所需字体放入项目 `fonts/` 文件夹，并配置 `\usepackage[fonts-dir=fonts]{otex}`。
 3. **手动安装**：在 Windows 下右键安装字体；在 Linux 下将字体放入 `~/.local/share/fonts` 并执行 `fc-cache -fv`。
 

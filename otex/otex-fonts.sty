@@ -1,4 +1,4 @@
-\ProvidesExplPackage {otex/otex-fonts} {2026-01-17} {1.2} {Orion's Font Configuration}
+\ProvidesExplPackage {otex/otex-fonts} {2026-07-31} {1.3} {Orion's Font Configuration}
 
 \bool_if:NF \g_otex_load_fonts_bool { \endinput }
 
@@ -43,14 +43,15 @@
   \defaultfontfeatures+ { Path = \g_otex_fonts_dir_tl / }
 }
 
-% 自动推断逻辑：依据所在的操作系统环境 (Windows/macOS/Linux) 智能匹配最佳的系统字体预设
+% 自动推断逻辑：expl3 将 macOS 与 Linux 都报告为 unix，因此还需检查 macOS 的系统版本文件。
+% 该检测不依赖 shell-escape，适用于受限模式下的 XeTeX/LuaTeX。
 \str_if_eq:VnT \g_otex_font_set_tl { auto }
 {
   \str_if_eq:VnTF \c_sys_platform_str { windows }
   { \tl_gset:Nn \g_otex_font_set_tl { windows } }
   {
-    \str_if_eq:VnTF \c_sys_platform_str { macos }
-    { \tl_gset:Nn \g_otex_font_set_tl { adobe } }
+    \file_if_exist:nTF { /System/Library/CoreServices/SystemVersion.plist }
+    { \tl_gset:Nn \g_otex_font_set_tl { macos } }
     { \tl_gset:Nn \g_otex_font_set_tl { linux } }
   }
 }
@@ -76,6 +77,12 @@
     \otex_set_font:nnn \g_otex_font_sans_tl \setsansfont { Liberation~Sans }
     \otex_set_font:nnn \g_otex_font_mono_tl \setmonofont { Liberation~Mono }
   }
+  {macos}
+  {
+    \otex_set_font:nnn \g_otex_font_main_tl \setmainfont { Times }
+    \otex_set_font:nnn \g_otex_font_sans_tl \setsansfont { Helvetica~Neue }
+    \otex_set_font:nnn \g_otex_font_mono_tl \setmonofont { Menlo }
+  }
   {adobe}
   {
     \otex_set_font:nnn \g_otex_font_main_tl \setmainfont { Source~Serif~Pro }
@@ -90,10 +97,10 @@
   \tl_if_empty:NTF #1 { #2 { #3 } } { #2 { #1 } }
 }
 
-% CJK
+% CJK：ctex 在 XeTeX 与 LuaTeX 下均提供 \setCJK...font 接口。
 \bool_if:NT \g_otex_load_ctex_bool
 {
-  \@ifpackageloaded{xeCJK}
+  \cs_if_exist:NT \setCJKmainfont
   {
     % 确定预设默认值
     \tl_set:Nn \l_otex_cjk_main_default_tl { SimSun }
@@ -105,6 +112,17 @@
         \tl_set:Nn \l_otex_cjk_main_default_tl { Noto~Serif~CJK~SC }
         \tl_set:Nn \l_otex_cjk_sans_default_tl { Noto~Sans~CJK~SC }
         \tl_set:Nn \l_otex_cjk_mono_default_tl { Noto~Sans~Mono~CJK~SC }
+      }
+      {macos} {
+        \tl_set:Nn \l_otex_cjk_main_default_tl { Songti~SC }
+        \tl_set:Nn \l_otex_cjk_sans_default_tl { PingFang~SC }
+        \tl_set:Nn \l_otex_cjk_mono_default_tl { PingFang~SC }
+        % luaotfload 无法索引新版 macOS 的 MobileAsset PingFang，改用同为系统内置的黑体。
+        \sys_if_engine_luatex:T
+        {
+          \tl_set:Nn \l_otex_cjk_sans_default_tl { Heiti~SC }
+          \tl_set:Nn \l_otex_cjk_mono_default_tl { Heiti~SC }
+        }
       }
       {adobe} {
         \tl_set:Nn \l_otex_cjk_main_default_tl { Source~Han~Serif~CN }
@@ -118,7 +136,6 @@
     \otex_set_cjk_font:nnn \g_otex_font_cjk_sans_tl \setCJKsansfont { \l_otex_cjk_sans_default_tl }
     \otex_set_cjk_font:nnn \g_otex_font_cjk_mono_tl \setCJKmonofont { \l_otex_cjk_mono_default_tl }
   }
-  {}
 }
 
 % 现代数学字体适配：仅在用户通过全局选项明确指定数学字体时，才启用 unicode-math 的动态配置

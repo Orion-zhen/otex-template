@@ -29,7 +29,7 @@ otex 通过 LaTeX3 的 `keys` 机制提供了一套非常直观的参数配置�
 | :--- | :--- | :--- | :--- |
 | `bib-backend` | `biblatex` | `bibtex`, `biber` | 参考文献处理后端 |
 | `bib-style` | `ieee` | `gb7714-2015`, `nature` | 参考文献引用样式 |
-| `font-set` | `auto` | `windows`, `linux`, `adobe`, `none` | 字体预设方案 (auto 模式下会自动检测操作系统) |
+| `font-set` | `auto` | `windows`, `linux`, `macos`, `adobe`, `none` | 字体预设方案（auto 模式下会自动检测操作系统） |
 | `fonts-dir` | (空) | `fonts` | 自定义字体搜索路径 |
 | `pdf-title` | `Generated Document` | `{我的论文}` | 自动设置 PDF Meta 属性 |
 | `pdf-author` | `Orion` | `{张三}` | 自动设置 PDF Meta 属性 |

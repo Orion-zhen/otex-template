@@ -10,7 +10,7 @@ otex 默认会检测你的载入类 (document class) 以及 **操作系统 (OS)*
 
 - **Windows**: 自动切换到 `windows` 预设。
 - **Linux**: 自动切换到 `linux` 预设 (使用 Liberation 和 Noto 字体)。
-- **macOS (Darwin)**: 自动切换到 `adobe` 预设 (使用 Source 家族字体)。
+- **macOS (Darwin)**: 自动切换到 `macos` 预设（使用 macOS 内置字体）。
 
 你也可以手动指定：
 
@@ -18,6 +18,7 @@ otex 默认会检测你的载入类 (document class) 以及 **操作系统 (OS)*
 | :--- | :--- | :--- | :--- |
 | `font-set=windows` | Windows 环境 | Times New Roman, Arial, Courier New | 中易宋体 (SimSun), 黑体 (SimHei), 仿宋 (FangSong) |
 | `font-set=linux` | Linux (Ubuntu/Debian等) | Liberation Serif, Sans, Mono | Noto Serif CJK SC, Noto Sans CJK SC, Noto Sans Mono CJK SC |
+| `font-set=macos` | macOS | Times, Helvetica Neue, Menlo | Songti SC, PingFang SC, PingFang SC（LuaLaTeX 下后两者使用 Heiti SC） |
 | `font-set=adobe` | 专业出版/开源 | Source Serif Pro, Source Sans Pro, Source Code Pro | Source Han Serif CN, Source Han Sans CN, Source Han Sans CN |
 | `font-set=none` | **手动模式** | 不加载任何预设，仅保留宏包环境 | 不加载任何预设 |
 
